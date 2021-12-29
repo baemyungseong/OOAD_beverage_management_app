@@ -24,6 +24,9 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+//import Firebase stuffs
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+
 class profileManagementScreen extends StatelessWidget {
   const profileManagementScreen({Key? key}) : super(key: key);
 
@@ -89,7 +92,7 @@ class profileManagementScreen extends StatelessWidget {
                                   padding: EdgeInsets.only(top: 8, left: appPadding + 18, right: appPadding),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(16.0),
-                                    child: Image.asset(amUserAvatar, scale: 10),
+                                    child: Image.network(currentUser.avatar, scale: 10),
                                   ),
                                 ),
                                 Container(
@@ -99,13 +102,14 @@ class profileManagementScreen extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Noob Chảo',
-                                        style: TextStyle(
-                                          color: blackLight,
-                                          fontFamily: 'SFProText',
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: title24
-                                        ),
+                                      currentUser.name,
+                                      style: TextStyle(
+                                        color: blackLight,
+                                        fontFamily: 'SFProText',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: title20
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                       ),
                                       SizedBox(height: 4),
                                       SizedBox(
@@ -119,8 +123,24 @@ class profileManagementScreen extends StatelessWidget {
                                         ),
                                       ),
                                       SizedBox(height: 8),
+                                      Flexible(
+                                        child: 
+                                        Text(
+                                          currentUser.email,
+                                          style: TextStyle(
+                                            color: blackLight,
+                                            fontFamily: 'SFProText',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: content12
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          softWrap: false,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
                                       Text(
-                                        'nhatkb2001@gmail.com',
+                                        currentUser.phone_number,
                                         style: TextStyle(
                                           color: blackLight,
                                           fontFamily: 'SFProText',
@@ -130,24 +150,14 @@ class profileManagementScreen extends StatelessWidget {
                                       ),
                                       SizedBox(height: 8),
                                       Text(
-                                        '84+ 902311293',
+                                        '@ ' + currentUser.dob,
                                         style: TextStyle(
                                           color: blackLight,
                                           fontFamily: 'SFProText',
                                           fontWeight: FontWeight.w500,
                                           fontSize: content12
                                         ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        '@26/03/2001',
-                                        style: TextStyle(
-                                          color: blackLight,
-                                          fontFamily: 'SFProText',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: content12
-                                        ),
-                                      ),
+                                      ),                                                                      
                                     ],
                                   )
                                 )
@@ -645,3 +655,4 @@ class profileManagementScreen extends StatelessWidget {
     );
   }
 }
+

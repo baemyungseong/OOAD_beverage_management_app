@@ -19,6 +19,7 @@ import 'package:ui_fresh_app/views/authentication/signIn.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 
 datePickerDialog(BuildContext context, selectDate, category) {
   return showRoundedDatePicker(
@@ -245,21 +246,14 @@ logoutDialog(BuildContext context) {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => signInScreen(),
-                        ),
-                      );
+                      firebaseAuth().signOut();
+                      Navigator.of(context).pushAndRemoveUntil(
+                           MaterialPageRoute(
+                               builder: (context) =>
+                                   signInScreen()),
+                           (Route<dynamic> route) => false);
                       showSnackBar(context, "Your account is logged out!", 'success');
                     },
-                    // onTap: () => signOutUser().then((value) {
-                    //   Navigator.of(context).pushAndRemoveUntil(
-                    //       MaterialPageRoute(
-                    //           builder: (context) =>
-                    //               authenticationWrapper()),
-                    //       (Route<dynamic> route) => false);
-                    // }),
                     child: Container(
                       width: 122,
                       height: 40,

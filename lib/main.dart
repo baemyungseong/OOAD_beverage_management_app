@@ -8,6 +8,9 @@ import 'package:ui_fresh_app/views/authentication/signIn.dart';
 //import others
 import 'package:shared_preferences/shared_preferences.dart';
 
+//import Firebase stuffs
+import 'package:firebase_core/firebase_core.dart';
+
 int initScreen = 0;
 
 Future<void> main() async {
@@ -15,6 +18,7 @@ Future<void> main() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
   initScreen = (preferences.getInt('initScreen') ?? 0);
   await preferences.setInt('initScreen', 1);
+  await Firebase.initializeApp();
   runApp(FreshApp());
 }
 
