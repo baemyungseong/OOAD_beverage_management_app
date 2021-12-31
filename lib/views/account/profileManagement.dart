@@ -6,6 +6,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/models/appUser.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -23,12 +24,24 @@ import 'package:ui_fresh_app/views/account/termCondition.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 //import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
-class profileManagementScreen extends StatelessWidget {
+class profileManagementScreen extends StatefulWidget {
   const profileManagementScreen({Key? key}) : super(key: key);
+
+  @override
+  _profileManagementScreenState createState() => _profileManagementScreenState();
+}
+ 
+class _profileManagementScreenState extends State<profileManagementScreen>
+{
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,10 +103,7 @@ class profileManagementScreen extends StatelessWidget {
                               children: [
                                 Container(
                                   padding: EdgeInsets.only(top: 8, left: appPadding + 18, right: appPadding),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(16.0),
-                                    child: Image.network(currentUser.avatar, scale: 10),
-                                  ),
+                                  child: displayAvatar(),
                                 ),
                                 Container(
                                   padding: EdgeInsets.only(top: 4, right: appPadding + 18),
@@ -150,7 +160,7 @@ class profileManagementScreen extends StatelessWidget {
                                       ),
                                       SizedBox(height: 8),
                                       Text(
-                                        '@ ' + currentUser.dob,
+                                        '@' + currentUser.dob,
                                         style: TextStyle(
                                           color: blackLight,
                                           fontFamily: 'SFProText',
@@ -361,13 +371,9 @@ class profileManagementScreen extends StatelessWidget {
                             child: GestureDetector(
                               //action navigate to dashboard screen
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        profileDetailScreen(),
-                                  ),
-                                );
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => profileDetailScreen()))
+                                .then((value) => setState(() {
+                                }));
                               },
                               child: AnimatedContainer(
                                 alignment: Alignment.center,
@@ -655,4 +661,17 @@ class profileManagementScreen extends StatelessWidget {
     );
   }
 }
+
+Widget displayAvatar() => ClipRRect(
+  borderRadius: BorderRadius.circular(16.0),
+  child: CachedNetworkImage(
+    imageUrl: currentUser.avatar,
+    height: 92,
+    width: 92,
+    fit: BoxFit.cover,
+    placeholder: (context, url) => 
+      Center(child: CircularProgressIndicator()),
+  ),
+);
+
 

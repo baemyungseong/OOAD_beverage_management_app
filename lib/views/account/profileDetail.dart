@@ -6,16 +6,24 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
+
+//import models
+import 'package:ui_fresh_app/models/appUser.dart';
 
 //import others
 import 'package:meta/meta.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+
+
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class profileDetailScreen extends StatefulWidget {
   const profileDetailScreen({Key? key}) : super(key: key);
@@ -32,7 +40,7 @@ class _profileDetailScreenState extends State<profileDetailScreen>
   TextEditingController phoneNumberController = TextEditingController();
   GlobalKey<FormState> phoneNumberFormKey = GlobalKey<FormState>();
 
-  late DateTime selectDate = DateTime.now();
+  late DateTime selectDate = new DateFormat("dd/MM/yyyy").parse(currentUser.dob);
 
   @override
   Widget build(BuildContext context) {
@@ -267,7 +275,7 @@ class _profileDetailScreenState extends State<profileDetailScreen>
                                   "${DateFormat('yMMMMd').format(selectDate)}",
                                   style: TextStyle(
                                     color: grey8,
-                                    fontFamily: 'Poppins',
+                                    fontFamily: 'SFProText',
                                     fontWeight: FontWeight.w400,
                                     fontSize: 14,
                                   ),
@@ -320,10 +328,10 @@ class _profileDetailScreenState extends State<profileDetailScreen>
                       onTap: () {
                         if(nameFormKey.currentState!.validate()) {
                           if (phoneNumberFormKey.currentState!.validate()) {
-                            showSnackBar(context, 'Successfully changed the profile!', 'success');
-                            Navigator.pop(context);
+                            showSnackBar(context, 'Successfully changed the profile details!', 'success');
+                            controlChangeDetails();
                           } else {
-                            showSnackBar(context, 'Your phone number is incorrect!', 'error');
+                            showSnackBar(context, 'Your phone number is invalid!', 'error');
                           }
                         } else if (phoneNumberFormKey.currentState!.validate()) {
                           showSnackBar(context, 'Your user name can not be blank!', 'error');
@@ -358,7 +366,7 @@ class _profileDetailScreenState extends State<profileDetailScreen>
                           "Confirm",
                           style: TextStyle(
                               color: white,
-                              fontFamily: 'Poppins',
+                              fontFamily: 'SFProText',
                               fontWeight: FontWeight.w600,
                               fontSize: textButton20),
                         ),
@@ -373,6 +381,20 @@ class _profileDetailScreenState extends State<profileDetailScreen>
       ),
     );
   }
+
+  controlChangeDetails() async {
+    userReference.doc(currentUser.id).update({
+      "name": nameController.text,
+      "phone number": phoneNumberController.text,
+      "dob": DateFormat("dd/MM/yyyy").format(selectDate),
+    });
+
+    //Update local appUser's details due to Firestore user's details
+    DocumentSnapshot documentSnapshot = await userReference.doc(currentUser.id).get();
+    currentUser = appUser.fromDocument(documentSnapshot);
+
+    Navigator.pop(context);
+  } 
 }
 
 //Create validation

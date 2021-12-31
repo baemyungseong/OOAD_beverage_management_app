@@ -11,7 +11,7 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/views/serve/dashboard/svDashboard.dart';
 import 'package:ui_fresh_app/views/serve/mainTask/svMainTaskManagement.dart';
 import 'package:ui_fresh_app/views/serve/invoice/svInvoiceManagement.dart';
-import 'package:ui_fresh_app/views/serve/incidentReport/svIncidentReportManagement.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportManagement.dart';
 
 //import others
 import 'package:flutter_svg/flutter_svg.dart';
@@ -46,7 +46,7 @@ class _serveNavigationBarState extends State<serveNavigationBar>
           svDashboardManagementScreen(),
           svMainTaskManagementScreen(),
           svInvoiceManagementScreen(),
-          svIncidentReportManagementScreen()
+          IncidentReportManagementScreen()
         ],
         controller: _tabController,
         //onPageChanged: whenPageChanged,

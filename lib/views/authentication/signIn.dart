@@ -6,6 +6,8 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+
+//import models
 import 'package:ui_fresh_app/models/appUser.dart';
 
 //import widgets

@@ -8,7 +8,7 @@ import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
 
 //import views
-import 'package:ui_fresh_app/views/accountant/incidentReport/atIncidentReportDetail.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportDetail.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -197,7 +197,7 @@ class _atTabViewWidgetState extends State<atTabViewWidget>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          atIncidentReportDetailScreen(),
+                                          IncidentReportDetailScreen(),
                                     ),
                                   );
                                 },
@@ -350,7 +350,7 @@ class _atTabViewWidgetState extends State<atTabViewWidget>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          atIncidentReportDetailScreen(),
+                                          IncidentReportDetailScreen(),
                                     ),
                                   );
                                 },
@@ -503,7 +503,7 @@ class _atTabViewWidgetState extends State<atTabViewWidget>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          atIncidentReportDetailScreen(),
+                                          IncidentReportDetailScreen(),
                                     ),
                                   );
                                 },

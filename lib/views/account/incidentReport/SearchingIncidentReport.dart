@@ -12,27 +12,27 @@ import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/storekeeper/incidentReport/skIncidentReportDetail.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportDetail.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class skIncidentReportSearchingScreen extends StatefulWidget {
-  skIncidentReportSearchingScreen(
+class IncidentReportSearchingScreen extends StatefulWidget {
+  IncidentReportSearchingScreen(
       {Key? key, required this.searchResult, required this.haveFilter})
       : super(key: key);
   String searchResult;
   bool haveFilter;
 
   @override
-  _skIncidentReportSearchingScreenState createState() =>
-      _skIncidentReportSearchingScreenState();
+  _IncidentReportSearchingScreenState createState() =>
+      _IncidentReportSearchingScreenState();
 }
 
-class _skIncidentReportSearchingScreenState
-    extends State<skIncidentReportSearchingScreen> {
+class _IncidentReportSearchingScreenState
+    extends State<IncidentReportSearchingScreen> {
   TextEditingController searchController = TextEditingController();
   bool? useFilter;
 
@@ -85,7 +85,7 @@ class _skIncidentReportSearchingScreenState
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        skIncidentReportDetailScreen(),
+                                        IncidentReportDetailScreen(),
                                   ),
                                 );
                               },

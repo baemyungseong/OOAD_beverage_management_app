@@ -12,7 +12,7 @@ import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/accountant/incidentReport/atIncidentReportEditing.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportEditing.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -22,16 +22,16 @@ import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
-class atIncidentReportDetailScreen extends StatefulWidget {
-  atIncidentReportDetailScreen({Key? key}) : super(key: key);
+class IncidentReportDetailScreen extends StatefulWidget {
+  IncidentReportDetailScreen({Key? key}) : super(key: key);
 
   @override
-  _atIncidentReportDetailScreenState createState() =>
-      _atIncidentReportDetailScreenState();
+  _IncidentReportDetailScreenState createState() =>
+      _IncidentReportDetailScreenState();
 }
 
-class _atIncidentReportDetailScreenState
-    extends State<atIncidentReportDetailScreen> {
+class _IncidentReportDetailScreenState
+    extends State<IncidentReportDetailScreen> {
   TextEditingController troubleNameController = TextEditingController();
 
   bool isCheckout = false;
@@ -172,143 +172,143 @@ class _atIncidentReportDetailScreenState
                                           ),
                                         ),
                                       ),
-                                      // SizedBox(height: 24),
-                                      // Container(
-                                      //   child: Text(
-                                      //     "Person in change",
-                                      //     style: TextStyle(
-                                      //       fontFamily: "SFProText",
-                                      //       fontSize: title20,
-                                      //       color: blackLight,
-                                      //       fontWeight: FontWeight.w600,
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      // SizedBox(height: 16),
-                                      // Container(
-                                      //   // height: 465,
-                                      //   child: ListView.separated(
-                                      //     physics: const NeverScrollableScrollPhysics(),
-                                      //     padding: EdgeInsets.zero,
-                                      //     scrollDirection: Axis.vertical,
-                                      //     shrinkWrap: true,
-                                      //     itemCount: 2,
-                                      //     separatorBuilder: (BuildContext context, int index) =>
-                                      //         SizedBox(height: 12),
-                                      //     itemBuilder: (context, index) {
-                                      //       return GestureDetector(
-                                      //         // onTap: () {
-                                      //         //   removeUserDialog(context);
-                                      //         // },
-                                      //         child: Container(
-                                      //           decoration: BoxDecoration(
-                                      //             color: blueLight,
-                                      //             borderRadius: BorderRadius.circular(8)
-                                      //           ),
-                                      //           height: 48,
-                                      //           width: 319,
-                                      //           child: Column(
-                                      //             mainAxisAlignment: MainAxisAlignment.center,
-                                      //               crossAxisAlignment: CrossAxisAlignment.start,
-                                      //               children: [
-                                      //                 Row(
-                                      //                   crossAxisAlignment: CrossAxisAlignment.center,
-                                      //                   mainAxisAlignment: MainAxisAlignment.start,
-                                      //                   children: [
-                                      //                     SizedBox(width: 16),
-                                      //                     AnimatedContainer(
-                                      //                       alignment: Alignment.center,
-                                      //                       duration: Duration(milliseconds: 300),
-                                      //                       height: 32,
-                                      //                       width: 32,
-                                      //                       decoration: BoxDecoration(
-                                      //                         color: blueWater,
-                                      //                         borderRadius:
-                                      //                             BorderRadius.circular(8),
-                                      //                         image: DecorationImage(
-                                      //                             image: NetworkImage(
-                                      //                                 'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
-                                      //                             fit: BoxFit.cover),
-                                      //                         shape: BoxShape.rectangle,
-                                      //                       ),
-                                      //                     ),
-                                      //                     SizedBox(width: 16),
-                                      //                     Column(
-                                      //                       crossAxisAlignment: CrossAxisAlignment.start,
-                                      //                       mainAxisAlignment: MainAxisAlignment.center,
-                                      //                       children: [
-                                      //                         Row(
-                                      //                           children: [
-                                      //                             Container(
-                                      //                               width: 168,
-                                      //                               child: Text(
-                                      //                                 'Pan Cái Chảo',
-                                      //                                 style: TextStyle(
-                                      //                                   fontSize: content14,
-                                      //                                   fontWeight: FontWeight.w600,
-                                      //                                   fontFamily: 'SFProText',
-                                      //                                   color: blackLight,
-                                      //                                 ),
-                                      //                               ),
-                                      //                             ),
-                                      //                             SizedBox(width: 43 - 24),
-                                      //                             Container(
-                                      //                               height: 16,
-                                      //                               width: 44,
-                                      //                               decoration: BoxDecoration(
-                                      //                                 borderRadius:
-                                      //                                     BorderRadius.circular(
-                                      //                                         4.0),
-                                      //                                 color: blueWater,
-                                      //                               ),
-                                      //                               child: Center(
-                                      //                                 child: Text(
-                                      //                                   'Accountant',
-                                      //                                   style: TextStyle(
-                                      //                                     fontFamily: 'SFProText',
-                                      //                                     fontSize: content6,
-                                      //                                     fontWeight:
-                                      //                                         FontWeight.w500,
-                                      //                                     color: white,
-                                      //                                   ),
-                                      //                                 ),
-                                      //                               ),
-                                      //                             ),
-                                      //                           ],
-                                      //                         ),
-                                      //                         SizedBox(height: 4),
-                                      //                         Row(
-                                      //                           children: [
-                                      //                             Icon(
-                                      //                               Iconsax.sms,
-                                      //                               color: blackLight,
-                                      //                               size: 12,
-                                      //                             ),
-                                      //                             SizedBox(
-                                      //                               width: 4,
-                                      //                             ),
-                                      //                             Text(
-                                      //                               'nhatkb2001@gmail.com',
-                                      //                               style: TextStyle(
-                                      //                                 fontFamily: 'SFProText',
-                                      //                                 fontSize: content8,
-                                      //                                 fontWeight: FontWeight.w500,
-                                      //                                 color: grey8,
-                                      //                               ),
-                                      //                             ),
-                                      //                           ],
-                                      //                         ),
-                                      //                       ],
-                                      //                     ),
-                                      //                   ],
-                                      //                 ),
-                                      //               ]
-                                      //             ),
-                                      //         ),
-                                      //       );
-                                      //     },
-                                      //   ),
-                                      // ),
+                                      SizedBox(height: 24),
+                                      Container(
+                                        child: Text(
+                                          "Performer",
+                                          style: TextStyle(
+                                            fontFamily: "SFProText",
+                                            fontSize: title20,
+                                            color: blackLight,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Container(
+                                        // height: 465,
+                                        child: ListView.separated(
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          padding: EdgeInsets.zero,
+                                          scrollDirection: Axis.vertical,
+                                          shrinkWrap: true,
+                                          itemCount: 2,
+                                          separatorBuilder: (BuildContext context, int index) =>
+                                              SizedBox(height: 12),
+                                          itemBuilder: (context, index) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                watchUserDialog(context);
+                                              },
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: blueLight,
+                                                  borderRadius: BorderRadius.circular(8)
+                                                ),
+                                                height: 48,
+                                                width: 319,
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          SizedBox(width: 16),
+                                                          AnimatedContainer(
+                                                            alignment: Alignment.center,
+                                                            duration: Duration(milliseconds: 300),
+                                                            height: 32,
+                                                            width: 32,
+                                                            decoration: BoxDecoration(
+                                                              color: blueWater,
+                                                              borderRadius:
+                                                                  BorderRadius.circular(8),
+                                                              image: DecorationImage(
+                                                                  image: NetworkImage(
+                                                                      'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
+                                                                  fit: BoxFit.cover),
+                                                              shape: BoxShape.rectangle,
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 16),
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Container(
+                                                                    width: 168,
+                                                                    child: Text(
+                                                                      'Pan Cái Chảo',
+                                                                      style: TextStyle(
+                                                                        fontSize: content14,
+                                                                        fontWeight: FontWeight.w600,
+                                                                        fontFamily: 'SFProText',
+                                                                        color: blackLight,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(width: 43 - 24),
+                                                                  Container(
+                                                                    height: 16,
+                                                                    width: 44,
+                                                                    decoration: BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              4.0),
+                                                                      color: blueWater,
+                                                                    ),
+                                                                    child: Center(
+                                                                      child: Text(
+                                                                        'Accountant',
+                                                                        style: TextStyle(
+                                                                          fontFamily: 'SFProText',
+                                                                          fontSize: content6,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                          color: white,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              SizedBox(height: 4),
+                                                              Row(
+                                                                children: [
+                                                                  Icon(
+                                                                    Iconsax.sms,
+                                                                    color: blackLight,
+                                                                    size: 12,
+                                                                  ),
+                                                                  SizedBox(
+                                                                    width: 4,
+                                                                  ),
+                                                                  Text(
+                                                                    'nhatkb2001@gmail.com',
+                                                                    style: TextStyle(
+                                                                      fontFamily: 'SFProText',
+                                                                      fontSize: content8,
+                                                                      fontWeight: FontWeight.w500,
+                                                                      color: grey8,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ]
+                                                  ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
                                       // Container(
                                       //   child: Column(children: [
                                       //     Container(
@@ -716,7 +716,6 @@ class _atIncidentReportDetailScreenState
                             size: 32, color: blackLight),
                       ),
                       Spacer(),
-                      
                       Container(
                           child: GestureDetector(
                         onTap: () {
@@ -778,7 +777,7 @@ class _atIncidentReportDetailScreenState
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      atIncidentReportEditingScreen(),
+                                      IncidentReportEditingScreen(),
                                 ),
                               );
                               // .then((value) {});
