@@ -1,4 +1,4 @@
-package com.example.ui_beverage_management_app
+package com.seuit.freshapp
 
 import io.flutter.embedding.android.FlutterActivity
 

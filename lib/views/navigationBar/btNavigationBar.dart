@@ -11,7 +11,7 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/views/bartender/dashboard/btDashboardManagement.dart';
 import 'package:ui_fresh_app/views/bartender/mainTask/btMainTaskManagement.dart';
 import 'package:ui_fresh_app/views/bartender/inventory/btInventoryManagement.dart';
-import 'package:ui_fresh_app/views/bartender/incidentReport/btIncidentReportManagement.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportManagement.dart';
 
 //import others
 import 'package:flutter_svg/flutter_svg.dart';
@@ -46,7 +46,7 @@ class _bartenderNavigationBarState extends State<bartenderNavigationBar>
           btDashboardManagementScreen(),
           btMainTaskManagementScreen(),
           btInventoryManagementScreen(),
-          btIncidentReportManagementScreen()
+          IncidentReportManagementScreen()
         ],
         controller: _tabController,
         //onPageChanged: whenPageChanged,

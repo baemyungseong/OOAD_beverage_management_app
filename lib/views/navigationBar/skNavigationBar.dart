@@ -10,7 +10,7 @@ import 'package:ui_fresh_app/constants/others.dart';
 //import views
 import 'package:ui_fresh_app/views/storekeeper/dashboard/skDashboard.dart';
 import 'package:ui_fresh_app/views/storekeeper/user/skUserManagement.dart';
-import 'package:ui_fresh_app/views/storekeeper/incidentReport/skIncidentReportManagement.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportManagement.dart';
 
 //import others
 import 'package:flutter_svg/flutter_svg.dart';
@@ -45,7 +45,7 @@ class _storekeeperNavigationBarState extends State<storekeeperNavigationBar>
         children: <Widget>[
           skDashboardScreen(),
           skUserManagementScreen(),
-          skIncidentReportManagementScreen()
+          IncidentReportManagementScreen()
         ],
         controller: _tabController,
         //onPageChanged: whenPageChanged,

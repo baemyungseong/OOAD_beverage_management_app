@@ -13,9 +13,9 @@ import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import screens
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
-import 'package:ui_fresh_app/views/bartender/incidentReport/btSearchingIncidentReport.dart';
-import 'package:ui_fresh_app/views/bartender/btWidget/btTabView.dart';
-import 'package:ui_fresh_app/views/bartender/incidentReport/btIncidentReportCreating.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportCreating.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/SearchingIncidentReport.dart';
+import 'package:ui_fresh_app/views/storekeeper/skWidget/skTabView.dart';
 
 //import others
 import 'package:flutter/services.dart';
@@ -23,14 +23,14 @@ import 'package:another_xlider/another_xlider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
-class btIncidentReportManagementScreen extends StatefulWidget {
-  const btIncidentReportManagementScreen({Key? key}) : super(key: key);
+class IncidentReportManagementScreen extends StatefulWidget {
+  const IncidentReportManagementScreen({Key? key}) : super(key: key);
 
   @override
-  State<btIncidentReportManagementScreen> createState() => _btIncidentReportManagementScreenState();
+  State<IncidentReportManagementScreen> createState() => _IncidentReportManagementScreenState();
 }
 
-class _btIncidentReportManagementScreenState extends State<btIncidentReportManagementScreen>
+class _IncidentReportManagementScreenState extends State<IncidentReportManagementScreen>
     with SingleTickerProviderStateMixin {
 
   TextEditingController searchController = TextEditingController();
@@ -188,7 +188,7 @@ class _btIncidentReportManagementScreenState extends State<btIncidentReportManag
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    btIncidentReportCreatingScreen(),
+                                    IncidentReportCreatingScreen(),
                               ),
                             );
                           },
@@ -238,7 +238,7 @@ class _btIncidentReportManagementScreenState extends State<btIncidentReportManag
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  btIncidentReportSearchingScreen(
+                                  IncidentReportSearchingScreen(
                                 searchResult: searchController.text,
                                 haveFilter: haveFilter,
                               ),
@@ -290,7 +290,7 @@ class _btIncidentReportManagementScreenState extends State<btIncidentReportManag
                   SizedBox(
                     height: 24,
                   ),
-                  btTabViewWidget(),
+                  skTabViewWidget(),
                 ],
               ),
             ),

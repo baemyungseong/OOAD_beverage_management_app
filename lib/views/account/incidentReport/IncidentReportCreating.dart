@@ -19,16 +19,16 @@ import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
-class btIncidentReportCreatingScreen extends StatefulWidget {
-  btIncidentReportCreatingScreen({Key? key}) : super(key: key);
+class IncidentReportCreatingScreen extends StatefulWidget {
+  IncidentReportCreatingScreen({Key? key}) : super(key: key);
 
   @override
-  _btIncidentReportCreatingScreenState createState() =>
-      _btIncidentReportCreatingScreenState();
+  _IncidentReportCreatingScreenState createState() =>
+      _IncidentReportCreatingScreenState();
 }
 
-class _btIncidentReportCreatingScreenState
-    extends State<btIncidentReportCreatingScreen> with InputValidationMixin {
+class _IncidentReportCreatingScreenState
+    extends State<IncidentReportCreatingScreen> with InputValidationMixin {
 
   TextEditingController troubleNameController = TextEditingController();
 
@@ -40,7 +40,7 @@ class _btIncidentReportCreatingScreenState
   GlobalKey<FormState> relatedFormKey = GlobalKey<FormState>();
 
   bool isCheckout = false;
-
+  bool isStatusValid = false;
   bool isDateValid = true;
   bool isTroubleValid = false;
 
@@ -55,6 +55,7 @@ class _btIncidentReportCreatingScreenState
           onTap: () {
             setState(() {
               selected = index;
+              isStatusValid = true;
             });
           },
           child: AnimatedContainer(
@@ -291,40 +292,40 @@ class _btIncidentReportCreatingScreenState
                                               )),
                                         ),
                                       ),
-                                      // SizedBox(height: 24),
-                                      // Container(
-                                      //   child: Text(
-                                      //     'Status',
-                                      //     style: TextStyle(
-                                      //       fontFamily: "SFProText",
-                                      //       fontSize: 20.0,
-                                      //       color: blackLight,
-                                      //       fontWeight: FontWeight.w600,
-                                      //     ),
-                                      //   ),
-                                      // ),
-                                      // SizedBox(height: 16),
-                                      // Container(
-                                      //   child: Column(
-                                      //     crossAxisAlignment: CrossAxisAlignment.start,
-                                      //     children: [
-                                      //       SizedBox(height: 12),
-                                      //       Column(
-                                      //         children: [
-                                      //           Row(
-                                      //             children: [
-                                      //               customRadio('Done', 1),
-                                      //               SizedBox(
-                                      //                 width: 16,
-                                      //               ),
-                                      //               customRadio('Processing', 2),
-                                      //             ],
-                                      //           ),
-                                      //         ],
-                                      //       ),
-                                      //     ],
-                                      //   ),
-                                      // ),
+                                      SizedBox(height: 24),
+                                      Container(
+                                        child: Text(
+                                          'Status',
+                                          style: TextStyle(
+                                            fontFamily: "SFProText",
+                                            fontSize: 20.0,
+                                            color: blackLight,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 16),
+                                      Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            SizedBox(height: 12),
+                                            Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    customRadio('Done', 1),
+                                                    SizedBox(
+                                                      width: 16,
+                                                    ),
+                                                    customRadio('Processing', 2),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       SizedBox(height: 24),
                                       Container(
                                         child: Text(
@@ -889,7 +890,8 @@ class _btIncidentReportCreatingScreenState
                         onTap: () {
                           if (nameFormKey.currentState!.validate() &&
                               reasonFormKey.currentState!.validate() &&
-                              relatedFormKey.currentState!.validate()) {
+                              relatedFormKey.currentState!.validate() &&
+                              isStatusValid == true) {
                             Navigator.pop(context);
                             showSnackBar(context, 'The incident report have been created!', 'success');
                           } else {

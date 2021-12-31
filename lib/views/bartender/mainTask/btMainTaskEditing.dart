@@ -6,7 +6,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
-import 'package:ui_fresh_app/views/bartender/incidentReport/btIncidentReportCreating.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportCreating.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';

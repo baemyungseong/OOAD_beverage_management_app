@@ -11,7 +11,7 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/views/accountant/dashboard/atDashboard.dart';
 import 'package:ui_fresh_app/views/accountant/mainTask/atMainTaskManagement.dart';
 import 'package:ui_fresh_app/views/accountant/reex/atReexManagement.dart';
-import 'package:ui_fresh_app/views/accountant/incidentReport/atIncidentReportManagement.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportManagement.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -45,7 +45,7 @@ class _accountantNavigationBarState extends State<accountantNavigationBar>
           atDashboardScreen(),
           atMainTaskManagementScreen(),
           atReexManagementScreen(),
-          atIncidentReportManagementScreen()
+          IncidentReportManagementScreen()
         ],
         controller: _tabController,
         //onPageChanged: whenPageChanged,

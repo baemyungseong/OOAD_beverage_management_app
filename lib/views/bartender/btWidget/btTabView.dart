@@ -8,7 +8,7 @@ import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
 
 //import views
-import 'package:ui_fresh_app/views/bartender/incidentReport/btIncidentReportDetail.dart';
+import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportDetail.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -197,7 +197,7 @@ class _btTabViewWidgetState extends State<btTabViewWidget>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          btIncidentReportDetailScreen(),
+                                          IncidentReportDetailScreen(),
                                     ),
                                   );
                                 },
@@ -350,7 +350,7 @@ class _btTabViewWidgetState extends State<btTabViewWidget>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          btIncidentReportDetailScreen(),
+                                          IncidentReportDetailScreen(),
                                     ),
                                   );
                                 },
@@ -503,7 +503,7 @@ class _btTabViewWidgetState extends State<btTabViewWidget>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          btIncidentReportDetailScreen(),
+                                          IncidentReportDetailScreen(),
                                     ),
                                   );
                                 },
