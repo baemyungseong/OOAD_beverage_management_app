@@ -12,11 +12,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 int initScreen = 0;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences preferences = await SharedPreferences.getInstance();
-  initScreen = (preferences.getInt('initScreen') ?? 0);
+  initScreen = (preferences.getInt('initScreenstore') ?? 0);
   await preferences.setInt('initScreen', 1);
   await Firebase.initializeApp();
   runApp(FreshApp());
