@@ -60,6 +60,12 @@ class _skNewAccountCreatingScreenState
   var avatars = [];
   String avatarURL = "";
 
+  void initState() {
+    super.initState();
+    avatars.clear();
+    getAvatarsInStorage();
+  }
+
   TextEditingController emailController = TextEditingController();
   GlobalKey<FormState> emailFormKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
@@ -606,6 +612,12 @@ class _skNewAccountCreatingScreenState
                                                         'Successfully created the account!',
                                                         'success');
                                                     controlCreateAccount();
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => skCreateAccountSuccessfullyScreen(),
+                                                      ),
+                                                    );
                                                     // .then((value) {});
                                                   } else {
                                                     showSnackBar(
@@ -700,7 +712,6 @@ class _skNewAccountCreatingScreenState
   }
   
   controlCreateAccount() async {
-    await getAvatarsInStorage();
     var randomAvatar = avatars[Random().nextInt(avatars.length)];
       switch (selected) {
       case 1:
@@ -713,21 +724,20 @@ class _skNewAccountCreatingScreenState
         selectedRole = "bartender";
         break;               
     }
-     firebaseAuth().signUp(emailController.text, confirmController.text, context).then((val) async {
+    firebaseAuth().signUp(emailController.text, confirmController.text, context).then((val) async {
       final FirebaseAuth auth = FirebaseAuth.instance;
       final User? user = auth.currentUser;
       final uid = user?.uid;
-      if (val != null) {
-        userReference.doc(uid).set({
-          "id": uid,
-          "email": emailController.text,
-          "name": usernameController.text,
-          "phone number": phoneController.text,
-          "dob": DateFormat("dd/MM/yyyy").format(selectDate),
-          "avatar": randomAvatar,
-          "role": selectedRole,
-        });
-      }
+      userReference.doc(uid).set({
+        "id": uid,
+        "email": emailController.text,
+        "name": usernameController.text,
+        "phone number": phoneController.text,
+        "dob": DateFormat("dd/MM/yyyy").format(selectDate),
+        "avatar": randomAvatar,
+        "role": selectedRole,
+        "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+      });
     });
   }
 

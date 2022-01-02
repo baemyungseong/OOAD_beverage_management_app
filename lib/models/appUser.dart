@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class appUser {
   final String id;
@@ -9,6 +10,7 @@ class appUser {
   final String dob;
   final String avatar;
   final String role;
+  final DateTime timestamp; 
 
   appUser({
     this.id = "",
@@ -18,7 +20,8 @@ class appUser {
     this.dob = "",
     this.avatar = "",
     this.role = "",
-  });
+    DateTime? timestamp 
+    }) : this.timestamp = timestamp ?? DateTime.now();
 
   factory appUser.fromDocument(DocumentSnapshot doc) {
     return appUser(
@@ -29,6 +32,7 @@ class appUser {
       dob: doc['dob'],
       avatar: doc['avatar'],
       role: doc['role'],
+      timestamp: DateFormat("dd/MM/yyyy HH:mm:ss").parse(doc['timestamp']),
     );
   }
 }

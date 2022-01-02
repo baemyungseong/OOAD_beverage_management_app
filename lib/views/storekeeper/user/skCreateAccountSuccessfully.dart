@@ -9,7 +9,7 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/views/navigationBar/skNavigationBar.dart';
 
 //import views
-import 'package:ui_fresh_app/views/storekeeper/user/skUserManagement.dart';
+import 'package:ui_fresh_app/views/storekeeper/user/skUsersManagement.dart';
 
 class skCreateAccountSuccessfullyScreen extends StatelessWidget {
   const skCreateAccountSuccessfullyScreen({Key? key}) : super(key: key);
@@ -41,7 +41,7 @@ class skCreateAccountSuccessfullyScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24),
                     Text(
-                      'Successful New Account' + '\n' + 'Registration!',
+                      'New Account' + '\n' + 'Registrated Successfully!',
                       style: TextStyle(
                         fontFamily: 'SFProText',
                         fontSize: title24,
@@ -53,7 +53,7 @@ class skCreateAccountSuccessfullyScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 16),
                     Text(
-                      'New account has been successfully' + '\n' + 'registered. Now you are ready for an' + '\n' + 'enjoyable moment!',
+                      'You have been successfully created a' + '\n' + ' new account. Now you are ready for' + '\n' + 'an enjoyable moment!',
                       style: TextStyle(
                         fontFamily: 'SFProText',
                         fontSize: content16,
@@ -69,12 +69,8 @@ class skCreateAccountSuccessfullyScreen extends StatelessWidget {
                         child: GestureDetector(
                           //action navigate to dashboard screen
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => storekeeperNavigationBar(),
-                              ),
-                            );
+                            Navigator.pop(context);
+                            Navigator.pop(context);
                           },
                           child: AnimatedContainer(
                             alignment: Alignment.center,
