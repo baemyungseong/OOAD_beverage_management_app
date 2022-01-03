@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +7,10 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/models/appUser.dart';
+import 'package:ui_fresh_app/models/incidentReportModel.dart';
+import 'package:ui_fresh_app/models/troubleModel.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -23,11 +28,13 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
 class IncidentReportDetailScreen extends StatefulWidget {
-  IncidentReportDetailScreen({Key? key}) : super(key: key);
+  String idIncidentReport;
+  IncidentReportDetailScreen({Key? key, required this.idIncidentReport})
+      : super(key: key);
 
   @override
   _IncidentReportDetailScreenState createState() =>
-      _IncidentReportDetailScreenState();
+      _IncidentReportDetailScreenState(idIncidentReport);
 }
 
 class _IncidentReportDetailScreenState
@@ -35,6 +42,83 @@ class _IncidentReportDetailScreenState
   TextEditingController troubleNameController = TextEditingController();
 
   bool isCheckout = false;
+  String idIncidentReport = '';
+
+  IncidentReport incidentReport = IncidentReport(
+      id: '',
+      name: '',
+      status: '',
+      reason: '',
+      performer: [],
+      time: '',
+      trouble: [],
+      partyinTrouble: '',
+      total: '');
+  Future getIncidentReportDetail() async {
+    FirebaseFirestore.instance
+        .collection('incidentReports')
+        .where('id', isEqualTo: idIncidentReport)
+        .snapshots()
+        .listen((value) {
+      setState(() {
+        incidentReport = IncidentReport.fromDocument(value.docs.first.data());
+      });
+    });
+  }
+
+  List<Trouble> troubleList = [];
+  List troubleIdList = [];
+
+  Future getTroubleList() async {
+    FirebaseFirestore.instance
+        .collection("incidentReports")
+        .doc(idIncidentReport)
+        .snapshots()
+        .listen((value1) {
+      FirebaseFirestore.instance.collection("troubles").get().then((value2) {
+        setState(() {
+          troubleList.clear();
+          troubleIdList = value1.data()!["detailOfTrouble"];
+          value2.docs.forEach((element) {
+            if (troubleIdList.contains(element.data()['id'] as String)) {
+              troubleList.add(Trouble.fromDocument(element.data()));
+            }
+          });
+        });
+      });
+    });
+  }
+
+  List<appUser> performerList = [];
+  List performerIdList = [];
+
+  Future getPerformerList() async {
+    FirebaseFirestore.instance
+        .collection("incidentReports")
+        .doc(idIncidentReport)
+        .snapshots()
+        .listen((value1) {
+      FirebaseFirestore.instance.collection("users").get().then((value) {
+        setState(() {
+          performerList.clear();
+          value.docs.forEach((element1) {
+            performerIdList = value1.data()!["performer"];
+            if (performerIdList.contains(element1.data()['id'] as String)) {
+              performerList.add(appUser.fromDocument(element1));
+            }
+          });
+        });
+      });
+    });
+  }
+
+  _IncidentReportDetailScreenState(this.idIncidentReport);
+  void initState() {
+    super.initState();
+    getIncidentReportDetail();
+    getTroubleList();
+    getPerformerList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +157,7 @@ class _IncidentReportDetailScreenState
                                       SizedBox(height: 8),
                                       Container(
                                         child: Text(
-                                          "Broken Glass",
+                                          incidentReport.name,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: 24.0,
@@ -116,7 +200,7 @@ class _IncidentReportDetailScreenState
                                               width: 2,
                                             ),
                                             Text(
-                                              'November 12, at 9:00 AM',
+                                              incidentReport.time,
                                               style: TextStyle(
                                                 fontFamily: "SFProText",
                                                 fontSize: content14,
@@ -163,7 +247,7 @@ class _IncidentReportDetailScreenState
                                         padding: EdgeInsets.zero,
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Done',
+                                          incidentReport.status,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: 14.0,
@@ -188,112 +272,166 @@ class _IncidentReportDetailScreenState
                                       Container(
                                         // height: 465,
                                         child: ListView.separated(
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           padding: EdgeInsets.zero,
                                           scrollDirection: Axis.vertical,
                                           shrinkWrap: true,
-                                          itemCount: 2,
-                                          separatorBuilder: (BuildContext context, int index) =>
-                                              SizedBox(height: 12),
+                                          itemCount: performerList.length,
+                                          separatorBuilder:
+                                              (BuildContext context,
+                                                      int index) =>
+                                                  SizedBox(height: 12),
                                           itemBuilder: (context, index) {
                                             return GestureDetector(
                                               onTap: () {
-                                                watchUserDialog(context);
+                                                // watchUserDialog(context);
                                               },
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  color: blueLight,
-                                                  borderRadius: BorderRadius.circular(8)
-                                                ),
+                                                    color: blueLight,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8)),
                                                 height: 48,
                                                 width: 319,
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Row(
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
                                                         children: [
                                                           SizedBox(width: 16),
                                                           AnimatedContainer(
-                                                            alignment: Alignment.center,
-                                                            duration: Duration(milliseconds: 300),
+                                                            alignment: Alignment
+                                                                .center,
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    300),
                                                             height: 32,
                                                             width: 32,
-                                                            decoration: BoxDecoration(
+                                                            decoration:
+                                                                BoxDecoration(
                                                               color: blueWater,
                                                               borderRadius:
-                                                                  BorderRadius.circular(8),
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
                                                               image: DecorationImage(
                                                                   image: NetworkImage(
-                                                                      'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
-                                                                  fit: BoxFit.cover),
-                                                              shape: BoxShape.rectangle,
+                                                                      performerList[
+                                                                              index]
+                                                                          .avatar),
+                                                                  fit: BoxFit
+                                                                      .cover),
+                                                              shape: BoxShape
+                                                                  .rectangle,
                                                             ),
                                                           ),
                                                           SizedBox(width: 16),
                                                           Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Row(
                                                                 children: [
                                                                   Container(
                                                                     width: 168,
                                                                     child: Text(
-                                                                      'Pan Cái Chảo',
-                                                                      style: TextStyle(
-                                                                        fontSize: content14,
-                                                                        fontWeight: FontWeight.w600,
-                                                                        fontFamily: 'SFProText',
-                                                                        color: blackLight,
+                                                                      performerList[
+                                                                              index]
+                                                                          .name,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            content14,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        fontFamily:
+                                                                            'SFProText',
+                                                                        color:
+                                                                            blackLight,
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  SizedBox(width: 43 - 24),
+                                                                  SizedBox(
+                                                                      width: 43 -
+                                                                          24),
                                                                   Container(
                                                                     height: 16,
                                                                     width: 44,
-                                                                    decoration: BoxDecoration(
+                                                                    decoration:
+                                                                        BoxDecoration(
                                                                       borderRadius:
                                                                           BorderRadius.circular(
                                                                               4.0),
-                                                                      color: blueWater,
+                                                                      color:
+                                                                          blueWater,
                                                                     ),
-                                                                    child: Center(
-                                                                      child: Text(
-                                                                        'Accountant',
-                                                                        style: TextStyle(
-                                                                          fontFamily: 'SFProText',
-                                                                          fontSize: content6,
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Text(
+                                                                        performerList[index]
+                                                                            .role,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              'SFProText',
+                                                                          fontSize:
+                                                                              content6,
                                                                           fontWeight:
                                                                               FontWeight.w500,
-                                                                          color: white,
+                                                                          color:
+                                                                              white,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
-                                                              SizedBox(height: 4),
+                                                              SizedBox(
+                                                                  height: 4),
                                                               Row(
                                                                 children: [
                                                                   Icon(
                                                                     Iconsax.sms,
-                                                                    color: blackLight,
+                                                                    color:
+                                                                        blackLight,
                                                                     size: 12,
                                                                   ),
                                                                   SizedBox(
                                                                     width: 4,
                                                                   ),
                                                                   Text(
-                                                                    'nhatkb2001@gmail.com',
-                                                                    style: TextStyle(
-                                                                      fontFamily: 'SFProText',
-                                                                      fontSize: content8,
-                                                                      fontWeight: FontWeight.w500,
-                                                                      color: grey8,
+                                                                    performerList[
+                                                                            index]
+                                                                        .email,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'SFProText',
+                                                                      fontSize:
+                                                                          content8,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color:
+                                                                          grey8,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -302,8 +440,7 @@ class _IncidentReportDetailScreenState
                                                           ),
                                                         ],
                                                       ),
-                                                    ]
-                                                  ),
+                                                    ]),
                                               ),
                                             );
                                           },
@@ -339,7 +476,7 @@ class _IncidentReportDetailScreenState
                                       SizedBox(height: 16),
                                       Container(
                                         child: Text(
-                                          'Create an article to welcome customers to the new branch of the store with an article to welcome customers',
+                                          incidentReport.reason,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: content14,
@@ -377,7 +514,7 @@ class _IncidentReportDetailScreenState
                                       SizedBox(height: 24),
                                       Container(
                                         child: Text(
-                                          "Related People",
+                                          "Party in trouble",
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: title20,
@@ -389,7 +526,7 @@ class _IncidentReportDetailScreenState
                                       SizedBox(height: 16),
                                       Container(
                                         child: Text(
-                                          'Create an article to welcome customers to the new branch of the store with an article to welcome customers',
+                                          incidentReport.partyinTrouble,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: content14,
@@ -419,7 +556,7 @@ class _IncidentReportDetailScreenState
                                           padding: EdgeInsets.zero,
                                           scrollDirection: Axis.vertical,
                                           shrinkWrap: true,
-                                          itemCount: 8,
+                                          itemCount: troubleList.length,
                                           separatorBuilder:
                                               (BuildContext context,
                                                       int index) =>
@@ -431,7 +568,9 @@ class _IncidentReportDetailScreenState
                                           itemBuilder: (context, index) {
                                             return Container(
                                               decoration: (index == 0 ||
-                                                      index == 8 - 1)
+                                                      index ==
+                                                          troubleList.length -
+                                                              1)
                                                   ? (index == 0)
                                                       ? BoxDecoration(
                                                           color: white,
@@ -502,15 +641,8 @@ class _IncidentReportDetailScreenState
                                                         children: [
                                                           Container(
                                                             child: Text(
-                                                              (index == 0 ||
-                                                                      index ==
-                                                                          2 ||
-                                                                      index ==
-                                                                          3 ||
-                                                                      index ==
-                                                                          5)
-                                                                  ? 'Broken Glass'
-                                                                  : 'Broken Plastic Glass',
+                                                              troubleList[index]
+                                                                  .name,
                                                               style: TextStyle(
                                                                   fontFamily:
                                                                       "SFProText",
@@ -525,41 +657,30 @@ class _IncidentReportDetailScreenState
                                                             ),
                                                           ),
                                                           SizedBox(width: 0),
-                                                          Container(
-                                                            child: Text(
-                                                              (index == 0 ||
-                                                                      index ==
-                                                                          2 ||
-                                                                      index ==
-                                                                          3 ||
-                                                                      index ==
-                                                                          5)
-                                                                  ? ' - 98'
-                                                                  : ' - 34',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      "SFProText",
-                                                                  fontSize:
-                                                                      content12,
-                                                                  color:
-                                                                      blackLight,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  height: 1.4),
-                                                            ),
-                                                          ),
+                                                          // Container(
+                                                          //   child: Text(
+                                                          //     troubleList[index]
+                                                          //         .money,
+                                                          //     style: TextStyle(
+                                                          //         fontFamily:
+                                                          //             "SFProText",
+                                                          //         fontSize:
+                                                          //             content12,
+                                                          //         color:
+                                                          //             blackLight,
+                                                          //         fontWeight:
+                                                          //             FontWeight
+                                                          //                 .w600,
+                                                          //         height: 1.4),
+                                                          //   ),
+                                                          // ),
                                                         ],
                                                       ),
                                                       SizedBox(height: 2),
                                                       Container(
                                                         child: Text(
-                                                          (index == 0 ||
-                                                                  index == 2 ||
-                                                                  index == 3 ||
-                                                                  index == 5)
-                                                              ? 'Compensation'
-                                                              : 'Cost',
+                                                          troubleList[index]
+                                                              .category,
                                                           style: TextStyle(
                                                             fontFamily:
                                                                 "SFProText",
@@ -574,12 +695,15 @@ class _IncidentReportDetailScreenState
                                                   ),
                                                   Spacer(),
                                                   Text(
-                                                    (index == 0 ||
-                                                            index == 2 ||
-                                                            index == 3 ||
-                                                            index == 5)
-                                                        ? '+\$103.00'
-                                                        : '-\$29.00',
+                                                    (troubleList[index]
+                                                                .category ==
+                                                            'Compensation')
+                                                        ? '+\$' +
+                                                            troubleList[index]
+                                                                .money
+                                                        : '-\$' +
+                                                            troubleList[index]
+                                                                .money,
                                                     maxLines: 1,
                                                     softWrap: false,
                                                     overflow: TextOverflow.fade,
@@ -589,11 +713,10 @@ class _IncidentReportDetailScreenState
                                                           FontWeight.w500,
                                                       fontFamily: 'SFProText',
                                                       foreground: Paint()
-                                                        ..shader = (index ==
-                                                                    0 ||
-                                                                index == 2 ||
-                                                                index == 3 ||
-                                                                index == 5)
+                                                        ..shader = (troubleList[
+                                                                        index]
+                                                                    .category ==
+                                                                'Compensation')
                                                             ? greenGradient
                                                             : redGradient,
                                                     ),
@@ -621,7 +744,22 @@ class _IncidentReportDetailScreenState
                                           ),
                                           Spacer(),
                                           Text(
-                                            '+ \$2069.00',
+                                            (double.parse(incidentReport.total +
+                                                        ".0") <
+                                                    0.0)
+                                                ? '- \$' +
+                                                    (double.parse(incidentReport
+                                                                    .total +
+                                                                ".0") *
+                                                            (-1.0))
+                                                        .toStringAsFixed(0)
+                                                        .toString()
+                                                : '+ \$' +
+                                                    double.parse(incidentReport
+                                                                .total +
+                                                            ".0")
+                                                        .toStringAsFixed(0)
+                                                        .toString(),
                                             maxLines: 1,
                                             softWrap: false,
                                             overflow: TextOverflow.fade,
@@ -703,84 +841,37 @@ class _IncidentReportDetailScreenState
                   ),
                 ),
               ),
-              Container(
-                  padding: EdgeInsets.only(top: 62),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        padding: EdgeInsets.only(left: 28),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Iconsax.arrow_square_left,
-                            size: 32, color: blackLight),
-                      ),
-                      Spacer(),
-                      Container(
-                          child: GestureDetector(
-                        onTap: () {
-                          removeDialog(context);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => svDrinkCartScreen(),
-                          //   ),
-                          // );
-                          // // .then((value) {});
-                          showSnackBar(context, 'The incident report has been removed!', "success");
-                        },
-                        child: AnimatedContainer(
-                          alignment: Alignment.center,
-                          duration: Duration(milliseconds: 300),
-                          height: 32,
-                          width: 32,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFFCB356B),
-                                  Color(0xFFBD3F32),
-                                ],
-                                stops: [
-                                  0.0,
-                                  1.0,
-                                ]),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: black.withOpacity(0.25),
-                                  spreadRadius: 0,
-                                  blurRadius: 64,
-                                  offset: Offset(8, 8)),
-                              BoxShadow(
-                                color: black.withOpacity(0.2),
-                                spreadRadius: 0,
-                                blurRadius: 4,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
+              (currentUser.role == 'storekeeper' ||
+                      currentUser.role == 'accountant')
+                  ? Container(
+                      padding: EdgeInsets.only(top: 62),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            padding: EdgeInsets.only(left: 28),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(Iconsax.arrow_square_left,
+                                size: 32, color: blackLight),
                           ),
-                          child: Container(
-                              padding: EdgeInsets.zero,
-                              alignment: Alignment.center,
-                              child: Icon(Iconsax.close_circle,
-                                  size: 18, color: white)),
-                        ),
-                      )),
-                      SizedBox(width: 8),
-                      Container(
-                          padding: EdgeInsets.only(right: 28),
-                          child: GestureDetector(
+                          Spacer(),
+                          Container(
+                              child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      IncidentReportEditingScreen(),
-                                ),
-                              );
-                              // .then((value) {});
+                              removeIncidentReportDialog(
+                                  context, idIncidentReport, troubleIdList);
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => svDrinkCartScreen(),
+                              //   ),
+                              // );
+                              // // .then((value) {});
+                              showSnackBar(
+                                  context,
+                                  'The incident report has been removed!',
+                                  "success");
                             },
                             child: AnimatedContainer(
                               alignment: Alignment.center,
@@ -793,8 +884,8 @@ class _IncidentReportDetailScreenState
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                     colors: [
-                                      blueWater,
-                                      Color(0xFF979DFA),
+                                      Color(0xFFCB356B),
+                                      Color(0xFFBD3F32),
                                     ],
                                     stops: [
                                       0.0,
@@ -817,12 +908,79 @@ class _IncidentReportDetailScreenState
                               child: Container(
                                   padding: EdgeInsets.zero,
                                   alignment: Alignment.center,
-                                  child: Icon(Iconsax.edit_2,
+                                  child: Icon(Iconsax.close_circle,
                                       size: 18, color: white)),
                             ),
                           )),
-                    ],
-                  ))
+                          SizedBox(width: 8),
+                          Container(
+                              padding: EdgeInsets.only(right: 28),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          IncidentReportEditingScreen(
+                                              idIncidentReport:
+                                                  idIncidentReport),
+                                    ),
+                                  );
+                                  // .then((value) {});
+                                },
+                                child: AnimatedContainer(
+                                  alignment: Alignment.center,
+                                  duration: Duration(milliseconds: 300),
+                                  height: 32,
+                                  width: 32,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          blueWater,
+                                          Color(0xFF979DFA),
+                                        ],
+                                        stops: [
+                                          0.0,
+                                          1.0,
+                                        ]),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: black.withOpacity(0.25),
+                                          spreadRadius: 0,
+                                          blurRadius: 64,
+                                          offset: Offset(8, 8)),
+                                      BoxShadow(
+                                        color: black.withOpacity(0.2),
+                                        spreadRadius: 0,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                      padding: EdgeInsets.zero,
+                                      alignment: Alignment.center,
+                                      child: Icon(Iconsax.edit_2,
+                                          size: 18, color: white)),
+                                ),
+                              )),
+                        ],
+                      ))
+                  : Container(
+                      padding: EdgeInsets.only(top: 62),
+                      child: Row(children: [
+                        IconButton(
+                          padding: EdgeInsets.only(left: 28),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(Iconsax.arrow_square_left,
+                              size: 32, color: blackLight),
+                        ),
+                      ]))
             ],
           ),
         ],

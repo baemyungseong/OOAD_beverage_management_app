@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +7,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/models/incidentReportModel.dart';
 
 //import views
 import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportDetail.dart';
@@ -23,7 +25,63 @@ class skTabViewWidget extends StatefulWidget {
 class _skTabViewWidgetState extends State<skTabViewWidget>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
   int _selectedIndex = 0;
+
+  List<IncidentReport> IncidentReportAll = [];
+  List<IncidentReport> IncidentReportDone = [];
+  List<IncidentReport> IncidentReportProcessing = [];
+
+  Future getIncidentReportAll() async {
+    FirebaseFirestore.instance
+        .collection("incidentReports")
+        .snapshots()
+        .listen((value2) {
+      setState(() {
+        IncidentReportAll.clear();
+        value2.docs.forEach((element) {
+          IncidentReportAll.add(IncidentReport.fromDocument(element.data()));
+        });
+        print("IncidentReportAll.length");
+        print(IncidentReportAll.length);
+      });
+    });
+  }
+
+  Future getIncidentReportProcessing() async {
+    FirebaseFirestore.instance
+        .collection("incidentReports")
+        .where('status', isEqualTo: 'Processing')
+        .snapshots()
+        .listen((value2) {
+      setState(() {
+        IncidentReportProcessing.clear();
+        value2.docs.forEach((element) {
+          IncidentReportProcessing.add(
+              IncidentReport.fromDocument(element.data()));
+        });
+        print("IncidentReportProcessing.length");
+        print(IncidentReportProcessing.length);
+      });
+    });
+  }
+
+  Future getIncidentReportDone() async {
+    FirebaseFirestore.instance
+        .collection("incidentReports")
+        .where('status', isEqualTo: 'Done')
+        .snapshots()
+        .listen((value2) {
+      setState(() {
+        IncidentReportDone.clear();
+        value2.docs.forEach((element) {
+          IncidentReportDone.add(IncidentReport.fromDocument(element.data()));
+        });
+        print("IncidentReportDone.length");
+        print(IncidentReportDone.length);
+      });
+    });
+  }
 
   void initState() {
     super.initState();
@@ -39,8 +97,9 @@ class _skTabViewWidgetState extends State<skTabViewWidget>
       _selectedIndex = _tabController.index;
       print(_selectedIndex);
     });
-    // getProjectsDataList();
-    // getProjectsIdList();
+    getIncidentReportAll();
+    getIncidentReportProcessing();
+    getIncidentReportDone();
   }
 
   @override
@@ -172,464 +231,454 @@ class _skTabViewWidgetState extends State<skTabViewWidget>
                 //   ),
                 // ),
                 Container(
-                  decoration: BoxDecoration(color: Colors.transparent),
-                  child: PageView.builder(
-                      controller: PageController(
-                          initialPage: 0,
-                          keepPage: true,
-                          viewportFraction: 1),
-                      itemCount: 1,
-                      //scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          child: ListView.separated(
-                            padding: EdgeInsets.only(top: 24, bottom: 120),
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    SizedBox(height: 16),
-                            itemCount: 8,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          IncidentReportDetailScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: blueLight,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  height: 80,
-                                  width: 319,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                          Text(
-                                            'Broken Glass',
-                                            style: TextStyle(
-                                              fontFamily: 'SFProText',
-                                              fontSize: content16,
-                                              fontWeight: FontWeight.w600,
-                                              color: blackLight,
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            width: 10,
-                                            height: 10,
-                                            decoration: new BoxDecoration(
-                                              gradient: (index == 0 ||
-                                                      index == 3)
-                                                  ? LinearGradient(
-                                                      begin: Alignment
-                                                          .centerLeft,
-                                                      end: Alignment
-                                                          .centerRight,
-                                                      colors: [
-                                                          Color(0xFF159957),
-                                                          Color(0xFF159199),
-                                                        ],
-                                                      stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ])
-                                                  : LinearGradient(
-                                                      begin: Alignment
-                                                          .centerLeft,
-                                                      end: Alignment
-                                                          .centerRight,
-                                                      colors: [
-                                                          Color(0xFFCB356B),
-                                                          Color(0xFFBD3F32),
-                                                        ],
-                                                      stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ]),
-                                              color: black,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                        ],
+                    decoration: BoxDecoration(color: Colors.transparent),
+                    child: PageView.builder(
+                        controller: PageController(
+                            initialPage: 0,
+                            keepPage: true,
+                            viewportFraction: 1),
+                        itemCount: 1,
+                        //scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            child: ListView.separated(
+                              padding: EdgeInsets.only(top: 24, bottom: 120),
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      SizedBox(height: 16),
+                              itemCount: IncidentReportAll.length,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            IncidentReportDetailScreen(
+                                          idIncidentReport:
+                                              IncidentReportAll[index].id,
+                                        ),
                                       ),
-                                      SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                          Icon(Iconsax.clock, size: 18, color: blueWater),
-                                          SizedBox(width: 6),
-                                          Text(
-                                            '02.00 pm, 08 Oct 2021',
-                                            style: TextStyle(
-                                              fontFamily: 'SFProText',
-                                              fontSize: content12,
-                                              fontWeight: FontWeight.w500,
-                                              color: grey8,
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: blueLight,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    height: 80,
+                                    width: 319,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
                                             ),
-                                          ),
-                                          Spacer(),
-                                          Column(
-                                            children: [
-                                              Container(
-                                                height: 16,
-                                                width: 48,
-                                                decoration: BoxDecoration(
-                                                  color: blueWater,
-                                                  borderRadius: BorderRadius.circular(4)
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    'AT#2024',
-                                                    style: TextStyle(
-                                                      fontFamily: 'SFProText',
-                                                      fontSize: content8,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: white,
+                                            Text(
+                                              IncidentReportAll[index].name,
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content16,
+                                                fontWeight: FontWeight.w600,
+                                                color: blackLight,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Container(
+                                              width: 10,
+                                              height: 10,
+                                              decoration: new BoxDecoration(
+                                                gradient: (IncidentReportAll[
+                                                                index]
+                                                            .status ==
+                                                        "Processing")
+                                                    ? LinearGradient(
+                                                        begin: Alignment
+                                                            .centerLeft,
+                                                        end: Alignment
+                                                            .centerRight,
+                                                        colors: [
+                                                            Color(0xFF159957),
+                                                            Color(0xFF159199),
+                                                          ],
+                                                        stops: [
+                                                            0.0,
+                                                            1.0,
+                                                          ])
+                                                    : LinearGradient(
+                                                        begin: Alignment
+                                                            .centerLeft,
+                                                        end: Alignment
+                                                            .centerRight,
+                                                        colors: [
+                                                            Color(0xFFCB356B),
+                                                            Color(0xFFBD3F32),
+                                                          ],
+                                                        stops: [
+                                                            0.0,
+                                                            1.0,
+                                                          ]),
+                                                color: black,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 24,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
+                                            ),
+                                            Icon(Iconsax.clock,
+                                                size: 18, color: blueWater),
+                                            SizedBox(width: 6),
+                                            Text(
+                                              IncidentReportAll[index].time,
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content12,
+                                                fontWeight: FontWeight.w500,
+                                                color: grey8,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  height: 16,
+                                                  width: 48,
+                                                  decoration: BoxDecoration(
+                                                      color: blueWater,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4)),
+                                                  child: Center(
+                                                    child: Text(
+                                                      'AT#2024',
+                                                      style: TextStyle(
+                                                        fontFamily: 'SFProText',
+                                                        fontSize: content8,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: white,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(width: 24),
-                                        ],
-                                      ),
-                                    ],
+                                              ],
+                                            ),
+                                            SizedBox(width: 24),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }
-                  )
-                ),
+                                );
+                              },
+                            ),
+                          );
+                        })),
                 Container(
-                  decoration: BoxDecoration(color: Colors.transparent),
-                  child: PageView.builder(
-                      controller: PageController(
-                          initialPage: 0,
-                          keepPage: true,
-                          viewportFraction: 1),
-                      itemCount: 1,
-                      //scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          child: ListView.separated(
-                            padding: EdgeInsets.only(top: 24, bottom: 120),
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    SizedBox(height: 16),
-                            itemCount: 8,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          IncidentReportDetailScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: blueLight,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  height: 80,
-                                  width: 319,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                          Text(
-                                            'Broken Glass',
-                                            style: TextStyle(
-                                              fontFamily: 'SFProText',
-                                              fontSize: content16,
-                                              fontWeight: FontWeight.w600,
-                                              color: blackLight,
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            width: 10,
-                                            height: 10,
-                                            decoration: new BoxDecoration(
-                                              gradient: (index == 0 ||
-                                                      index == 3)
-                                                  ? LinearGradient(
-                                                      begin: Alignment
-                                                          .centerLeft,
-                                                      end: Alignment
-                                                          .centerRight,
-                                                      colors: [
-                                                          Color(0xFF159957),
-                                                          Color(0xFF159199),
-                                                        ],
-                                                      stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ])
-                                                  : LinearGradient(
-                                                      begin: Alignment
-                                                          .centerLeft,
-                                                      end: Alignment
-                                                          .centerRight,
-                                                      colors: [
-                                                          Color(0xFFCB356B),
-                                                          Color(0xFFBD3F32),
-                                                        ],
-                                                      stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ]),
-                                              color: black,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                        ],
+                    decoration: BoxDecoration(color: Colors.transparent),
+                    child: PageView.builder(
+                        controller: PageController(
+                            initialPage: 0,
+                            keepPage: true,
+                            viewportFraction: 1),
+                        itemCount: 1,
+                        //scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            child: ListView.separated(
+                              padding: EdgeInsets.only(top: 24, bottom: 120),
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      SizedBox(height: 16),
+                              itemCount: IncidentReportProcessing.length,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            IncidentReportDetailScreen(
+                                          idIncidentReport:
+                                              IncidentReportProcessing[index]
+                                                  .id,
+                                        ),
                                       ),
-                                      SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                          Icon(Iconsax.clock, size: 18, color: blueWater),
-                                          SizedBox(width: 6),
-                                          Text(
-                                            '02.00 pm, 08 Oct 2021',
-                                            style: TextStyle(
-                                              fontFamily: 'SFProText',
-                                              fontSize: content12,
-                                              fontWeight: FontWeight.w500,
-                                              color: grey8,
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: blueLight,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    height: 80,
+                                    width: 319,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
                                             ),
-                                          ),
-                                          Spacer(),
-                                          Column(
-                                            children: [
-                                              Container(
-                                                height: 16,
-                                                width: 48,
-                                                decoration: BoxDecoration(
-                                                  color: blueWater,
-                                                  borderRadius: BorderRadius.circular(4)
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    'AT#2024',
-                                                    style: TextStyle(
-                                                      fontFamily: 'SFProText',
-                                                      fontSize: content8,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: white,
+                                            Text(
+                                              IncidentReportProcessing[index]
+                                                  .name,
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content16,
+                                                fontWeight: FontWeight.w600,
+                                                color: blackLight,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Container(
+                                              width: 10,
+                                              height: 10,
+                                              decoration: new BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                    colors: [
+                                                      Color(0xFF159957),
+                                                      Color(0xFF159199),
+                                                    ],
+                                                    stops: [
+                                                      0.0,
+                                                      1.0,
+                                                    ]),
+                                                color: black,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 24,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
+                                            ),
+                                            Icon(Iconsax.clock,
+                                                size: 18, color: blueWater),
+                                            SizedBox(width: 6),
+                                            Text(
+                                              IncidentReportProcessing[index]
+                                                  .time,
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content12,
+                                                fontWeight: FontWeight.w500,
+                                                color: grey8,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  height: 16,
+                                                  width: 48,
+                                                  decoration: BoxDecoration(
+                                                      color: blueWater,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4)),
+                                                  child: Center(
+                                                    child: Text(
+                                                      'AT#2024',
+                                                      style: TextStyle(
+                                                        fontFamily: 'SFProText',
+                                                        fontSize: content8,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: white,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(width: 24),
-                                        ],
-                                      ),
-                                    ],
+                                              ],
+                                            ),
+                                            SizedBox(width: 24),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }
-                  )
-                ),
+                                );
+                              },
+                            ),
+                          );
+                        })),
                 Container(
-                  decoration: BoxDecoration(color: Colors.transparent),
-                  child: PageView.builder(
-                      controller: PageController(
-                          initialPage: 0,
-                          keepPage: true,
-                          viewportFraction: 1),
-                      itemCount: 1,
-                      //scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          child: ListView.separated(
-                            padding: EdgeInsets.only(top: 24, bottom: 120),
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    SizedBox(height: 16),
-                            itemCount: 8,
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          IncidentReportDetailScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: blueLight,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  height: 80,
-                                  width: 319,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                          Text(
-                                            'Broken Glass',
-                                            style: TextStyle(
-                                              fontFamily: 'SFProText',
-                                              fontSize: content16,
-                                              fontWeight: FontWeight.w600,
-                                              color: blackLight,
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            width: 10,
-                                            height: 10,
-                                            decoration: new BoxDecoration(
-                                              gradient: (index == 0 ||
-                                                      index == 3)
-                                                  ? LinearGradient(
-                                                      begin: Alignment
-                                                          .centerLeft,
-                                                      end: Alignment
-                                                          .centerRight,
-                                                      colors: [
-                                                          Color(0xFF159957),
-                                                          Color(0xFF159199),
-                                                        ],
-                                                      stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ])
-                                                  : LinearGradient(
-                                                      begin: Alignment
-                                                          .centerLeft,
-                                                      end: Alignment
-                                                          .centerRight,
-                                                      colors: [
-                                                          Color(0xFFCB356B),
-                                                          Color(0xFFBD3F32),
-                                                        ],
-                                                      stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ]),
-                                              color: black,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                        ],
+                    decoration: BoxDecoration(color: Colors.transparent),
+                    child: PageView.builder(
+                        controller: PageController(
+                            initialPage: 0,
+                            keepPage: true,
+                            viewportFraction: 1),
+                        itemCount: 1,
+                        //scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            child: ListView.separated(
+                              padding: EdgeInsets.only(top: 24, bottom: 120),
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      SizedBox(height: 16),
+                              itemCount: IncidentReportDone.length,
+                              scrollDirection: Axis.vertical,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            IncidentReportDetailScreen(
+                                          idIncidentReport:
+                                              IncidentReportProcessing[index]
+                                                  .id,
+                                        ),
                                       ),
-                                      SizedBox(height: 8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                          ),
-                                          Icon(Iconsax.clock, size: 18, color: blueWater),
-                                          SizedBox(width: 6),
-                                          Text(
-                                            '02.00 pm, 08 Oct 2021',
-                                            style: TextStyle(
-                                              fontFamily: 'SFProText',
-                                              fontSize: content12,
-                                              fontWeight: FontWeight.w500,
-                                              color: grey8,
+                                    );
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: blueLight,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    height: 80,
+                                    width: 319,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
                                             ),
-                                          ),
-                                          Spacer(),
-                                          Column(
-                                            children: [
-                                              Container(
-                                                height: 16,
-                                                width: 48,
-                                                decoration: BoxDecoration(
-                                                  color: blueWater,
-                                                  borderRadius: BorderRadius.circular(4)
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    'AT#2024',
-                                                    style: TextStyle(
-                                                      fontFamily: 'SFProText',
-                                                      fontSize: content8,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: white,
+                                            Text(
+                                              IncidentReportDone[index].name,
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content16,
+                                                fontWeight: FontWeight.w600,
+                                                color: blackLight,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Container(
+                                              width: 10,
+                                              height: 10,
+                                              decoration: new BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                    colors: [
+                                                      Color(0xFFCB356B),
+                                                      Color(0xFFBD3F32),
+                                                    ],
+                                                    stops: [
+                                                      0.0,
+                                                      1.0,
+                                                    ]),
+                                                color: black,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 24,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              width: 24,
+                                            ),
+                                            Icon(Iconsax.clock,
+                                                size: 18, color: blueWater),
+                                            SizedBox(width: 6),
+                                            Text(
+                                              IncidentReportDone[index].time,
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content12,
+                                                fontWeight: FontWeight.w500,
+                                                color: grey8,
+                                              ),
+                                            ),
+                                            Spacer(),
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  height: 16,
+                                                  width: 48,
+                                                  decoration: BoxDecoration(
+                                                      color: blueWater,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4)),
+                                                  child: Center(
+                                                    child: Text(
+                                                      'AT#2024',
+                                                      style: TextStyle(
+                                                        fontFamily: 'SFProText',
+                                                        fontSize: content8,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: white,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(width: 24),
-                                        ],
-                                      ),
-                                    ],
+                                              ],
+                                            ),
+                                            SizedBox(width: 24),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      }
-                  )
-                ),
+                                );
+                              },
+                            ),
+                          );
+                        })),
               ],
             ),
           ),

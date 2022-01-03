@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +8,8 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/models/incidentReportModel.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -23,16 +27,19 @@ import 'package:another_xlider/another_xlider.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:intl/intl.dart';
 
+import 'package:ui_fresh_app/models/appUser.dart';
+
 class IncidentReportManagementScreen extends StatefulWidget {
   const IncidentReportManagementScreen({Key? key}) : super(key: key);
 
   @override
-  State<IncidentReportManagementScreen> createState() => _IncidentReportManagementScreenState();
+  State<IncidentReportManagementScreen> createState() =>
+      _IncidentReportManagementScreenState();
 }
 
-class _IncidentReportManagementScreenState extends State<IncidentReportManagementScreen>
+class _IncidentReportManagementScreenState
+    extends State<IncidentReportManagementScreen>
     with SingleTickerProviderStateMixin {
-
   TextEditingController searchController = TextEditingController();
 
   @override
@@ -313,6 +320,7 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
   int selected = 0;
   double _lowerValue = 0;
   double _upperValue = 1000;
+  //initialize 3 list incident Report
 
   void initState() {
     super.initState();
@@ -418,14 +426,15 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                               fontSize: content20,
                               fontWeight: FontWeight.w500,
                               fontFamily: 'SFProText',
-                              foreground: (selected == 1) ? (Paint()..shader = greenGradient) : (Paint()..shader = blackLightShader),
+                              foreground: (selected == 1)
+                                  ? (Paint()..shader = greenGradient)
+                                  : (Paint()..shader = blackLightShader),
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(
-                              width: 2,
-                              color: (selected == 1) ? green : greyC
-                            ),
+                                width: 2,
+                                color: (selected == 1) ? green : greyC),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -451,14 +460,14 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                               fontSize: content20,
                               fontWeight: FontWeight.w500,
                               fontFamily: 'SFProText',
-                              foreground: (selected == 2) ? (Paint()..shader = redGradient) : (Paint()..shader = blackLightShader),
+                              foreground: (selected == 2)
+                                  ? (Paint()..shader = redGradient)
+                                  : (Paint()..shader = blackLightShader),
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(
-                              width: 2,
-                              color: (selected == 2) ? red : greyC
-                            ),
+                                width: 2, color: (selected == 2) ? red : greyC),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -478,11 +487,10 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                       child: Text(
                         'Date',
                         style: TextStyle(
-                          fontSize: content20,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'SFProText',
-                          color: blackLight
-                        ),
+                            fontSize: content20,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'SFProText',
+                            color: blackLight),
                       ),
                     ),
                     Spacer(),
@@ -491,11 +499,10 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                       child: Text(
                         'range',
                         style: TextStyle(
-                          fontSize: content16,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'SFProText',
-                          color: grey8
-                        ),
+                            fontSize: content16,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SFProText',
+                            color: grey8),
                       ),
                     ),
                   ],
@@ -505,106 +512,99 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: EdgeInsets.only(left: 28),
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () async {
-                          String category = "reex";
-                          DateTime? dt = await datePickerDialog(context, selectDate1, category);
-                          if (dt != null) {
-                            selectDate1 = dt;
-                            SetState1(() {
-                              selectDate1 != selectDate1;
-                            });
-                          }
-                          print(selectDate1);
-                        },
-                        child: AnimatedContainer(
-                          alignment: Alignment.center,
-                          duration: Duration(milliseconds: 300),
-                          height: 36,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            color: white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border(
-                              top: BorderSide(width: 1, color: greyC),
-                              left: BorderSide(width: 1, color: greyC),
-                              right: BorderSide(width: 1, color: greyC),
-                              bottom: BorderSide(width: 1, color: greyC),
-                            )
-                          ),
-                          child: Center(
-                            child: Text(
-                              // "12 November, 2021",
-                              // dd/MM/yyyy
-                              "${DateFormat('yMd').format(selectDate1)}",
-                              // "${selectDate.day} ${selectDate.month}, ${selectDate.year}",
-                              style: TextStyle(
-                                color: blackLight,
-                                fontFamily: 'SFProText',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                          )
-                        ),
-                      )
-                    ),
+                        padding: EdgeInsets.only(left: 28),
+                        alignment: Alignment.centerLeft,
+                        child: GestureDetector(
+                          onTap: () async {
+                            String category = "reex";
+                            DateTime? dt = await datePickerDialog(
+                                context, selectDate1, category);
+                            if (dt != null) {
+                              selectDate1 = dt;
+                              SetState1(() {
+                                selectDate1 != selectDate1;
+                              });
+                            }
+                            print(selectDate1);
+                          },
+                          child: AnimatedContainer(
+                              alignment: Alignment.center,
+                              duration: Duration(milliseconds: 300),
+                              height: 36,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  color: white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border(
+                                    top: BorderSide(width: 1, color: greyC),
+                                    left: BorderSide(width: 1, color: greyC),
+                                    right: BorderSide(width: 1, color: greyC),
+                                    bottom: BorderSide(width: 1, color: greyC),
+                                  )),
+                              child: Center(
+                                child: Text(
+                                  // "12 November, 2021",
+                                  // dd/MM/yyyy
+                                  "${DateFormat('yMd').format(selectDate1)}",
+                                  // "${selectDate.day} ${selectDate.month}, ${selectDate.year}",
+                                  style: TextStyle(
+                                    color: blackLight,
+                                    fontFamily: 'SFProText',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )),
+                        )),
                     Container(
-                      padding: EdgeInsets.zero,
-                      alignment: Alignment.center,
-                      child: Icon(
-                        Iconsax.arrow_right_1,
-                        size: 24, color: blackLight
-                      )
-                    ),
+                        padding: EdgeInsets.zero,
+                        alignment: Alignment.center,
+                        child: Icon(Iconsax.arrow_right_1,
+                            size: 24, color: blackLight)),
                     Container(
-                      padding: EdgeInsets.only(right: 28),
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () async {
-                          String category = "reex";
-                          DateTime? dt = await datePickerDialog(context, selectDate2, category);
-                          if (dt != null) {
-                            selectDate2 = dt;
-                            SetState1(() {
-                              selectDate2 != selectDate2;
-                            });
-                          }
-                          print(selectDate2);
-                        },
-                        child: AnimatedContainer(
-                          alignment: Alignment.center,
-                          duration: Duration(milliseconds: 300),
-                          height: 36,
-                          width: 120,
-                          decoration: BoxDecoration(
-                            color: white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border(
-                              top: BorderSide(width: 1, color: greyC),
-                              left: BorderSide(width: 1, color: greyC),
-                              right: BorderSide(width: 1, color: greyC),
-                              bottom: BorderSide(width: 1, color: greyC),
-                            )
-                          ),
-                          child: Center(
-                            child: Text(
-                              // "12 November, 2021",
-                              "${DateFormat('yMd').format(selectDate2)}",
-                              // "${selectDate.day} ${selectDate.month}, ${selectDate.year}",
-                              style: TextStyle(
-                                color: blackLight,
-                                fontFamily: 'SFProText',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                              ),
-                            ),
-                          )
-                        ),
-                      )
-                    ),
+                        padding: EdgeInsets.only(right: 28),
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                          onTap: () async {
+                            String category = "reex";
+                            DateTime? dt = await datePickerDialog(
+                                context, selectDate2, category);
+                            if (dt != null) {
+                              selectDate2 = dt;
+                              SetState1(() {
+                                selectDate2 != selectDate2;
+                              });
+                            }
+                            print(selectDate2);
+                          },
+                          child: AnimatedContainer(
+                              alignment: Alignment.center,
+                              duration: Duration(milliseconds: 300),
+                              height: 36,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  color: white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border(
+                                    top: BorderSide(width: 1, color: greyC),
+                                    left: BorderSide(width: 1, color: greyC),
+                                    right: BorderSide(width: 1, color: greyC),
+                                    bottom: BorderSide(width: 1, color: greyC),
+                                  )),
+                              child: Center(
+                                child: Text(
+                                  // "12 November, 2021",
+                                  "${DateFormat('yMd').format(selectDate2)}",
+                                  // "${selectDate.day} ${selectDate.month}, ${selectDate.year}",
+                                  style: TextStyle(
+                                    color: blackLight,
+                                    fontFamily: 'SFProText',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              )),
+                        )),
                   ],
                 ),
                 // SizedBox(height: 32),
@@ -824,19 +824,23 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                       padding: const EdgeInsets.only(left: 28),
                       child: ElevatedButton(
                           onPressed: () {
-                            if(selectDate1.isBefore(selectDate2)) {
-                              if(_lowerValue <= _upperValue) {
+                            if (selectDate1.isBefore(selectDate2)) {
+                              if (_lowerValue <= _upperValue) {
                                 setState(() {
                                   haveFilter = true;
                                 });
                                 Navigator.pop(context);
-                              } 
-                              else {
-                                showSnackBar(context, 'The max value must be greater than the min', "error");
+                              } else {
+                                showSnackBar(
+                                    context,
+                                    'The max value must be greater than the min',
+                                    "error");
                               }
-                            }
-                            else {
-                              showSnackBar(context, 'The max date must be greater than the min', "error");
+                            } else {
+                              showSnackBar(
+                                  context,
+                                  'The max date must be greater than the min',
+                                  "error");
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -854,46 +858,44 @@ class _IncidentReportManagementScreenState extends State<IncidentReportManagemen
                               fontFamily: 'SFProText',
                               color: white,
                             ),
-                          )
-                      ),
+                          )),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 28),
                       child: ElevatedButton(
-                        onPressed: () {
-                          SetState1(() {
-                            selected = 0;
-                            selectDate1 = DateTime.now();
-                            selectDate2 = DateTime.now();
-                            _lowerValue = 0;
-                            _upperValue = 1000;
-                            _minpricecontroller.text =  _lowerValue.toString();
-                            _maxpricecontroller.text = _upperValue.toString();
-                          });
-                          setState(() {
-                            haveFilter = false;
-                          });
-                          SetState1(() {
-                            haveFilter = false;
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(112, 52),
-                          primary: Colors.white,
-                          shape: new RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(12.0),
+                          onPressed: () {
+                            SetState1(() {
+                              selected = 0;
+                              selectDate1 = DateTime.now();
+                              selectDate2 = DateTime.now();
+                              _lowerValue = 0;
+                              _upperValue = 1000;
+                              _minpricecontroller.text = _lowerValue.toString();
+                              _maxpricecontroller.text = _upperValue.toString();
+                            });
+                            setState(() {
+                              haveFilter = false;
+                            });
+                            SetState1(() {
+                              haveFilter = false;
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: Size(112, 52),
+                            primary: Colors.white,
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(12.0),
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          ' Reset',
-                          style: TextStyle(
-                            fontSize: textButton20,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'SFProText',
-                            color: blackLight,
-                          ),
-                        )
-                      ),
+                          child: Text(
+                            ' Reset',
+                            style: TextStyle(
+                              fontSize: textButton20,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'SFProText',
+                              color: blackLight,
+                            ),
+                          )),
                     ),
                   ],
                 )
