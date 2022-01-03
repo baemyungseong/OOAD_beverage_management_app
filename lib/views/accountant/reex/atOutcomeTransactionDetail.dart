@@ -220,7 +220,7 @@ class _atOutcomeTransactionDetailScreenState
                                           itemBuilder: (context, index) {
                                             return GestureDetector(
                                               onTap: () {
-                                                watchUserDialog(context);
+                                                //watchUserDialog(context);
                                               },
                                               child: Container(
                                                 decoration: BoxDecoration(

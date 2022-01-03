@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_string_encryption/flutter_string_encryption.dart';
 
 //import Firebase stuffs
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,7 +47,7 @@ class skNewAccountCreatingScreen extends StatefulWidget {
 }
 
 class _skNewAccountCreatingScreenState
-    extends State<skNewAccountCreatingScreen> with InputValidationMixin{
+    extends State<skNewAccountCreatingScreen> with InputValidationMixin {
   TextEditingController troubleNameController = TextEditingController();
 
   bool isCheckout = false;
@@ -607,17 +609,19 @@ class _skNewAccountCreatingScreenState
                                                   confirmFormKey.currentState!.validate()) {
                                                 if (newController.text ==
                                                       confirmController.text) {
-                                                    showSnackBar(
-                                                        context,
-                                                        'Successfully created the account!',
-                                                        'success');
                                                     controlCreateAccount();
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => skCreateAccountSuccessfullyScreen(),
-                                                      ),
-                                                    );
+                                                    Timer(Duration(seconds: 4), () {
+                                                      showSnackBar(
+                                                          context,
+                                                          'Successfully created the account!',
+                                                          'success');
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => skCreateAccountSuccessfullyScreen(),
+                                                        ),
+                                                      );                                                            
+                                                    });    
                                                     // .then((value) {});
                                                   } else {
                                                     showSnackBar(
@@ -724,20 +728,31 @@ class _skNewAccountCreatingScreenState
         selectedRole = "bartender";
         break;               
     }
+
+    PlatformStringCryptor cryptor;
+    cryptor = PlatformStringCryptor();
+    final salt = await cryptor.generateSalt();
+
     firebaseAuth().signUp(emailController.text, confirmController.text, context).then((val) async {
       final FirebaseAuth auth = FirebaseAuth.instance;
       final User? user = auth.currentUser;
       final uid = user?.uid;
-      userReference.doc(uid).set({
-        "id": uid,
-        "email": emailController.text,
-        "name": usernameController.text,
-        "phone number": phoneController.text,
-        "dob": DateFormat("dd/MM/yyyy").format(selectDate),
-        "avatar": randomAvatar,
-        "role": selectedRole,
-        "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
-      });
+      var key = await cryptor.generateKeyFromPassword(confirmController.text, salt);
+      var encrypted = await cryptor.encrypt(confirmController.text, key);
+      if (val != null) {
+        userReference.doc(uid).set({
+          "id": uid,
+          "email": emailController.text,
+          "name": usernameController.text,
+          "phone number": phoneController.text,
+          "dob": DateFormat("dd/MM/yyyy").format(selectDate),
+          "avatar": randomAvatar,
+          "role": selectedRole,
+          "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+          "encoded_pw": encrypted,
+          "key": key,
+        });
+      }
     });
   }
 

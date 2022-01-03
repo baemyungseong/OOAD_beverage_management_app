@@ -25,6 +25,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:flutter_string_encryption/flutter_string_encryption.dart';
 
 //import Firebase stuffs
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -395,50 +396,55 @@ class _signInScreenState extends State<signInScreen> {
   }
 
   //Control sign-in
-  controlSignIn() {
+  controlSignIn() async {
     if (emailFormKey.currentState!.validate() &&
         passwordFormKey.currentState!.validate()){
-      //Firebase auth
-      try {    
-        firebaseAuth().signIn(emailController.text, passwordController.text, context).then((val) async {
-          final FirebaseAuth auth = FirebaseAuth.instance;
-          final User? user = auth.currentUser;
-          final uid = user?.uid;
+      PlatformStringCryptor cryptor;
+      cryptor = PlatformStringCryptor();
+      final salt = await cryptor.generateSalt();
 
-          if (val != null) {
-            DocumentSnapshot documentSnapshot = await userReference.doc(uid).get();
-            currentUser = appUser.fromDocument(documentSnapshot);
+      //Firebase auth 
+      firebaseAuth().signIn(emailController.text, passwordController.text, context).then((val) async {
+        final FirebaseAuth auth = FirebaseAuth.instance;
+        final User? user = auth.currentUser;
+        final uid = user?.uid;
 
-            //Switch account due to specific role
-            if(currentUser.role == "storekeeper")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => storekeeperNavigationBar()),
-                    (Route<dynamic> route) => route is storekeeperNavigationBar
-            );
-            else if(currentUser.role == "serve")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => serveNavigationBar()),
-                    (Route<dynamic> route) => route is serveNavigationBar
-            );
-            else if(currentUser.role == "bartender")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => bartenderNavigationBar()),
-                    (Route<dynamic> route) => route is bartenderNavigationBar
-            );
-            else if(currentUser.role == "accountant")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => accountantNavigationBar()),
-                    (Route<dynamic> route) => route is accountantNavigationBar
-            );   
-          }   
-        });
-      } on FirebaseAuthException catch(e) {
-        if (e.code == 'user-not-found') {
-          showSnackBar(context, 'Please check again your email!', 'error');
-        } else if (e.code == 'wrong-password') {
-          showSnackBar(context, 'Please check again your password!', 'error');
-        }
-      }
+        if (val != null) {
+          var key = await cryptor.generateKeyFromPassword(passwordController.text, salt);
+          var encrypted = await cryptor.encrypt(passwordController.text, key);
+
+          //Update new decoded_pw and new key
+          userReference.doc(uid).update({
+            "encoded_pw": encrypted,
+            "key": key,
+          });
+
+          DocumentSnapshot documentSnapshot = await userReference.doc(uid).get();
+          currentUser = appUser.fromDocument(documentSnapshot);
+
+          //Switch account due to specific role
+          if(currentUser.role == "storekeeper")
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) => storekeeperNavigationBar()),
+                  (Route<dynamic> route) => route is storekeeperNavigationBar
+          );
+          else if(currentUser.role == "serve")
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) => serveNavigationBar()),
+                  (Route<dynamic> route) => route is serveNavigationBar
+          );
+          else if(currentUser.role == "bartender")
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) => bartenderNavigationBar()),
+                  (Route<dynamic> route) => route is bartenderNavigationBar
+          );
+          else if(currentUser.role == "accountant")
+          Navigator.pushAndRemoveUntil(context,
+              MaterialPageRoute(builder: (context) => accountantNavigationBar()),
+                  (Route<dynamic> route) => route is accountantNavigationBar
+          );   
+        }   
+      });
     }    
   }
 
