@@ -89,8 +89,7 @@ class _IncidentReportManagementScreenState
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
                               image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://scontent.fsgn5-8.fna.fbcdn.net/v/t1.6435-9/50903697_2672799252747189_6623025456616570880_n.jpg?_nc_cat=103&ccb=1-5&_nc_sid=0debeb&_nc_ohc=TK2F5ekRXQ8AX8U_UKh&_nc_ht=scontent.fsgn5-8.fna&oh=00_AT9TXhfcm2xYO8PPao04FguuU-QFMshrwKndfcBZ9SjnAg&oe=61E61521'),
+                                  image: NetworkImage(currentUser.avatar),
                                   fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
@@ -117,7 +116,7 @@ class _IncidentReportManagementScreenState
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Noob chảo',
+                            currentUser.name,
                             style: TextStyle(
                               fontSize: content16,
                               fontWeight: FontWeight.w600,
@@ -132,7 +131,7 @@ class _IncidentReportManagementScreenState
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                'Accountant',
+                                currentUser.role,
                                 style: TextStyle(
                                   fontSize: content10,
                                   fontWeight: FontWeight.w400,
@@ -240,7 +239,7 @@ class _IncidentReportManagementScreenState
                         height: 40,
                         child: TextFormField(
                           controller: searchController,
-                          autofocus: false,
+                          autofocus: true,
                           onEditingComplete: () => Navigator.push(
                             context,
                             MaterialPageRoute(
