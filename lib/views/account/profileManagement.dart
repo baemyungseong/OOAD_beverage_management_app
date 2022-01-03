@@ -103,7 +103,7 @@ class _profileManagementScreenState extends State<profileManagementScreen>
                               children: [
                                 Container(
                                   padding: EdgeInsets.only(top: 8, left: appPadding + 18, right: appPadding),
-                                  child: displayAvatar(),
+                                  child: displayMainAvatar(),
                                 ),
                                 Container(
                                   padding: EdgeInsets.only(top: 4, right: appPadding + 18),
@@ -662,7 +662,7 @@ class _profileManagementScreenState extends State<profileManagementScreen>
   }
 }
 
-Widget displayAvatar() => ClipRRect(
+displayMainAvatar() => ClipRRect(
   borderRadius: BorderRadius.circular(16.0),
   child: CachedNetworkImage(
     imageUrl: currentUser.avatar,

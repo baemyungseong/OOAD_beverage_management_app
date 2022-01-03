@@ -222,7 +222,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                           itemBuilder: (context, index) {
                                             return GestureDetector(
                                               onTap: () {
-                                                watchUserDialog(context);
+                                                //watchUserDialog(context);
                                               },
                                               child: Container(
                                                 decoration: BoxDecoration(

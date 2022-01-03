@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -11,6 +14,9 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
+//import models
+import 'package:ui_fresh_app/models/appUser.dart';
+
 //import views
 import 'package:ui_fresh_app/views/storekeeper/user/skCreateAccountSuccessfully.dart';
 
@@ -21,6 +27,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_string_encryption/flutter_string_encryption.dart';
+
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 
 class skNewAccountCreatingScreen extends StatefulWidget {
   skNewAccountCreatingScreen({Key? key}) : super(key: key);
@@ -31,7 +47,7 @@ class skNewAccountCreatingScreen extends StatefulWidget {
 }
 
 class _skNewAccountCreatingScreenState
-    extends State<skNewAccountCreatingScreen> with InputValidationMixin{
+    extends State<skNewAccountCreatingScreen> with InputValidationMixin {
   TextEditingController troubleNameController = TextEditingController();
 
   bool isCheckout = false;
@@ -41,6 +57,16 @@ class _skNewAccountCreatingScreenState
   late DateTime selectDate = DateTime.now();
 
   int selected = 0;
+  String selectedRole = "";
+
+  var avatars = [];
+  String avatarURL = "";
+
+  void initState() {
+    super.initState();
+    avatars.clear();
+    getAvatarsInStorage();
+  }
 
   TextEditingController emailController = TextEditingController();
   GlobalKey<FormState> emailFormKey = GlobalKey<FormState>();
@@ -393,7 +419,7 @@ class _skNewAccountCreatingScreenState
                                                     "${DateFormat('yMMMMd').format(selectDate)}",
                                                     style: TextStyle(
                                                       color: grey8,
-                                                      fontFamily: 'Poppins',
+                                                      fontFamily: 'SFProText',
                                                       fontWeight: FontWeight.w400,
                                                       fontSize: 14,
                                                     ),
@@ -583,17 +609,19 @@ class _skNewAccountCreatingScreenState
                                                   confirmFormKey.currentState!.validate()) {
                                                 if (newController.text ==
                                                       confirmController.text) {
-                                                    showSnackBar(
+                                                    controlCreateAccount();
+                                                    Timer(Duration(seconds: 4), () {
+                                                      showSnackBar(
+                                                          context,
+                                                          'Successfully created the account!',
+                                                          'success');
+                                                      Navigator.push(
                                                         context,
-                                                        'Successfully changed the password!',
-                                                        'success');
-                                                    Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            skCreateAccountSuccessfullyScreen(),
-                                                      ),
-                                                    );
+                                                        MaterialPageRoute(
+                                                          builder: (context) => skCreateAccountSuccessfullyScreen(),
+                                                        ),
+                                                      );                                                            
+                                                    });    
                                                     // .then((value) {});
                                                   } else {
                                                     showSnackBar(
@@ -642,7 +670,7 @@ class _skNewAccountCreatingScreenState
                                             )
                                             : Container(
                                               child: Text(
-                                                "Checkout",
+                                                "Create Account",
                                                 style: TextStyle(
                                                   color: whiteLight,
                                                   fontFamily: 'SFProText',
@@ -687,6 +715,55 @@ class _skNewAccountCreatingScreenState
     );
   }
   
+  controlCreateAccount() async {
+    var randomAvatar = avatars[Random().nextInt(avatars.length)];
+      switch (selected) {
+      case 1:
+        selectedRole = "accountant";
+        break;
+      case 2:
+        selectedRole = "serve";
+        break;
+      case 3:
+        selectedRole = "bartender";
+        break;               
+    }
+
+    PlatformStringCryptor cryptor;
+    cryptor = PlatformStringCryptor();
+    final salt = await cryptor.generateSalt();
+
+    firebaseAuth().signUp(emailController.text, confirmController.text, context).then((val) async {
+      final FirebaseAuth auth = FirebaseAuth.instance;
+      final User? user = auth.currentUser;
+      final uid = user?.uid;
+      var key = await cryptor.generateKeyFromPassword(confirmController.text, salt);
+      var encrypted = await cryptor.encrypt(confirmController.text, key);
+      if (val != null) {
+        userReference.doc(uid).set({
+          "id": uid,
+          "email": emailController.text,
+          "name": usernameController.text,
+          "phone number": phoneController.text,
+          "dob": DateFormat("dd/MM/yyyy").format(selectDate),
+          "avatar": randomAvatar,
+          "role": selectedRole,
+          "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+          "encoded_pw": encrypted,
+          "key": key,
+        });
+      }
+    });
+  }
+
+  getAvatarsInStorage() async {
+    firebase_storage.ListResult result = await avatarsReference.listAll();
+    result.items.forEach((firebase_storage.Reference ref) async {
+      avatarURL = await ref.getDownloadURL();
+      avatars.add(avatarURL);
+    });
+  }
+
   //Create function
   void _toggleNewPasswordView() {
     setState(() {

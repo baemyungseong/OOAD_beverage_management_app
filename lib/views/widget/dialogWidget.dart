@@ -1,5 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
@@ -14,6 +13,7 @@ import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/models/appUser.dart';
 import 'package:ui_fresh_app/views/account/accountMessageDetail.dart';
+import 'package:ui_fresh_app/views/account/profileManagement.dart';
 
 //import views
 import 'package:ui_fresh_app/views/authentication/signIn.dart';
@@ -23,6 +23,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 datePickerDialog(BuildContext context, selectDate, category) {
   return showRoundedDatePicker(
@@ -1045,7 +1046,7 @@ addGoodDialog(BuildContext context) {
       });
 }
 
-watchUserDialog(BuildContext context) {
+watchUserDialog(BuildContext context, String _name, String _email, String _phone_number, String _dob, String _avatar) {
   return showGeneralDialog(
     barrierLabel: "Label",
     barrierDismissible: true,
@@ -1075,17 +1076,7 @@ watchUserDialog(BuildContext context) {
                       AnimatedContainer(
                         alignment: Alignment.center,
                         duration: Duration(milliseconds: 300),
-                        height: 56,
-                        width: 56,
-                        decoration: BoxDecoration(
-                          color: blueWater,
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                              image: NetworkImage(
-                                  'https://scontent.fvca1-1.fna.fbcdn.net/v/t39.30808-6/244996278_2952087241710403_6324580891206192742_n.jpg?_nc_cat=102&ccb=1-5&_nc_sid=09cbfe&_nc_ohc=QkKoL3I2WxEAX9x_RIV&_nc_ht=scontent.fvca1-1.fna&oh=00_AT-HVBPf8k4Qgo6eEWGidx5PSEN7T9wnIu1_FQRmt9gafg&oe=61CD1F40'),
-                              fit: BoxFit.cover),
-                          shape: BoxShape.rectangle,
-                        ),
+                        child: displayAvatar(_avatar),
                       ),
                     ],
                   ),
@@ -1097,7 +1088,7 @@ watchUserDialog(BuildContext context) {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Pan cái chảo',
+                        _name,
                         style: TextStyle(
                             fontSize: content18,
                             fontWeight: FontWeight.w700,
@@ -1118,7 +1109,7 @@ watchUserDialog(BuildContext context) {
                         height: 8,
                       ),
                       Text(
-                        'nhatkb2021@gmail.com',
+                        _email,
                         style: TextStyle(
                             fontSize: content10,
                             fontWeight: FontWeight.w500,
@@ -1131,7 +1122,7 @@ watchUserDialog(BuildContext context) {
                         height: 4,
                       ),
                       Text(
-                        '84+ 902311293',
+                        _phone_number,
                         style: TextStyle(
                             fontSize: content10,
                             fontWeight: FontWeight.w500,
@@ -1144,7 +1135,7 @@ watchUserDialog(BuildContext context) {
                         height: 4,
                       ),
                       Text(
-                        '@26/03/2001',
+                        '@' + _dob,
                         style: TextStyle(
                             fontSize: content10,
                             fontWeight: FontWeight.w500,
@@ -2188,5 +2179,17 @@ searchDialog(
             ),
           );
         });
-      });
+      });   
 }
+
+displayAvatar(String _url) => ClipRRect(
+  borderRadius: BorderRadius.circular(8.0),
+  child: CachedNetworkImage(
+    imageUrl: _url,
+    height: 56,
+    width: 56,
+    fit: BoxFit.cover,
+    placeholder: (context, url) => 
+      Center(child: CircularProgressIndicator()),
+  ),
+);   

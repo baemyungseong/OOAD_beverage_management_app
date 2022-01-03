@@ -150,7 +150,7 @@ class _svInvoiceDetailScreenState
                                             //   removeUserDialog(context);
                                             // },
                                             onTap: () {
-                                              watchUserDialog(context);
+                                              //watchUserDialog(context);
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(

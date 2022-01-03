@@ -71,7 +71,7 @@ class _skUserSearchingScreenState extends State<skUserSearchingScreen> {
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    watchUserDialog(context);
+                                    //watchUserDialog(context);
                                   },
                                   child: Container(
                                     padding: EdgeInsets.only(
