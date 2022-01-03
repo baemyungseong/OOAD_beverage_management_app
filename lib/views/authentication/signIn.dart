@@ -59,6 +59,7 @@ class _signInScreenState extends State<signInScreen> {
           statusBarIconBrightness: Brightness.light,
           statusBarColor: Colors.transparent),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -206,11 +207,10 @@ class _signInScreenState extends State<signInScreen> {
                           alignment: Alignment.topCenter,
                           child: TextFormField(
                               style: TextStyle(
-                                fontFamily: 'SFProText',
-                                fontSize: 16,
-                                color: blackLight,
-                                fontWeight: FontWeight.w400
-                              ),
+                                  fontFamily: 'SFProText',
+                                  fontSize: 16,
+                                  color: blackLight,
+                                  fontWeight: FontWeight.w400),
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                               autofillHints: [AutofillHints.email],
@@ -224,7 +224,7 @@ class _signInScreenState extends State<signInScreen> {
                               // },
                               decoration: InputDecoration(
                                 contentPadding:
-                                  EdgeInsets.only(left: 20, right: 12),
+                                    EdgeInsets.only(left: 20, right: 12),
                                 hintStyle: TextStyle(
                                     fontFamily: 'SFProText',
                                     fontSize: content16,
@@ -242,8 +242,7 @@ class _signInScreenState extends State<signInScreen> {
                                   fontSize: 0,
                                   height: 0,
                                 ),
-                              )
-                          ),
+                              )),
                         ),
                       ),
                       SizedBox(height: 16),
@@ -258,15 +257,13 @@ class _signInScreenState extends State<signInScreen> {
                           alignment: Alignment.topCenter,
                           child: TextFormField(
                               style: TextStyle(
-                                fontFamily: 'SFProText',
-                                fontSize: 16,
-                                color: blackLight,
-                                fontWeight: FontWeight.w400
-                              ),
+                                  fontFamily: 'SFProText',
+                                  fontSize: 16,
+                                  color: blackLight,
+                                  fontWeight: FontWeight.w400),
                               controller: passwordController,
                               obscureText: isHiddenPassword,
-                              keyboardType:
-                                  TextInputType.visiblePassword,
+                              keyboardType: TextInputType.visiblePassword,
                               autofillHints: [AutofillHints.password],
                               // //validator
                               // validator: (password) {
@@ -278,29 +275,30 @@ class _signInScreenState extends State<signInScreen> {
                               // },
                               decoration: InputDecoration(
                                 suffixIcon: InkWell(
-                                onTap: _togglePasswordView,
-                                child: isHiddenPassword
-                                  ? Stack(
-                                      alignment: Alignment.centerRight,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Icon(Iconsax.eye, size: 24, color: grey8)
-                                        )
-                                      ]
-                                  )
-                                  : Stack(
-                                    alignment: Alignment.centerRight,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 20),
-                                        child: Icon(Iconsax.eye_slash, size: 24, color: grey8)
-                                      )
-                                    ]
-                                  )
-                                ),
+                                    onTap: _togglePasswordView,
+                                    child: isHiddenPassword
+                                        ? Stack(
+                                            alignment: Alignment.centerRight,
+                                            children: [
+                                                Container(
+                                                    padding: EdgeInsets.only(
+                                                        right: 20),
+                                                    child: Icon(Iconsax.eye,
+                                                        size: 24, color: grey8))
+                                              ])
+                                        : Stack(
+                                            alignment: Alignment.centerRight,
+                                            children: [
+                                                Container(
+                                                    padding: EdgeInsets.only(
+                                                        right: 20),
+                                                    child: Icon(
+                                                        Iconsax.eye_slash,
+                                                        size: 24,
+                                                        color: grey8))
+                                              ])),
                                 contentPadding:
-                                  EdgeInsets.only(left: 20, right: 12),
+                                    EdgeInsets.only(left: 20, right: 12),
                                 hintStyle: TextStyle(
                                     fontFamily: 'SFProText',
                                     fontSize: content16,
@@ -318,8 +316,7 @@ class _signInScreenState extends State<signInScreen> {
                                   fontSize: 0,
                                   height: 0,
                                 ),
-                              )
-                          ),
+                              )),
                         ),
                       ),
                       Container(
@@ -386,8 +383,7 @@ class _signInScreenState extends State<signInScreen> {
                               fontSize: textButton20),
                         ),
                       ),
-                    )
-                ),
+                    )),
               ],
             )),
       ),
@@ -397,49 +393,55 @@ class _signInScreenState extends State<signInScreen> {
   //Control sign-in
   controlSignIn() {
     if (emailFormKey.currentState!.validate() &&
-        passwordFormKey.currentState!.validate()){
+        passwordFormKey.currentState!.validate()) {
       //Firebase auth
-      try {    
-        firebaseAuth().signIn(emailController.text, passwordController.text, context).then((val) async {
+      try {
+        firebaseAuth()
+            .signIn(emailController.text, passwordController.text, context)
+            .then((val) async {
           final FirebaseAuth auth = FirebaseAuth.instance;
           final User? user = auth.currentUser;
           final uid = user?.uid;
 
           if (val != null) {
-            DocumentSnapshot documentSnapshot = await userReference.doc(uid).get();
+            DocumentSnapshot documentSnapshot =
+                await userReference.doc(uid).get();
             currentUser = appUser.fromDocument(documentSnapshot);
 
             //Switch account due to specific role
-            if(currentUser.role == "storekeeper")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => storekeeperNavigationBar()),
-                    (Route<dynamic> route) => route is storekeeperNavigationBar
-            );
-            else if(currentUser.role == "serve")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => serveNavigationBar()),
-                    (Route<dynamic> route) => route is serveNavigationBar
-            );
-            else if(currentUser.role == "bartender")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => bartenderNavigationBar()),
-                    (Route<dynamic> route) => route is bartenderNavigationBar
-            );
-            else if(currentUser.role == "accountant")
-            Navigator.pushAndRemoveUntil(context,
-                MaterialPageRoute(builder: (context) => accountantNavigationBar()),
-                    (Route<dynamic> route) => route is accountantNavigationBar
-            );   
-          }   
+            if (currentUser.role == "storekeeper")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => storekeeperNavigationBar()),
+                  (Route<dynamic> route) => route is storekeeperNavigationBar);
+            else if (currentUser.role == "serve")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => serveNavigationBar()),
+                  (Route<dynamic> route) => route is serveNavigationBar);
+            else if (currentUser.role == "bartender")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => bartenderNavigationBar()),
+                  (Route<dynamic> route) => route is bartenderNavigationBar);
+            else if (currentUser.role == "accountant")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => accountantNavigationBar()),
+                  (Route<dynamic> route) => route is accountantNavigationBar);
+          }
         });
-      } on FirebaseAuthException catch(e) {
+      } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
           showSnackBar(context, 'Please check again your email!', 'error');
         } else if (e.code == 'wrong-password') {
           showSnackBar(context, 'Please check again your password!', 'error');
         }
       }
-    }    
+    }
   }
 
   //Create function

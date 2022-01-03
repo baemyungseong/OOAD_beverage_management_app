@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +7,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/models/incidentReportModel.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -35,11 +37,30 @@ class _IncidentReportSearchingScreenState
     extends State<IncidentReportSearchingScreen> {
   TextEditingController searchController = TextEditingController();
   bool? useFilter;
+  List<IncidentReport> IncidentReportAll = [];
+
+  Future getIncidentReportAll() async {
+    FirebaseFirestore.instance
+        .collection("incidentReports")
+        .where('name', isGreaterThanOrEqualTo: searchController.text)
+        .snapshots()
+        .listen((value2) {
+      setState(() {
+        IncidentReportAll.clear();
+        value2.docs.forEach((element) {
+          IncidentReportAll.add(IncidentReport.fromDocument(element.data()));
+        });
+        print("IncidentReportAll.length");
+        print(IncidentReportAll.length);
+      });
+    });
+  }
 
   void initState() {
     super.initState();
     searchController.text = widget.searchResult;
     useFilter = widget.haveFilter;
+    getIncidentReportAll();
   }
 
   @override
@@ -75,7 +96,7 @@ class _IncidentReportSearchingScreenState
                           padding: EdgeInsets.zero,
                           separatorBuilder: (BuildContext context, int index) =>
                               SizedBox(height: 16),
-                          itemCount: 8,
+                          itemCount: IncidentReportAll.length,
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
@@ -85,7 +106,10 @@ class _IncidentReportSearchingScreenState
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        IncidentReportDetailScreen(),
+                                        IncidentReportDetailScreen(
+                                      idIncidentReport:
+                                          IncidentReportAll[index].id,
+                                    ),
                                   ),
                                 );
                               },
@@ -106,7 +130,7 @@ class _IncidentReportSearchingScreenState
                                           width: 24,
                                         ),
                                         Text(
-                                          'Broken Glass',
+                                          IncidentReportAll[index].name,
                                           style: TextStyle(
                                             fontFamily: 'SFProText',
                                             fontSize: content16,
@@ -119,7 +143,9 @@ class _IncidentReportSearchingScreenState
                                           width: 10,
                                           height: 10,
                                           decoration: new BoxDecoration(
-                                            gradient: (index == 0 || index == 3)
+                                            gradient: (IncidentReportAll[index]
+                                                        .status ==
+                                                    'Processing')
                                                 ? LinearGradient(
                                                     begin: Alignment.centerLeft,
                                                     end: Alignment.centerRight,
@@ -163,7 +189,7 @@ class _IncidentReportSearchingScreenState
                                             size: 18, color: blueWater),
                                         SizedBox(width: 6),
                                         Text(
-                                          '02.00 pm, 08 Oct 2021',
+                                          IncidentReportAll[index].time,
                                           style: TextStyle(
                                             fontFamily: 'SFProText',
                                             fontSize: content12,
