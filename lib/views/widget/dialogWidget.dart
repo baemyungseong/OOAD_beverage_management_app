@@ -11,6 +11,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/models/appUser.dart';
 import 'package:ui_fresh_app/views/account/accountMessageDetail.dart';
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 
@@ -22,6 +23,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 datePickerDialog(BuildContext context, selectDate, category) {
   return showRoundedDatePicker(
@@ -40,7 +42,9 @@ datePickerDialog(BuildContext context, selectDate, category) {
       initialDate: selectDate,
       // initialDate: DateTime(2022, 12, 17),
       firstDate: DateTime(1900),
-      lastDate: (category == "reex" || category == "dob") ? DateTime.now() : DateTime(2050),
+      lastDate: (category == "reex" || category == "dob")
+          ? DateTime.now()
+          : DateTime(2050),
       // onTapActionButton:() {
       //   if()
       // },
@@ -250,11 +254,11 @@ logoutDialog(BuildContext context) {
                     onTap: () {
                       firebaseAuth().signOut();
                       Navigator.of(context).pushAndRemoveUntil(
-                           MaterialPageRoute(
-                               builder: (context) =>
-                                   signInScreen()),
-                           (Route<dynamic> route) => false);
-                      showSnackBar(context, "Your account is logged out!", 'success');
+                          MaterialPageRoute(
+                              builder: (context) => signInScreen()),
+                          (Route<dynamic> route) => false);
+                      showSnackBar(
+                          context, "Your account is logged out!", 'success');
                     },
                     child: Container(
                       width: 122,
@@ -346,7 +350,6 @@ logoutDialog(BuildContext context) {
   );
 }
 
-
 //add trouble dialog
 int selected = 0;
 Widget customRadio(String role, int index, StateSetter setState) {
@@ -356,6 +359,7 @@ Widget customRadio(String role, int index, StateSetter setState) {
         onTap: () {
           setState(() {
             selected = index;
+            category = role;
           });
         },
         child: AnimatedContainer(
@@ -388,8 +392,14 @@ Widget customRadio(String role, int index, StateSetter setState) {
       ));
 }
 
-addTroubleDialog(BuildContext context) {
-  showDialog(
+//addTroubleDialog
+String name = '';
+String category = '';
+String money = '';
+bool isStatusValid = false;
+// String idTrouble = '';
+Future addTroubleDialog(BuildContext context, String idTrouble) {
+  return showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
@@ -468,8 +478,9 @@ addTroubleDialog(BuildContext context) {
                           width: 251,
                           height: 36,
                           child: TextFormField(
-                            // initialValue:
-                            //     'Tại sao em lại ra đi hả Bùi Khắc Lam',
+                            onChanged: (value) {
+                              name = value;
+                            },
                             autofocus: false,
                             style: TextStyle(
                                 fontFamily: 'SFProText',
@@ -545,18 +556,20 @@ addTroubleDialog(BuildContext context) {
                                 fontWeight: FontWeight.w400,
                                 color: blackLight,
                                 height: 1.0),
+                            onChanged: (value) {
+                              money = value;
+                            },
                             decoration: InputDecoration(
                               prefix: Column(
                                 children: [
                                   Text(
                                     '\$ ',
                                     style: TextStyle(
-                                      fontFamily: 'SFProText',
-                                      fontSize: content12,
-                                      fontWeight: FontWeight.w400,
-                                      color: blackLight,
-                                      height: 1.4
-                                    ),
+                                        fontFamily: 'SFProText',
+                                        fontSize: content12,
+                                        fontWeight: FontWeight.w400,
+                                        color: blackLight,
+                                        height: 1.4),
                                   ),
                                   SizedBox(height: 0.3)
                                 ],
@@ -578,13 +591,34 @@ addTroubleDialog(BuildContext context) {
                             ),
                           ),
                         ),
-                        SizedBox( height: 32),
+                        SizedBox(height: 32),
                         Row(
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.pop(context);
-                                showSnackBar(context, 'The trouble have been created!', 'success');
+                                FirebaseFirestore.instance
+                                    .collection('troubles')
+                                    .add({
+                                  "name": name,
+                                  "category": category,
+                                  "money": money,
+                                  'idIncidentReport': '',
+                                }).then((value) {
+                                  FirebaseFirestore.instance
+                                      .collection('troubles')
+                                      .doc(value.id)
+                                      .update({
+                                    'id': value.id,
+                                  });
+                                  print("value.id");
+                                  print(value.id);
+                                  idTrouble = value.id;
+                                  Navigator.of(context).pop(idTrouble);
+                                  showSnackBar(
+                                      context,
+                                      'The trouble have been created!',
+                                      'success');
+                                });
                               },
                               child: AnimatedContainer(
                                 duration: Duration(milliseconds: 300),
@@ -1056,13 +1090,12 @@ watchUserDialog(BuildContext context, String _name, String _email, String _phone
                       Text(
                         _name,
                         style: TextStyle(
-                          fontSize: content18,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'SFProText',
-                          color: blackLight,
-                          decoration: TextDecoration.none,
-                          height: 1.4
-                        ),
+                            fontSize: content18,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'SFProText',
+                            color: blackLight,
+                            decoration: TextDecoration.none,
+                            height: 1.4),
                       ),
                       SizedBox(
                         height: 8,
@@ -1078,13 +1111,12 @@ watchUserDialog(BuildContext context, String _name, String _email, String _phone
                       Text(
                         _email,
                         style: TextStyle(
-                          fontSize: content10,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'SFProText',
-                          color: grey8,
-                          decoration: TextDecoration.none,
-                          height: 1.4
-                        ),
+                            fontSize: content10,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SFProText',
+                            color: grey8,
+                            decoration: TextDecoration.none,
+                            height: 1.4),
                       ),
                       SizedBox(
                         height: 4,
@@ -1092,13 +1124,12 @@ watchUserDialog(BuildContext context, String _name, String _email, String _phone
                       Text(
                         _phone_number,
                         style: TextStyle(
-                          fontSize: content10,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'SFProText',
-                          color: grey8,
-                          decoration: TextDecoration.none,
-                          height: 1.4
-                        ),
+                            fontSize: content10,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SFProText',
+                            color: grey8,
+                            decoration: TextDecoration.none,
+                            height: 1.4),
                       ),
                       SizedBox(
                         height: 4,
@@ -1106,13 +1137,12 @@ watchUserDialog(BuildContext context, String _name, String _email, String _phone
                       Text(
                         '@' + _dob,
                         style: TextStyle(
-                          fontSize: content10,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'SFProText',
-                          color: grey8,
-                          decoration: TextDecoration.none,
-                          height: 1.4
-                        ),
+                            fontSize: content10,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'SFProText',
+                            color: grey8,
+                            decoration: TextDecoration.none,
+                            height: 1.4),
                       ),
                     ],
                   ),
@@ -1217,7 +1247,8 @@ watchUserDialog(BuildContext context, String _name, String _email, String _phone
   );
 }
 
-removeDialog(BuildContext context) {
+removeIncidentReportDialog(
+    BuildContext context, String idIncidentReport, List troubleList) {
   return showGeneralDialog(
     barrierLabel: "Label",
     barrierDismissible: true,
@@ -1302,9 +1333,25 @@ removeDialog(BuildContext context) {
                   ),
                   GestureDetector(
                     onTap: () {
+                      FirebaseFirestore.instance
+                          .collection('troubles')
+                          .get()
+                          .then((value) => value.docs.forEach((element) {
+                                if (troubleList
+                                    .contains(element.data()['id'] as String)) {
+                                  FirebaseFirestore.instance
+                                      .collection('troubles')
+                                      .doc(element.data()['id'])
+                                      .delete();
+                                }
+                              }))
+                          .whenComplete(() => FirebaseFirestore.instance
+                              .collection('incidentReports')
+                              .doc(idIncidentReport)
+                              .delete());
                       Navigator.of(context)
-                      ..pop()
-                      ..pop();
+                        ..pop()
+                        ..pop();
                     },
                     child: Container(
                       width: 122,
@@ -1482,10 +1529,10 @@ checkoutDialog(BuildContext context) {
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
-                      showSnackBar(context, 'The order has been passed!', "success");
+                      showSnackBar(
+                          context, 'The order has been passed!', "success");
                     },
-                    child: 
-                      Container(
+                    child: Container(
                       width: 122,
                       height: 40,
                       decoration: BoxDecoration(
@@ -1573,6 +1620,380 @@ checkoutDialog(BuildContext context) {
       );
     },
   );
+}
+
+List<appUser> userListChoice = [];
+TextEditingController searchController = TextEditingController();
+Future addPerformerDialog(BuildContext mContext, String id) {
+  return showDialog(
+      context: mContext,
+      builder: (context) {
+        return StatefulBuilder(builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0),
+            ),
+            contentPadding: EdgeInsets.zero,
+            insetPadding: EdgeInsets.all(28),
+            backgroundColor: white,
+            content: Container(
+              width: 319,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: white,
+                boxShadow: [
+                  BoxShadow(
+                    color: black.withOpacity(0.25),
+                    spreadRadius: 0,
+                    blurRadius: 4,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(top: 28, left: 28),
+                        alignment: Alignment.center,
+                        child: Form(
+                          // key: searchFormKey,
+                          child: Container(
+                            width: 230,
+                            height: 36,
+                            padding: EdgeInsets.only(right: 16),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: whiteLight),
+                            alignment: Alignment.topCenter,
+                            child: TextFormField(
+                                controller: searchController,
+                                onChanged: (val) {
+                                  FirebaseFirestore.instance
+                                      .collection("users")
+                                      .where("email",
+                                          isEqualTo: searchController.text)
+                                      .get()
+                                      .then((value) {
+                                    setState(() {
+                                      value.docs.forEach((element) {
+                                        var check = userListChoice.where(
+                                            (element) =>
+                                                element.email ==
+                                                searchController.text);
+                                        if (check.isEmpty) {
+                                          userListChoice.add(
+                                              appUser.fromDocument(element));
+                                        } else {
+                                          showSnackBar(
+                                              context,
+                                              "This email is searched ",
+                                              "error");
+                                        }
+                                      });
+                                    });
+                                  });
+                                },
+                                onEditingComplete: () {
+                                  FirebaseFirestore.instance
+                                      .collection("users")
+                                      .where("email",
+                                          isEqualTo: searchController.text)
+                                      .get()
+                                      .then((value) {
+                                    setState(() {
+                                      value.docs.forEach((element) {
+                                        var check = userListChoice.where(
+                                            (element) =>
+                                                element.email ==
+                                                searchController.text);
+                                        if (check.isEmpty) {
+                                          userListChoice.add(
+                                              appUser.fromDocument(element));
+                                        } else {
+                                          showSnackBar(
+                                              context,
+                                              "This email is searched ",
+                                              "error");
+                                        }
+                                      });
+                                    });
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 12,
+                                    color: black,
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.5),
+                                // controller: searchController,
+                                keyboardType: TextInputType.text,
+                                decoration: InputDecoration(
+                                  prefixIcon: Container(
+                                      child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                        Icon(Iconsax.search_normal_1,
+                                            size: 16, color: black)
+                                      ])),
+                                  border: InputBorder.none,
+                                  hintText: "Search by entering email",
+                                  hintStyle: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12,
+                                      color: Color(0xFF666666),
+                                      fontWeight: FontWeight.w400,
+                                      height: 1.6),
+                                )),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        padding: EdgeInsets.only(top: 28),
+                        onPressed: () {
+                          // Navigator.pop(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) =>
+                          //         projectManagementScreen(required, uid: uid),
+                          //   )
+                          // );
+                        },
+                        icon:
+                            Icon(Iconsax.close_square, size: 20, color: black),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    padding: EdgeInsets.only(left: 28, right: 28),
+                    child: Container(
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: userListChoice.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.of(context)
+                                  .pop(userListChoice[index].id);
+                              showSnackBar(context, 'The user have been added!',
+                                  'success');
+                              setState(() {
+                                searchController.clear();
+                                userListChoice.clear();
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: blueLight,
+                                  borderRadius: BorderRadius.circular(8)),
+                              height: 48,
+                              width: 319,
+                              child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 16),
+                                        AnimatedContainer(
+                                          alignment: Alignment.center,
+                                          duration: Duration(milliseconds: 300),
+                                          height: 32,
+                                          width: 32,
+                                          decoration: BoxDecoration(
+                                            color: blueWater,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    userListChoice[index]
+                                                        .avatar),
+                                                fit: BoxFit.cover),
+                                            shape: BoxShape.rectangle,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 163,
+                                                  child: Text(
+                                                    userListChoice[index].name,
+                                                    style: TextStyle(
+                                                      fontSize: content14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontFamily: 'SFProText',
+                                                      color: blackLight,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  height: 16,
+                                                  width: 44,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            4.0),
+                                                    color: blueWater,
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      userListChoice[index]
+                                                          .role,
+                                                      style: TextStyle(
+                                                        fontFamily: 'SFProText',
+                                                        fontSize: content6,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Iconsax.sms,
+                                                  color: blackLight,
+                                                  size: 12,
+                                                ),
+                                                SizedBox(
+                                                  width: 4,
+                                                ),
+                                                Text(
+                                                  userListChoice[index].email,
+                                                  style: TextStyle(
+                                                    fontFamily: 'SFProText',
+                                                    fontSize: content8,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: grey8,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ]),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.center,
+                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                  //   children: [
+                  //     GestureDetector(
+                  //       onTap: () {
+                  //         Navigator.of(context).pop(id);
+                  //         showSnackBar(
+                  //             context, 'The user have been added!', 'success');
+                  //       },
+                  //       child: AnimatedContainer(
+                  //         duration: Duration(milliseconds: 300),
+                  //         width: 122,
+                  //         height: 40,
+                  //         decoration: BoxDecoration(
+                  //           gradient: LinearGradient(
+                  //               begin: Alignment.centerLeft,
+                  //               end: Alignment.centerRight,
+                  //               colors: [
+                  //                 blueWater,
+                  //                 Color(0xFF979DFA),
+                  //               ],
+                  //               stops: [
+                  //                 0.0,
+                  //                 1.0,
+                  //               ]),
+                  //           borderRadius: BorderRadius.all(
+                  //             Radius.circular(8.0),
+                  //           ),
+                  //           boxShadow: [
+                  //             BoxShadow(
+                  //               color: black.withOpacity(0.25),
+                  //               spreadRadius: 0,
+                  //               blurRadius: 4,
+                  //               offset: Offset(0, 4),
+                  //             ),
+                  //           ],
+                  //         ),
+                  //         child: Center(
+                  //           child: Text(
+                  //             'Add',
+                  //             style: TextStyle(
+                  //               fontFamily: "SFProText",
+                  //               fontSize: 16,
+                  //               color: white,
+                  //               fontWeight: FontWeight.w600,
+                  //               decoration: TextDecoration.none,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     GestureDetector(
+                  //       onTap: () {
+                  //         Navigator.pop(context);
+                  //       },
+                  //       child: AnimatedContainer(
+                  //         duration: Duration(milliseconds: 300),
+                  //         width: 122,
+                  //         height: 40,
+                  //         decoration: BoxDecoration(
+                  //           borderRadius: BorderRadius.all(
+                  //             Radius.circular(8.0),
+                  //           ),
+                  //         ),
+                  //         child: Center(
+                  //           child: Text(
+                  //             'Cancel',
+                  //             style: TextStyle(
+                  //               fontFamily: "SFProText",
+                  //               fontSize: 16,
+                  //               color: blackLight,
+                  //               fontWeight: FontWeight.w600,
+                  //               decoration: TextDecoration.none,
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  SizedBox(height: 28)
+                ],
+              ),
+            ),
+          );
+        });
+      });
 }
 
 searchDialog(

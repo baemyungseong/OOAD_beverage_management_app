@@ -60,6 +60,7 @@ class _signInScreenState extends State<signInScreen> {
           statusBarIconBrightness: Brightness.light,
           statusBarColor: Colors.transparent),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -207,11 +208,10 @@ class _signInScreenState extends State<signInScreen> {
                           alignment: Alignment.topCenter,
                           child: TextFormField(
                               style: TextStyle(
-                                fontFamily: 'SFProText',
-                                fontSize: 16,
-                                color: blackLight,
-                                fontWeight: FontWeight.w400
-                              ),
+                                  fontFamily: 'SFProText',
+                                  fontSize: 16,
+                                  color: blackLight,
+                                  fontWeight: FontWeight.w400),
                               controller: emailController,
                               keyboardType: TextInputType.emailAddress,
                               autofillHints: [AutofillHints.email],
@@ -225,7 +225,7 @@ class _signInScreenState extends State<signInScreen> {
                               // },
                               decoration: InputDecoration(
                                 contentPadding:
-                                  EdgeInsets.only(left: 20, right: 12),
+                                    EdgeInsets.only(left: 20, right: 12),
                                 hintStyle: TextStyle(
                                     fontFamily: 'SFProText',
                                     fontSize: content16,
@@ -243,8 +243,7 @@ class _signInScreenState extends State<signInScreen> {
                                   fontSize: 0,
                                   height: 0,
                                 ),
-                              )
-                          ),
+                              )),
                         ),
                       ),
                       SizedBox(height: 16),
@@ -259,15 +258,13 @@ class _signInScreenState extends State<signInScreen> {
                           alignment: Alignment.topCenter,
                           child: TextFormField(
                               style: TextStyle(
-                                fontFamily: 'SFProText',
-                                fontSize: 16,
-                                color: blackLight,
-                                fontWeight: FontWeight.w400
-                              ),
+                                  fontFamily: 'SFProText',
+                                  fontSize: 16,
+                                  color: blackLight,
+                                  fontWeight: FontWeight.w400),
                               controller: passwordController,
                               obscureText: isHiddenPassword,
-                              keyboardType:
-                                  TextInputType.visiblePassword,
+                              keyboardType: TextInputType.visiblePassword,
                               autofillHints: [AutofillHints.password],
                               // //validator
                               // validator: (password) {
@@ -279,29 +276,30 @@ class _signInScreenState extends State<signInScreen> {
                               // },
                               decoration: InputDecoration(
                                 suffixIcon: InkWell(
-                                onTap: _togglePasswordView,
-                                child: isHiddenPassword
-                                  ? Stack(
-                                      alignment: Alignment.centerRight,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 20),
-                                          child: Icon(Iconsax.eye, size: 24, color: grey8)
-                                        )
-                                      ]
-                                  )
-                                  : Stack(
-                                    alignment: Alignment.centerRight,
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.only(right: 20),
-                                        child: Icon(Iconsax.eye_slash, size: 24, color: grey8)
-                                      )
-                                    ]
-                                  )
-                                ),
+                                    onTap: _togglePasswordView,
+                                    child: isHiddenPassword
+                                        ? Stack(
+                                            alignment: Alignment.centerRight,
+                                            children: [
+                                                Container(
+                                                    padding: EdgeInsets.only(
+                                                        right: 20),
+                                                    child: Icon(Iconsax.eye,
+                                                        size: 24, color: grey8))
+                                              ])
+                                        : Stack(
+                                            alignment: Alignment.centerRight,
+                                            children: [
+                                                Container(
+                                                    padding: EdgeInsets.only(
+                                                        right: 20),
+                                                    child: Icon(
+                                                        Iconsax.eye_slash,
+                                                        size: 24,
+                                                        color: grey8))
+                                              ])),
                                 contentPadding:
-                                  EdgeInsets.only(left: 20, right: 12),
+                                    EdgeInsets.only(left: 20, right: 12),
                                 hintStyle: TextStyle(
                                     fontFamily: 'SFProText',
                                     fontSize: content16,
@@ -319,8 +317,7 @@ class _signInScreenState extends State<signInScreen> {
                                   fontSize: 0,
                                   height: 0,
                                 ),
-                              )
-                          ),
+                              )),
                         ),
                       ),
                       Container(
@@ -387,8 +384,7 @@ class _signInScreenState extends State<signInScreen> {
                               fontSize: textButton20),
                         ),
                       ),
-                    )
-                ),
+                    )),
               ],
             )),
       ),
@@ -445,7 +441,7 @@ class _signInScreenState extends State<signInScreen> {
           );   
         }   
       });
-    }    
+    }
   }
 
   //Create function

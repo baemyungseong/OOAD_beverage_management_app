@@ -21,7 +21,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
-
 //import Firebase stuffs
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -34,13 +33,13 @@ class profileDetailScreen extends StatefulWidget {
 
 class _profileDetailScreenState extends State<profileDetailScreen>
     with InputValidationMixin {
-
   TextEditingController nameController = TextEditingController();
   GlobalKey<FormState> nameFormKey = GlobalKey<FormState>();
   TextEditingController phoneNumberController = TextEditingController();
   GlobalKey<FormState> phoneNumberFormKey = GlobalKey<FormState>();
 
-  late DateTime selectDate = new DateFormat("dd/MM/yyyy").parse(currentUser.dob);
+  late DateTime selectDate =
+      new DateFormat("dd/MM/yyyy").parse(currentUser.dob);
 
   @override
   Widget build(BuildContext context) {
@@ -55,20 +54,18 @@ class _profileDetailScreenState extends State<profileDetailScreen>
           ),
           SingleChildScrollView(
             child:
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start, 
-                children: [
-                  SizedBox(height: 62),
-                  IconButton(
-                    padding: EdgeInsets.only(left: appPadding),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Iconsax.arrow_square_left,
-                        size: 32, color: blackLight),
-                  ),
-                  SizedBox(height: 8),
-                  Container(
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(height: 62),
+              IconButton(
+                padding: EdgeInsets.only(left: appPadding),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Iconsax.arrow_square_left,
+                    size: 32, color: blackLight),
+              ),
+              SizedBox(height: 8),
+              Container(
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.only(left: appPadding, right: appPadding),
                   child: Column(
@@ -85,297 +82,303 @@ class _profileDetailScreenState extends State<profileDetailScreen>
                       ),
                     ],
                   )),
-                  SizedBox(height: 32),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      child: Text(
-                        "Username",
-                        style: TextStyle(
-                            fontFamily: "SFProText",
-                            fontSize: 20.0,
-                            color: black,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      alignment: Alignment.centerLeft,
-                      child: Form(
-                        key: nameFormKey,
-                        child: Container(
-                          width: 319,
-                          height: 48,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: blueLight),
-                          alignment: Alignment.topCenter,
-                          child: TextFormField(
-                              style: TextStyle(
-                                  fontFamily: 'SFProText',
-                                  fontSize: 16,
-                                  color: blackLight,
-                                  fontWeight: FontWeight.w400),
-                              controller: nameController,
-                              keyboardType: TextInputType.text,
-                              //validator
-                              validator: (name) {
-                                if (isNameValid(name.toString())) {
-                                  return null;
-                                } else {
-                                  return '';
-                                }
-                              },
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.only(left: 20, right: 12),
-                                hintStyle: TextStyle(
-                                    fontFamily: 'SFProText',
-                                    fontSize: content16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackLight.withOpacity(0.5)),
-                                hintText: "Enter your username",
-                                filled: true,
-                                fillColor: blueLight,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                errorStyle: TextStyle(
-                                  color: Colors.transparent,
-                                  fontSize: 0,
-                                  height: 0,
-                                ),
-                              )),
-                        ),
-                      ),
-                    ),
-                  ]),
-                  SizedBox(height: 24),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      child: Text(
-                        "Phone Number",
-                        style: TextStyle(
-                            fontFamily: "SFProText",
-                            fontSize: 20.0,
-                            color: black,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      alignment: Alignment.centerLeft,
-                      child: Form(
-                        key: phoneNumberFormKey,
-                        child: Container(
-                          width: 319,
-                          height: 48,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: blueLight),
-                          alignment: Alignment.topCenter,
-                          child: TextFormField(
-                              style: TextStyle(
-                                  fontFamily: 'SFProText',
-                                  fontSize: 16,
-                                  color: blackLight,
-                                  fontWeight: FontWeight.w400),
-                              controller: phoneNumberController,
-                              keyboardType: TextInputType.phone,
-                              //validator
-                              validator: (phoneNumber) {
-                                if (isPhoneNumberValid(phoneNumber.toString())) {
-                                  return null;
-                                } else {
-                                  return '';
-                                }
-                              },
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.only(left: 20, right: 12),
-                                hintStyle: TextStyle(
-                                    fontFamily: 'SFProText',
-                                    fontSize: content16,
-                                    fontWeight: FontWeight.w400,
-                                    color: blackLight.withOpacity(0.5)),
-                                hintText: "Enter your phone number",
-                                filled: true,
-                                fillColor: blueLight,
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                errorStyle: TextStyle(
-                                  color: Colors.transparent,
-                                  fontSize: 0,
-                                  height: 0,
-                                ),
-                              )),
-                        ),
-                      ),
-                    ),
-                  ]),
-                  SizedBox(height: 24),
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      child: Text(
-                        "Date of Birth",
-                        style: TextStyle(
-                          fontFamily: "SFProText",
-                          fontSize: 20.0,
-                          color: black,
-                          fontWeight: FontWeight.w500
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () async {
-                          String category = "dob";
-                          DateTime? dt = await datePickerDialog(context, selectDate, category);
-                          if (dt != null) {
-                            selectDate = dt;
-                            setState(() {
-                              selectDate != selectDate;
-                            });
-                          }
-                          print(selectDate);
-                        },
-                        child: AnimatedContainer(
-                            alignment: Alignment.center,
-                            duration: Duration(milliseconds: 300),
-                            height: 48,
-                            width: 180,
-                            decoration: BoxDecoration(
-                              color: blueLight,
-                              borderRadius: BorderRadius.circular(8),
+              SizedBox(height: 32),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  padding: EdgeInsets.only(left: appPadding, right: appPadding),
+                  child: Text(
+                    "Username",
+                    style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20.0,
+                        color: black,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.only(left: appPadding, right: appPadding),
+                  alignment: Alignment.centerLeft,
+                  child: Form(
+                    key: nameFormKey,
+                    child: Container(
+                      width: 319,
+                      height: 48,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: blueLight),
+                      alignment: Alignment.topCenter,
+                      child: TextFormField(
+                          style: TextStyle(
+                              fontFamily: 'SFProText',
+                              fontSize: 16,
+                              color: blackLight,
+                              fontWeight: FontWeight.w400),
+                          controller: nameController,
+                          keyboardType: TextInputType.text,
+                          //validator
+                          validator: (name) {
+                            if (isNameValid(name.toString())) {
+                              return null;
+                            } else {
+                              return '';
+                            }
+                          },
+                          decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.only(left: 20, right: 12),
+                            hintStyle: TextStyle(
+                                fontFamily: 'SFProText',
+                                fontSize: content16,
+                                fontWeight: FontWeight.w400,
+                                color: blackLight.withOpacity(0.5)),
+                            hintText: "Enter your username",
+                            filled: true,
+                            fillColor: blueLight,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 12),
-                                Container(
-                                    padding: EdgeInsets.zero,
-                                    alignment: Alignment.center,
-                                    child: Icon(
-                                      Iconsax.calendar_1,
-                                      size: 16,
-                                      color: blackLight,
-                                    )),
-                                SizedBox(width: 8),
-                                Text(
-                                  "${DateFormat('yMMMMd').format(selectDate)}",
-                                  style: TextStyle(
-                                    color: grey8,
-                                    fontFamily: 'SFProText',
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                              ],
-                            )),
-                      ),
+                            errorStyle: TextStyle(
+                              color: Colors.transparent,
+                              fontSize: 0,
+                              height: 0,
+                            ),
+                          )),
                     ),
-                  ]),
-                  SizedBox(height: 64),
-                  Container(
-                    alignment: Alignment.center,
-                    child: GestureDetector(
-                      // onTap: () {
-                      //   if (currentController.text != "" &&
-                      //       newController.text != "" &&
-                      //       confirmController.text != "") {
-                      //     if (currentFormKey.currentState!.validate() &&
-                      //         newFormKey.currentState!.validate() &&
-                      //         confirmFormKey.currentState!.validate()) {
-                      //       if (currentController.text == "password") {
-                      //         if (newController.text == confirmController.text) {
-                      //           showSnackBar(
-                      //               context,
-                      //               'Successfully changed the password!',
-                      //               'success');
-                      //           Navigator.pop(context);
-                      //         } else {
-                      //           showSnackBar(
-                      //               context,
-                      //               "New password isn't confirmed correctly",
-                      //               'error');
-                      //         }
-                      //       } else {
-                      //         showSnackBar(
-                      //             context,
-                      //             'Your current password is not correct!',
-                      //             'error');
-                      //       }
-                      //     } else {
-                      //       showSnackBar(context,
-                      //           'Your password must be more than 6', 'error');
-                      //     }
-                      //   } else {
-                      //     showSnackBar(context, 'Your password can not be blank!',
-                      //         'error');
-                      //   }
-                      // },
-                      onTap: () {
-                        if(nameFormKey.currentState!.validate()) {
-                          if (phoneNumberFormKey.currentState!.validate()) {
-                            showSnackBar(context, 'Successfully changed the profile details!', 'success');
-                            controlChangeDetails();
-                          } else {
-                            showSnackBar(context, 'Your phone number is invalid!', 'error');
-                          }
-                        } else if (phoneNumberFormKey.currentState!.validate()) {
-                          showSnackBar(context, 'Your user name can not be blank!', 'error');
-                        } else {
-                          showSnackBar(context, "Information can not be blank or incorrect!", 'error');
-                        }
-                      },
-                      child: AnimatedContainer(
+                  ),
+                ),
+              ]),
+              SizedBox(height: 24),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  padding: EdgeInsets.only(left: appPadding, right: appPadding),
+                  child: Text(
+                    "Phone Number",
+                    style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20.0,
+                        color: black,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.only(left: appPadding, right: appPadding),
+                  alignment: Alignment.centerLeft,
+                  child: Form(
+                    key: phoneNumberFormKey,
+                    child: Container(
+                      width: 319,
+                      height: 48,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: blueLight),
+                      alignment: Alignment.topCenter,
+                      child: TextFormField(
+                          style: TextStyle(
+                              fontFamily: 'SFProText',
+                              fontSize: 16,
+                              color: blackLight,
+                              fontWeight: FontWeight.w400),
+                          controller: phoneNumberController,
+                          keyboardType: TextInputType.phone,
+                          //validator
+                          validator: (phoneNumber) {
+                            if (isPhoneNumberValid(phoneNumber.toString())) {
+                              return null;
+                            } else {
+                              return '';
+                            }
+                          },
+                          decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.only(left: 20, right: 12),
+                            hintStyle: TextStyle(
+                                fontFamily: 'SFProText',
+                                fontSize: content16,
+                                fontWeight: FontWeight.w400,
+                                color: blackLight.withOpacity(0.5)),
+                            hintText: "Enter your phone number",
+                            filled: true,
+                            fillColor: blueLight,
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            errorStyle: TextStyle(
+                              color: Colors.transparent,
+                              fontSize: 0,
+                              height: 0,
+                            ),
+                          )),
+                    ),
+                  ),
+                ),
+              ]),
+              SizedBox(height: 24),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  padding: EdgeInsets.only(left: appPadding, right: appPadding),
+                  child: Text(
+                    "Date of Birth",
+                    style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20.0,
+                        color: black,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Container(
+                  padding: EdgeInsets.only(left: appPadding, right: appPadding),
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () async {
+                      String category = "dob";
+                      DateTime? dt =
+                          await datePickerDialog(context, selectDate, category);
+                      if (dt != null) {
+                        selectDate = dt;
+                        setState(() {
+                          selectDate != selectDate;
+                        });
+                      }
+                      print(selectDate);
+                    },
+                    child: AnimatedContainer(
                         alignment: Alignment.center,
                         duration: Duration(milliseconds: 300),
                         height: 48,
-                        width: 200,
+                        width: 180,
                         decoration: BoxDecoration(
-                          color: blackLight,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: black.withOpacity(0.25),
-                              spreadRadius: 0,
-                              blurRadius: 4,
-                              offset: Offset(0, 4),
+                          color: blueLight,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(width: 12),
+                            Container(
+                                padding: EdgeInsets.zero,
+                                alignment: Alignment.center,
+                                child: Icon(
+                                  Iconsax.calendar_1,
+                                  size: 16,
+                                  color: blackLight,
+                                )),
+                            SizedBox(width: 8),
+                            Text(
+                              "${DateFormat('yMMMMd').format(selectDate)}",
+                              style: TextStyle(
+                                color: grey8,
+                                fontFamily: 'SFProText',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
                             ),
-                            BoxShadow(
-                              color: black.withOpacity(0.1),
-                              spreadRadius: 0,
-                              blurRadius: 60,
-                              offset: Offset(10, 10),
-                            ),
+                            SizedBox(width: 4),
                           ],
-                        ),
-                        child: Text(
-                          "Confirm",
-                          style: TextStyle(
-                              color: white,
-                              fontFamily: 'SFProText',
-                              fontWeight: FontWeight.w600,
-                              fontSize: textButton20),
-                        ),
-                      ),
-                    )
+                        )),
                   ),
-                  SizedBox(height: 64),
-                ]
-            ),
+                ),
+              ]),
+              SizedBox(height: 64),
+              Container(
+                  alignment: Alignment.center,
+                  child: GestureDetector(
+                    // onTap: () {
+                    //   if (currentController.text != "" &&
+                    //       newController.text != "" &&
+                    //       confirmController.text != "") {
+                    //     if (currentFormKey.currentState!.validate() &&
+                    //         newFormKey.currentState!.validate() &&
+                    //         confirmFormKey.currentState!.validate()) {
+                    //       if (currentController.text == "password") {
+                    //         if (newController.text == confirmController.text) {
+                    //           showSnackBar(
+                    //               context,
+                    //               'Successfully changed the password!',
+                    //               'success');
+                    //           Navigator.pop(context);
+                    //         } else {
+                    //           showSnackBar(
+                    //               context,
+                    //               "New password isn't confirmed correctly",
+                    //               'error');
+                    //         }
+                    //       } else {
+                    //         showSnackBar(
+                    //             context,
+                    //             'Your current password is not correct!',
+                    //             'error');
+                    //       }
+                    //     } else {
+                    //       showSnackBar(context,
+                    //           'Your password must be more than 6', 'error');
+                    //     }
+                    //   } else {
+                    //     showSnackBar(context, 'Your password can not be blank!',
+                    //         'error');
+                    //   }
+                    // },
+                    onTap: () {
+                      if (nameFormKey.currentState!.validate()) {
+                        if (phoneNumberFormKey.currentState!.validate()) {
+                          showSnackBar(
+                              context,
+                              'Successfully changed the profile details!',
+                              'success');
+                          controlChangeDetails();
+                        } else {
+                          showSnackBar(context, 'Your phone number is invalid!',
+                              'error');
+                        }
+                      } else if (phoneNumberFormKey.currentState!.validate()) {
+                        showSnackBar(context,
+                            'Your user name can not be blank!', 'error');
+                      } else {
+                        showSnackBar(
+                            context,
+                            "Information can not be blank or incorrect!",
+                            'error');
+                      }
+                    },
+                    child: AnimatedContainer(
+                      alignment: Alignment.center,
+                      duration: Duration(milliseconds: 300),
+                      height: 48,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: blackLight,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: black.withOpacity(0.25),
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                          ),
+                          BoxShadow(
+                            color: black.withOpacity(0.1),
+                            spreadRadius: 0,
+                            blurRadius: 60,
+                            offset: Offset(10, 10),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        "Confirm",
+                        style: TextStyle(
+                            color: white,
+                            fontFamily: 'SFProText',
+                            fontWeight: FontWeight.w600,
+                            fontSize: textButton20),
+                      ),
+                    ),
+                  )),
+              SizedBox(height: 64),
+            ]),
           )
         ],
       ),
@@ -390,11 +393,12 @@ class _profileDetailScreenState extends State<profileDetailScreen>
     });
 
     //Update local appUser's details due to Firestore user's details
-    DocumentSnapshot documentSnapshot = await userReference.doc(currentUser.id).get();
+    DocumentSnapshot documentSnapshot =
+        await userReference.doc(currentUser.id).get();
     currentUser = appUser.fromDocument(documentSnapshot);
 
     Navigator.pop(context);
-  } 
+  }
 }
 
 //Create validation

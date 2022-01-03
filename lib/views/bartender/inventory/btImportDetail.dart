@@ -26,12 +26,10 @@ class btImportDetailScreen extends StatefulWidget {
   btImportDetailScreen({Key? key}) : super(key: key);
 
   @override
-  _btImportDetailScreenState createState() =>
-      _btImportDetailScreenState();
+  _btImportDetailScreenState createState() => _btImportDetailScreenState();
 }
 
 class _btImportDetailScreenState extends State<btImportDetailScreen> {
-
   bool isCheckout = false;
 
   @override
@@ -211,13 +209,16 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       Container(
                                         // height: 465,
                                         child: ListView.separated(
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           padding: EdgeInsets.zero,
                                           scrollDirection: Axis.vertical,
                                           shrinkWrap: true,
                                           itemCount: 1,
-                                          separatorBuilder: (BuildContext context, int index) =>
-                                              SizedBox(height: 12),
+                                          separatorBuilder:
+                                              (BuildContext context,
+                                                      int index) =>
+                                                  SizedBox(height: 12),
                                           itemBuilder: (context, index) {
                                             return GestureDetector(
                                               onTap: () {
@@ -225,40 +226,61 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                               },
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  color: blueLight,
-                                                  borderRadius: BorderRadius.circular(8)
-                                                ),
+                                                    color: blueLight,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8)),
                                                 height: 48,
                                                 width: 319,
                                                 child: Column(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Row(
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
                                                         children: [
                                                           SizedBox(width: 16),
                                                           AnimatedContainer(
-                                                            alignment: Alignment.center,
-                                                            duration: Duration(milliseconds: 300),
+                                                            alignment: Alignment
+                                                                .center,
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    300),
                                                             height: 32,
                                                             width: 32,
-                                                            decoration: BoxDecoration(
+                                                            decoration:
+                                                                BoxDecoration(
                                                               color: blueWater,
                                                               borderRadius:
-                                                                  BorderRadius.circular(8),
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
                                                               image: DecorationImage(
                                                                   image: NetworkImage(
                                                                       'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
-                                                                  fit: BoxFit.cover),
-                                                              shape: BoxShape.rectangle,
+                                                                  fit: BoxFit
+                                                                      .cover),
+                                                              shape: BoxShape
+                                                                  .rectangle,
                                                             ),
                                                           ),
                                                           SizedBox(width: 16),
                                                           Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            mainAxisAlignment: MainAxisAlignment.center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
                                                             children: [
                                                               Row(
                                                                 children: [
@@ -266,45 +288,62 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                                     width: 168,
                                                                     child: Text(
                                                                       'Pan Cái Chảo',
-                                                                      style: TextStyle(
-                                                                        fontSize: content14,
-                                                                        fontWeight: FontWeight.w600,
-                                                                        fontFamily: 'SFProText',
-                                                                        color: blackLight,
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            content14,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                        fontFamily:
+                                                                            'SFProText',
+                                                                        color:
+                                                                            blackLight,
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  SizedBox(width: 43 - 24),
+                                                                  SizedBox(
+                                                                      width: 43 -
+                                                                          24),
                                                                   Container(
                                                                     height: 16,
                                                                     width: 44,
-                                                                    decoration: BoxDecoration(
+                                                                    decoration:
+                                                                        BoxDecoration(
                                                                       borderRadius:
                                                                           BorderRadius.circular(
                                                                               4.0),
-                                                                      color: blueWater,
+                                                                      color:
+                                                                          blueWater,
                                                                     ),
-                                                                    child: Center(
-                                                                      child: Text(
+                                                                    child:
+                                                                        Center(
+                                                                      child:
+                                                                          Text(
                                                                         'Bartender',
-                                                                        style: TextStyle(
-                                                                          fontFamily: 'SFProText',
-                                                                          fontSize: content6,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              'SFProText',
+                                                                          fontSize:
+                                                                              content6,
                                                                           fontWeight:
                                                                               FontWeight.w500,
-                                                                          color: white,
+                                                                          color:
+                                                                              white,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
-                                                              SizedBox(height: 4),
+                                                              SizedBox(
+                                                                  height: 4),
                                                               Row(
                                                                 children: [
                                                                   Icon(
                                                                     Iconsax.sms,
-                                                                    color: blackLight,
+                                                                    color:
+                                                                        blackLight,
                                                                     size: 12,
                                                                   ),
                                                                   SizedBox(
@@ -312,11 +351,17 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                                   ),
                                                                   Text(
                                                                     'nhatkb2001@gmail.com',
-                                                                    style: TextStyle(
-                                                                      fontFamily: 'SFProText',
-                                                                      fontSize: content8,
-                                                                      fontWeight: FontWeight.w500,
-                                                                      color: grey8,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'SFProText',
+                                                                      fontSize:
+                                                                          content8,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color:
+                                                                          grey8,
                                                                     ),
                                                                   ),
                                                                 ],
@@ -325,8 +370,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                    ]
-                                                  ),
+                                                    ]),
                                               ),
                                             );
                                           },
@@ -680,60 +724,68 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       ),
                                       SizedBox(height: 40),
                                       Container(
-                                        alignment: Alignment.center,
-                                        child: GestureDetector(
-                                          //action navigate to dashboard screen
-                                          onTap: () {
-                                            setState(() {
-                                              checkoutDialog(context);
-                                              isCheckout = true;
-                                              // Navigator.pop(context);
-                                            });
-                                          },
-                                          child: AnimatedContainer(
-                                            alignment: Alignment.center,
-                                            duration: Duration(milliseconds: 300),
-                                            height: 48,
-                                            width: 200,
-                                            decoration: BoxDecoration(
-                                              color: (isCheckout) ? white : blackLight,
-                                              borderRadius:
-                                                  BorderRadius.all(Radius.circular(12)),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: black.withOpacity(0.25),
-                                                  spreadRadius: 0,
-                                                  blurRadius: 4,
-                                                  offset: Offset(
-                                                      0, 4), // changes position of shadow
-                                                ),
-                                                BoxShadow(
-                                                  color: black.withOpacity(0.1),
-                                                  spreadRadius: 0,
-                                                  blurRadius: 64,
-                                                  offset: Offset(
-                                                      15, 15), // changes position of shadow
-                                                ),
-                                              ],
+                                          alignment: Alignment.center,
+                                          child: GestureDetector(
+                                            //action navigate to dashboard screen
+                                            onTap: () {
+                                              setState(() {
+                                                checkoutDialog(context);
+                                                isCheckout = true;
+                                                // Navigator.pop(context);
+                                              });
+                                            },
+                                            child: AnimatedContainer(
+                                              alignment: Alignment.center,
+                                              duration:
+                                                  Duration(milliseconds: 300),
+                                              height: 48,
+                                              width: 200,
+                                              decoration: BoxDecoration(
+                                                color: (isCheckout)
+                                                    ? white
+                                                    : blackLight,
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(12)),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color:
+                                                        black.withOpacity(0.25),
+                                                    spreadRadius: 0,
+                                                    blurRadius: 4,
+                                                    offset: Offset(0,
+                                                        4), // changes position of shadow
+                                                  ),
+                                                  BoxShadow(
+                                                    color:
+                                                        black.withOpacity(0.1),
+                                                    spreadRadius: 0,
+                                                    blurRadius: 64,
+                                                    offset: Offset(15,
+                                                        15), // changes position of shadow
+                                                  ),
+                                                ],
+                                              ),
+                                              child: (isCheckout)
+                                                  ? Container(
+                                                      child: Icon(
+                                                          Iconsax.refresh,
+                                                          size: 24,
+                                                          color: blackLight),
+                                                    )
+                                                  : Container(
+                                                      child: Text(
+                                                      "Checkout",
+                                                      style: TextStyle(
+                                                          color: whiteLight,
+                                                          fontFamily:
+                                                              'SFProText',
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontSize:
+                                                              textButton20),
+                                                    )),
                                             ),
-                                            child: (isCheckout)
-                                            ? Container(
-                                              child: Icon(Iconsax.refresh, size: 24, color: blackLight),
-                                            )
-                                            : Container(
-                                              child: Text(
-                                                "Checkout",
-                                                style: TextStyle(
-                                                  color: whiteLight,
-                                                  fontFamily: 'SFProText',
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: textButton20
-                                                ),
-                                              )
-                                            ),
-                                          ),
-                                        )
-                                      ),
+                                          )),
                                       SizedBox(height: 24)
                                     ]),
                               )
@@ -761,7 +813,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                       Container(
                           child: GestureDetector(
                         onTap: () {
-                          removeDialog(context);
+                          // removeDialog(context);
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(
@@ -769,7 +821,8 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                           //   ),
                           // );
                           // // .then((value) {});
-                          showSnackBar(context, 'The order has been removed!', "success");
+                          showSnackBar(context, 'The order has been removed!',
+                              "success");
                         },
                         child: AnimatedContainer(
                           alignment: Alignment.center,
@@ -818,8 +871,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      btImportEditingScreen(),
+                                  builder: (context) => btImportEditingScreen(),
                                 ),
                               );
                               // .then((value) {});
