@@ -1,9 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
+
+import 'package:flutter_string_encryption/flutter_string_encryption.dart';
 
 class firebaseAuth {
   //Sign-up
@@ -54,6 +57,7 @@ class firebaseAuth {
           ),
         );
         user.updatePassword(newPassword).then((_) {
+        controlUpdateEncPw(newPassword);
           showSnackBar(context, 'Successfully changed password!', 'success');
           Navigator.pop(context);
         }).catchError((error) {
@@ -67,4 +71,18 @@ class firebaseAuth {
       showSnackBar(context, 'Your current password is wrong!', 'error');
     }
   }
+}
+
+controlUpdateEncPw(_newPw) async {
+  //Update encoded_pw
+  PlatformStringCryptor cryptor;
+  cryptor = PlatformStringCryptor();
+  final salt = await cryptor.generateSalt();
+  var key = await cryptor.generateKeyFromPassword(_newPw, salt);
+  var new_encoded_pw = await cryptor.encrypt(_newPw, key);
+
+  userReference.doc(currentUser.id).update({
+    "encoded_pw": new_encoded_pw,
+    "key": key,
+  });
 }

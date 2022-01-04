@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,6 +34,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 class skUserManagementScreen extends StatefulWidget {
   const skUserManagementScreen({Key? key}) : super(key: key);
@@ -306,191 +309,209 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
         Container(
           height: 598,
           width: 319,
-          child: SingleChildScrollView(
-            child:
-            FutureBuilder(
-              future: getAllAccounts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: 
-                    CircularProgressIndicator(),
-                  );
-                }
-                return Column(
-                children: [
-                  ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: accountsList.length,
-                    separatorBuilder: (BuildContext context, int index) =>
-                        SizedBox(height: 24),
-                    itemBuilder: (context, index) {
-                      return Dismissible(
-                        onDismissed: (direction) => controlDeleteUser(accountsList[index].email, accountsList[index].encoded_pw, accountsList[index].key, accountsList[index].id),
-                        direction: DismissDirection.endToStart,
-                        key: ValueKey(index),
-                        background: Container(
-                          padding: EdgeInsets.only(right: 32),
-                          alignment: Alignment.centerRight,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFFCB356B),
-                                  Color(0xFFBD3F32),
-                                ],
-                                stops: [
-                                  0.0,
-                                  1.0,
-                                ]),
-                          ),
-                          child: Icon(Iconsax.minus, size: 24, color: white)),
-                        child: GestureDetector(
-                          onTap: () {
-                            watchUserDialog(context, accountsList[index].name, accountsList[index].email, 
-                            accountsList[index].phone_number, accountsList[index].dob, accountsList[index].avatar);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.only(left: 24, top: 16, bottom: 16, right: 16),
-                            decoration: BoxDecoration(
-                              color: blueLight,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            height: 80,
-                            width: 319,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
+          child: RefreshIndicator(
+            child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),             
+                child:
+                FutureBuilder(
+                  future: getAllAccounts(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: 
+                        CircularProgressIndicator(),
+                      );
+                    }
+                    return Column(
+                    children: [
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: accountsList.length,
+                        separatorBuilder: (BuildContext context, int index) =>
+                            SizedBox(height: 24),
+                        itemBuilder: (context, index) {
+                          return Dismissible(
+                            onDismissed: (direction) => controlDeleteUser(accountsList[index].email, accountsList[index].encoded_pw, accountsList[index].key, accountsList[index].id),
+                            direction: DismissDirection.endToStart,
+                            key: ValueKey(index),
+                            background: Container(
+                              padding: EdgeInsets.only(right: 32),
+                              alignment: Alignment.centerRight,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFFCB356B),
+                                      Color(0xFFBD3F32),
+                                    ],
+                                    stops: [
+                                      0.0,
+                                      1.0,
+                                    ]),
+                              ),
+                              child: Icon(Iconsax.minus, size: 24, color: white)),
+                            child: GestureDetector(
+                              onTap: () {
+                                watchUserDialog(context, accountsList[index].name, accountsList[index].email, 
+                                accountsList[index].phone_number, accountsList[index].dob, accountsList[index].avatar);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(left: 24, top: 16, bottom: 16, right: 16),
+                                decoration: BoxDecoration(
+                                  color: blueLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                height: 80,
+                                width: 319,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      AnimatedContainer(
-                                        alignment: Alignment.center,
-                                        duration: Duration(milliseconds: 300),
-                                        child: displayAvatar(accountsList[index].avatar),
-                                      ),
-                                      SizedBox(width: 24),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      Row(
                                         children: [
-                                          Row(
+                                          AnimatedContainer(
+                                            alignment: Alignment.center,
+                                            duration: Duration(milliseconds: 300),
+                                            child: displayAvatar(accountsList[index].avatar),
+                                          ),
+                                          SizedBox(width: 24),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                accountsList[index].name,
-                                                style: TextStyle(
-                                                  fontSize: content16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: 'SFProText',
-                                                  color: blackLight,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 50,
-                                              ),
-                                              Container(
-                                                height: 18,
-                                                width: 56,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          4.0),
-                                                  color: blueWater,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    StringUtils.capitalize(accountsList[index].role),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    accountsList[index].name,
                                                     style: TextStyle(
+                                                      fontSize: content16,
+                                                      fontWeight: FontWeight.w600,
                                                       fontFamily: 'SFProText',
-                                                      fontSize: content8,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: white,
+                                                      color: blackLight,
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 8),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Iconsax.sms,
-                                                color: blackLight,
-                                                size: 18,
-                                              ),
-                                              SizedBox(
-                                                width: 6,
-                                              ),
-                                              Text(
-                                                accountsList[index].email,
-                                                style: TextStyle(
-                                                  fontFamily: 'SFProText',
-                                                  fontSize: content12,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: grey8,
+                                                  SizedBox(
+                                                    width: 50,
                                                   ),
+                                                  Container(
+                                                    height: 18,
+                                                    width: 56,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4.0),
+                                                      color: blueWater,
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        StringUtils.capitalize(accountsList[index].role),
+                                                        style: TextStyle(
+                                                          fontFamily: 'SFProText',
+                                                          fontSize: content8,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Iconsax.sms,
+                                                    color: blackLight,
+                                                    size: 18,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 6,
+                                                  ),
+                                                  Text(
+                                                    accountsList[index].email,
+                                                    style: TextStyle(
+                                                      fontFamily: 'SFProText',
+                                                      fontSize: content12,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: grey8,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ]
-                              ),
-                            ),
-                          )
-                        );
-                      },
-                    ),
-                    SizedBox(height: 112),
-                  ],
-                );                            
-              },
-            ), 
+                                      ]
+                                  ),
+                                ),
+                              )
+                            );
+                          },
+                        ),
+                        SizedBox(height: 112),
+                      ],
+                    );                            
+                  },
+                ), 
+              ), 
+            onRefresh: () => controlOnRefresh(),
           ),
         ),
       ],
     );    
   }
 
-  controlDeleteUser(String _email, String _encoded_pw, String _key, String _uid) async {
-      PlatformStringCryptor cryptor;
-      cryptor = PlatformStringCryptor();
-      final salt = await cryptor.generateSalt();
-
-      //Sign in the user
-      var decoded_pw = await cryptor.decrypt(_encoded_pw, _key);
-      firebaseAuth().signIn(_email, decoded_pw, context).then((val) async {
-        FirebaseAuth auth = FirebaseAuth.instance;
-        User? user = auth.currentUser;
-        user!.delete();
-        await auth.signOut();
-        isUserDeleted = true;
-      });
-      userReference.doc(_uid).delete();
-
-      setState(() {
-        reSignIn();
-      });      
+  Future<void> controlOnRefresh() async {
+    setState(() {
+    });
   }
 
-/*
-  reAuth() async {
+  controlDeleteUser(String _email, String _encoded_pw, String _key, String _uid) async {
     PlatformStringCryptor cryptor;
     cryptor = PlatformStringCryptor();
     final salt = await cryptor.generateSalt();
-    //Reauth the storekeeper
-    var decoded_pw_default = await cryptor.decrypt(currentUser.encoded_pw, currentUser.key);
-    AuthCredential credential = EmailAuthProvider.credential(email: currentUser.email, password: decoded_pw_default);
-    await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(credential);
+
+    //Sign in the user
+    var decoded_pw = await cryptor.decrypt(_encoded_pw, _key);
+    FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(email: _email, password: decoded_pw);
+      User? user = _firebaseAuth.currentUser;
+      user!.delete().whenComplete(() => deleteAccountSuccessfully(_uid));
+      await _firebaseAuth.signOut();
+    } on FirebaseAuthException catch (e) {
+      onFailureDeleteAccount();
+    } catch(e) {
+      onFailureDeleteAccount();
+    }  
+    reSignIn();
   }
-*/
+
+  deleteAccountSuccessfully(String _uid) async {
+    await userReference.doc(_uid).delete();
+    showSnackBar(
+        context,
+        'Successfully removed the user!',
+        'success');
+    setState(() {
+    });           
+  }
+
+  onFailureDeleteAccount() {
+    showSnackBar(
+        context,
+        'Error occured! Please try again.',
+        'error');
+    setState(() {
+    });             
+  }
+
+
 
   reSignIn() async {
     PlatformStringCryptor cryptor;
