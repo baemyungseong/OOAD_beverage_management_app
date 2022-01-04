@@ -47,7 +47,6 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
   TextEditingController searchController = TextEditingController();
 
   List<appUser> accountsList = [];
-  bool isUserDeleted = false;
 
   void initState() {
     super.initState();
@@ -216,14 +215,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                         child: TextFormField(
                           controller: searchController,
                           autofocus: false,
-                          onEditingComplete: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => skUserSearchingScreen(
-                                searchResult: searchController.text,
-                              ),
-                            ),
-                          ),
+                          onEditingComplete: () => controlSearchUser(),
                           style: TextStyle(
                               fontFamily: 'SFProText',
                               fontSize: content14,
@@ -237,7 +229,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                               color: black,
                             ),
                             contentPadding: EdgeInsets.only(left: 20, right: 0),
-                            hintText: "What're you looking for?",
+                            hintText: "Who are you looking for?",
                             hintStyle: TextStyle(
                                 fontFamily: 'SFProText',
                                 fontSize: content14,
@@ -275,6 +267,26 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
       ),
     );
   }
+
+  controlSearchUser() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });
+  }
+
+  getAllAccountsSeached() async {
+    await getAllAccounts();
+    List<appUser> searchList = [];
+    for (int i = 0; i < accountsList.length; i++) {
+      if (accountsList[i].name.toLowerCase().
+      contains(searchController.text.toLowerCase())) {
+        searchList.add(accountsList[i]);
+      }
+    }
+    accountsList.clear();
+    accountsList = List.from(searchList);
+  }
+  
 
   getAllAccounts() async {
     accountsList.clear();
@@ -314,7 +326,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                 physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),             
                 child:
                 FutureBuilder(
-                  future: getAllAccounts(),
+                  future: searchController.text.isEmpty ? getAllAccounts() : getAllAccountsSeached(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
