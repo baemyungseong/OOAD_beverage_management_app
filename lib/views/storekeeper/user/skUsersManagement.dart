@@ -96,15 +96,10 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                           child: AnimatedContainer(
                             alignment: Alignment.center,
                             duration: Duration(milliseconds: 300),
-                            height: 32,
-                            width: 32,
+                            child: displayAvatar(currentUser.avatar, 32, 32),
                             decoration: BoxDecoration(
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://scontent.fsgn5-8.fna.fbcdn.net/v/t1.6435-9/50903697_2672799252747189_6623025456616570880_n.jpg?_nc_cat=103&ccb=1-5&_nc_sid=0debeb&_nc_ohc=TK2F5ekRXQ8AX8U_UKh&_nc_ht=scontent.fsgn5-8.fna&oh=00_AT9TXhfcm2xYO8PPao04FguuU-QFMshrwKndfcBZ9SjnAg&oe=61E61521'),
-                                  fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
                                 BoxShadow(
@@ -130,7 +125,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Noob chảo',
+                            currentUser.name,
                             style: TextStyle(
                               fontSize: content16,
                               fontWeight: FontWeight.w600,
@@ -145,7 +140,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                'Accountant',
+                                StringUtils.capitalize(currentUser.role),
                                 style: TextStyle(
                                   fontSize: content10,
                                   fontWeight: FontWeight.w400,
@@ -278,7 +273,10 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
     await getAllAccounts();
     List<appUser> searchList = [];
     for (int i = 0; i < accountsList.length; i++) {
-      if (accountsList[i].name.toLowerCase().
+      if (searchController.text.toLowerCase() == accountsList[i].role.toLowerCase()) {
+        searchList.add(accountsList[i]);
+      }
+      else if (accountsList[i].name.toLowerCase().
       contains(searchController.text.toLowerCase())) {
         searchList.add(accountsList[i]);
       }
@@ -303,12 +301,12 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
     accountsList = accountsList.reversed.toList();    
   }
 
-  displayAvatar(String _url) => ClipRRect(
+  displayAvatar(String _url, double _height, double _width) => ClipRRect(
     borderRadius: BorderRadius.circular(8.0),
     child: CachedNetworkImage(
       imageUrl: _url,
-      height: 48,
-      width: 48,
+      height: _height,
+      width: _width,
       fit: BoxFit.cover,
       placeholder: (context, url) => 
         Center(child: CircularProgressIndicator()),
@@ -323,7 +321,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
           width: 319,
           child: RefreshIndicator(
             child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),             
+                physics: const AlwaysScrollableScrollPhysics(),             
                 child:
                 FutureBuilder(
                   future: searchController.text.isEmpty ? getAllAccounts() : getAllAccountsSeached(),
@@ -331,7 +329,14 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                         child: 
-                        CircularProgressIndicator(),
+                          SizedBox(
+                            child: CircularProgressIndicator(
+                              color: blackLight,
+                              strokeWidth: 3,
+                            ),
+                            height: 25.0,
+                            width: 25.0,
+                          ),
                       );
                     }
                     return Column(
@@ -388,7 +393,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                                           AnimatedContainer(
                                             alignment: Alignment.center,
                                             duration: Duration(milliseconds: 300),
-                                            child: displayAvatar(accountsList[index].avatar),
+                                            child: displayAvatar(accountsList[index].avatar, 48, 48),
                                           ),
                                           SizedBox(width: 24),
                                           Column(
