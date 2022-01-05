@@ -40,7 +40,7 @@ class changePasswordSuccessfullyScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 24),
                     Text(
-                      'Successful Changing' + '\n' + 'Password!',
+                      'Successfully Changed' + '\n' + 'Password!',
                       style: TextStyle(
                         fontFamily: 'SFProText',
                         fontSize: title24,

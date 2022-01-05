@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,6 +34,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 class skUserManagementScreen extends StatefulWidget {
   const skUserManagementScreen({Key? key}) : super(key: key);
@@ -44,7 +47,6 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
   TextEditingController searchController = TextEditingController();
 
   List<appUser> accountsList = [];
-  bool isUserDeleted = false;
 
   void initState() {
     super.initState();
@@ -94,15 +96,10 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                           child: AnimatedContainer(
                             alignment: Alignment.center,
                             duration: Duration(milliseconds: 300),
-                            height: 32,
-                            width: 32,
+                            child: displayAvatar(currentUser.avatar, 32, 32),
                             decoration: BoxDecoration(
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://scontent.fsgn5-8.fna.fbcdn.net/v/t1.6435-9/50903697_2672799252747189_6623025456616570880_n.jpg?_nc_cat=103&ccb=1-5&_nc_sid=0debeb&_nc_ohc=TK2F5ekRXQ8AX8U_UKh&_nc_ht=scontent.fsgn5-8.fna&oh=00_AT9TXhfcm2xYO8PPao04FguuU-QFMshrwKndfcBZ9SjnAg&oe=61E61521'),
-                                  fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
                                 BoxShadow(
@@ -128,7 +125,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Noob chảo',
+                            currentUser.name,
                             style: TextStyle(
                               fontSize: content16,
                               fontWeight: FontWeight.w600,
@@ -143,7 +140,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                'Accountant',
+                                StringUtils.capitalize(currentUser.role),
                                 style: TextStyle(
                                   fontSize: content10,
                                   fontWeight: FontWeight.w400,
@@ -213,14 +210,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                         child: TextFormField(
                           controller: searchController,
                           autofocus: false,
-                          onEditingComplete: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => skUserSearchingScreen(
-                                searchResult: searchController.text,
-                              ),
-                            ),
-                          ),
+                          onEditingComplete: () => controlSearchUser(),
                           style: TextStyle(
                               fontFamily: 'SFProText',
                               fontSize: content14,
@@ -234,7 +224,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                               color: black,
                             ),
                             contentPadding: EdgeInsets.only(left: 20, right: 0),
-                            hintText: "What're you looking for?",
+                            hintText: "Who are you looking for?",
                             hintStyle: TextStyle(
                                 fontFamily: 'SFProText',
                                 fontSize: content14,
@@ -273,6 +263,29 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
     );
   }
 
+  controlSearchUser() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });
+  }
+
+  getAllAccountsSeached() async {
+    await getAllAccounts();
+    List<appUser> searchList = [];
+    for (int i = 0; i < accountsList.length; i++) {
+      if (searchController.text.toLowerCase() == accountsList[i].role.toLowerCase()) {
+        searchList.add(accountsList[i]);
+      }
+      else if (accountsList[i].name.toLowerCase().
+      contains(searchController.text.toLowerCase())) {
+        searchList.add(accountsList[i]);
+      }
+    }
+    accountsList.clear();
+    accountsList = List.from(searchList);
+  }
+  
+
   getAllAccounts() async {
     accountsList.clear();
     QuerySnapshot querySnapshot = await userReference.get();
@@ -288,12 +301,12 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
     accountsList = accountsList.reversed.toList();    
   }
 
-  displayAvatar(String _url) => ClipRRect(
+  displayAvatar(String _url, double _height, double _width) => ClipRRect(
     borderRadius: BorderRadius.circular(8.0),
     child: CachedNetworkImage(
       imageUrl: _url,
-      height: 48,
-      width: 48,
+      height: _height,
+      width: _width,
       fit: BoxFit.cover,
       placeholder: (context, url) => 
         Center(child: CircularProgressIndicator()),
@@ -306,191 +319,216 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
         Container(
           height: 598,
           width: 319,
-          child: SingleChildScrollView(
-            child:
-            FutureBuilder(
-              future: getAllAccounts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: 
-                    CircularProgressIndicator(),
-                  );
-                }
-                return Column(
-                children: [
-                  ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: accountsList.length,
-                    separatorBuilder: (BuildContext context, int index) =>
-                        SizedBox(height: 24),
-                    itemBuilder: (context, index) {
-                      return Dismissible(
-                        onDismissed: (direction) => controlDeleteUser(accountsList[index].email, accountsList[index].encoded_pw, accountsList[index].key, accountsList[index].id),
-                        direction: DismissDirection.endToStart,
-                        key: ValueKey(index),
-                        background: Container(
-                          padding: EdgeInsets.only(right: 32),
-                          alignment: Alignment.centerRight,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFFCB356B),
-                                  Color(0xFFBD3F32),
-                                ],
-                                stops: [
-                                  0.0,
-                                  1.0,
-                                ]),
-                          ),
-                          child: Icon(Iconsax.minus, size: 24, color: white)),
-                        child: GestureDetector(
-                          onTap: () {
-                            watchUserDialog(context, accountsList[index].name, accountsList[index].email, 
-                            accountsList[index].phone_number, accountsList[index].dob, accountsList[index].avatar);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.only(left: 24, top: 16, bottom: 16, right: 16),
-                            decoration: BoxDecoration(
-                              color: blueLight,
-                              borderRadius: BorderRadius.circular(8),
+          child: RefreshIndicator(
+            child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),             
+                child:
+                FutureBuilder(
+                  future: searchController.text.isEmpty ? getAllAccounts() : getAllAccountsSeached(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: 
+                          SizedBox(
+                            child: CircularProgressIndicator(
+                              color: blackLight,
+                              strokeWidth: 3,
                             ),
-                            height: 80,
-                            width: 319,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Row(
+                            height: 25.0,
+                            width: 25.0,
+                          ),
+                      );
+                    }
+                    return Column(
+                    children: [
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: accountsList.length,
+                        separatorBuilder: (BuildContext context, int index) =>
+                            SizedBox(height: 24),
+                        itemBuilder: (context, index) {
+                          return Dismissible(
+                            onDismissed: (direction) => controlDeleteUser(accountsList[index].email, accountsList[index].encoded_pw, accountsList[index].key, accountsList[index].id),
+                            direction: DismissDirection.endToStart,
+                            key: ValueKey(index),
+                            background: Container(
+                              padding: EdgeInsets.only(right: 32),
+                              alignment: Alignment.centerRight,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Color(0xFFCB356B),
+                                      Color(0xFFBD3F32),
+                                    ],
+                                    stops: [
+                                      0.0,
+                                      1.0,
+                                    ]),
+                              ),
+                              child: Icon(Iconsax.minus, size: 24, color: white)),
+                            child: GestureDetector(
+                              onTap: () {
+                                watchUserDialog(context, accountsList[index].name, accountsList[index].email, 
+                                accountsList[index].phone_number, accountsList[index].dob, accountsList[index].avatar);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(left: 24, top: 16, bottom: 16, right: 16),
+                                decoration: BoxDecoration(
+                                  color: blueLight,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                height: 80,
+                                width: 319,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      AnimatedContainer(
-                                        alignment: Alignment.center,
-                                        duration: Duration(milliseconds: 300),
-                                        child: displayAvatar(accountsList[index].avatar),
-                                      ),
-                                      SizedBox(width: 24),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      Row(
                                         children: [
-                                          Row(
+                                          AnimatedContainer(
+                                            alignment: Alignment.center,
+                                            duration: Duration(milliseconds: 300),
+                                            child: displayAvatar(accountsList[index].avatar, 48, 48),
+                                          ),
+                                          SizedBox(width: 24),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text(
-                                                accountsList[index].name,
-                                                style: TextStyle(
-                                                  fontSize: content16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: 'SFProText',
-                                                  color: blackLight,
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 50,
-                                              ),
-                                              Container(
-                                                height: 18,
-                                                width: 56,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          4.0),
-                                                  color: blueWater,
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    StringUtils.capitalize(accountsList[index].role),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    accountsList[index].name,
                                                     style: TextStyle(
+                                                      fontSize: content16,
+                                                      fontWeight: FontWeight.w600,
                                                       fontFamily: 'SFProText',
-                                                      fontSize: content8,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: white,
+                                                      color: blackLight,
                                                     ),
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 8),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Iconsax.sms,
-                                                color: blackLight,
-                                                size: 18,
-                                              ),
-                                              SizedBox(
-                                                width: 6,
-                                              ),
-                                              Text(
-                                                accountsList[index].email,
-                                                style: TextStyle(
-                                                  fontFamily: 'SFProText',
-                                                  fontSize: content12,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: grey8,
+                                                  SizedBox(
+                                                    width: 50,
                                                   ),
+                                                  Container(
+                                                    height: 18,
+                                                    width: 56,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4.0),
+                                                      color: blueWater,
+                                                    ),
+                                                    child: Center(
+                                                      child: Text(
+                                                        StringUtils.capitalize(accountsList[index].role),
+                                                        style: TextStyle(
+                                                          fontFamily: 'SFProText',
+                                                          fontSize: content8,
+                                                          fontWeight: FontWeight.w500,
+                                                          color: white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Iconsax.sms,
+                                                    color: blackLight,
+                                                    size: 18,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 6,
+                                                  ),
+                                                  Text(
+                                                    accountsList[index].email,
+                                                    style: TextStyle(
+                                                      fontFamily: 'SFProText',
+                                                      fontSize: content12,
+                                                      fontWeight: FontWeight.w500,
+                                                      color: grey8,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  ]
-                              ),
-                            ),
-                          )
-                        );
-                      },
-                    ),
-                    SizedBox(height: 112),
-                  ],
-                );                            
-              },
-            ), 
+                                      ]
+                                  ),
+                                ),
+                              )
+                            );
+                          },
+                        ),
+                        SizedBox(height: 112),
+                      ],
+                    );                            
+                  },
+                ), 
+              ), 
+            onRefresh: () => controlOnRefresh(),
           ),
         ),
       ],
     );    
   }
 
-  controlDeleteUser(String _email, String _encoded_pw, String _key, String _uid) async {
-      PlatformStringCryptor cryptor;
-      cryptor = PlatformStringCryptor();
-      final salt = await cryptor.generateSalt();
-
-      //Sign in the user
-      var decoded_pw = await cryptor.decrypt(_encoded_pw, _key);
-      firebaseAuth().signIn(_email, decoded_pw, context).then((val) async {
-        FirebaseAuth auth = FirebaseAuth.instance;
-        User? user = auth.currentUser;
-        user!.delete();
-        await auth.signOut();
-        isUserDeleted = true;
-      });
-      userReference.doc(_uid).delete();
-
-      setState(() {
-        reSignIn();
-      });      
+  Future<void> controlOnRefresh() async {
+    setState(() {
+    });
   }
 
-/*
-  reAuth() async {
+  controlDeleteUser(String _email, String _encoded_pw, String _key, String _uid) async {
     PlatformStringCryptor cryptor;
     cryptor = PlatformStringCryptor();
     final salt = await cryptor.generateSalt();
-    //Reauth the storekeeper
-    var decoded_pw_default = await cryptor.decrypt(currentUser.encoded_pw, currentUser.key);
-    AuthCredential credential = EmailAuthProvider.credential(email: currentUser.email, password: decoded_pw_default);
-    await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(credential);
+
+    //Sign in the user
+    var decoded_pw = await cryptor.decrypt(_encoded_pw, _key);
+    FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(email: _email, password: decoded_pw);
+      User? user = _firebaseAuth.currentUser;
+      user!.delete().whenComplete(() => deleteAccountSuccessfully(_uid));
+      await _firebaseAuth.signOut();
+    } on FirebaseAuthException catch (e) {
+      onFailureDeleteAccount();
+    } catch(e) {
+      onFailureDeleteAccount();
+    }  
+    reSignIn();
   }
-*/
+
+  deleteAccountSuccessfully(String _uid) async {
+    await userReference.doc(_uid).delete();
+    showSnackBar(
+        context,
+        'Successfully removed the user!',
+        'success');
+    setState(() {
+    });           
+  }
+
+  onFailureDeleteAccount() {
+    showSnackBar(
+        context,
+        'Error occured! Please try again.',
+        'error');
+    setState(() {
+    });             
+  }
+
+
 
   reSignIn() async {
     PlatformStringCryptor cryptor;
