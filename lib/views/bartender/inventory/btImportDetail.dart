@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +7,9 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/models/importModel.dart';
+import 'package:ui_fresh_app/models/importSubModel.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -23,14 +27,68 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
 class btImportDetailScreen extends StatefulWidget {
-  btImportDetailScreen({Key? key}) : super(key: key);
+  String idImport;
+  btImportDetailScreen({Key? key, required this.idImport}) : super(key: key);
 
   @override
-  _btImportDetailScreenState createState() => _btImportDetailScreenState();
+  _btImportDetailScreenState createState() =>
+      _btImportDetailScreenState(idImport);
 }
 
 class _btImportDetailScreenState extends State<btImportDetailScreen> {
   bool isCheckout = false;
+  String idImport = '';
+
+  _btImportDetailScreenState(this.idImport);
+  Import import = Import(
+      id: '',
+      sender: '',
+      description: '',
+      receiver: '',
+      note: '',
+      goodsDetail: [],
+      total: '',
+      time: '');
+  Future getImportDetail() async {
+    FirebaseFirestore.instance
+        .collection('imports')
+        .where('id', isEqualTo: idImport)
+        .snapshots()
+        .listen((value) {
+      setState(() {
+        import = Import.fromDocument(value.docs.first.data());
+        importSubIdList = import.goodsDetail;
+      });
+    });
+  }
+
+  List importSubIdList = [];
+  List<ImportSub> importSubList = [];
+  Future getImportSubList() async {
+    FirebaseFirestore.instance
+        .collection("imports")
+        .doc(idImport)
+        .snapshots()
+        .listen((value1) {
+      FirebaseFirestore.instance.collection("importSubs").get().then((value2) {
+        setState(() {
+          importSubList.clear();
+          importSubIdList = value1.data()!["goodsDetail"];
+          value2.docs.forEach((element) {
+            if (importSubIdList.contains(element.data()['id'] as String)) {
+              importSubList.add(ImportSub.fromDocument(element.data()));
+            }
+          });
+        });
+      });
+    });
+  }
+
+  void initState() {
+    super.initState();
+    getImportDetail();
+    getImportSubList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +170,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                               width: 2,
                                             ),
                                             Text(
-                                              'November 12, at 9:00 AM',
+                                              import.time,
                                               style: TextStyle(
                                                 fontFamily: "SFProText",
                                                 fontSize: content14,
@@ -183,7 +241,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       SizedBox(height: 16),
                                       Container(
                                         child: Text(
-                                          'Peter Parker - Brotherhood Co. Ltd',
+                                          import.sender,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: content14,
@@ -207,175 +265,188 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       ),
                                       SizedBox(height: 16),
                                       Container(
-                                        // height: 465,
-                                        child: ListView.separated(
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          padding: EdgeInsets.zero,
-                                          scrollDirection: Axis.vertical,
-                                          shrinkWrap: true,
-                                          itemCount: 1,
-                                          separatorBuilder:
-                                              (BuildContext context,
-                                                      int index) =>
-                                                  SizedBox(height: 12),
-                                          itemBuilder: (context, index) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                //watchUserDialog(context);
-                                              },
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    color: blueLight,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8)),
-                                                height: 48,
-                                                width: 319,
-                                                child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .center,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          SizedBox(width: 16),
-                                                          AnimatedContainer(
-                                                            alignment: Alignment
-                                                                .center,
-                                                            duration: Duration(
-                                                                milliseconds:
-                                                                    300),
-                                                            height: 32,
-                                                            width: 32,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: blueWater,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8),
-                                                              image: DecorationImage(
-                                                                  image: NetworkImage(
-                                                                      'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
-                                                                  fit: BoxFit
-                                                                      .cover),
-                                                              shape: BoxShape
-                                                                  .rectangle,
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: 16),
-                                                          Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  Container(
-                                                                    width: 168,
-                                                                    child: Text(
-                                                                      'Pan Cái Chảo',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            content14,
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        fontFamily:
-                                                                            'SFProText',
-                                                                        color:
-                                                                            blackLight,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      width: 43 -
-                                                                          24),
-                                                                  Container(
-                                                                    height: 16,
-                                                                    width: 44,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              4.0),
-                                                                      color:
-                                                                          blueWater,
-                                                                    ),
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          Text(
-                                                                        'Bartender',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          fontSize:
-                                                                              content6,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                          color:
-                                                                              white,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 4),
-                                                              Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Iconsax.sms,
-                                                                    color:
-                                                                        blackLight,
-                                                                    size: 12,
-                                                                  ),
-                                                                  SizedBox(
-                                                                    width: 4,
-                                                                  ),
-                                                                  Text(
-                                                                    'nhatkb2001@gmail.com',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'SFProText',
-                                                                      fontSize:
-                                                                          content8,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      color:
-                                                                          grey8,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ]),
-                                              ),
-                                            );
-                                          },
+                                        child: Text(
+                                          import.receiver,
+                                          style: TextStyle(
+                                            fontFamily: "SFProText",
+                                            fontSize: content14,
+                                            color: grey8,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                          textAlign: TextAlign.justify,
                                         ),
                                       ),
+                                      // Container(
+                                      //   // height: 465,
+                                      //   child: ListView.separated(
+                                      //     physics:
+                                      //         const NeverScrollableScrollPhysics(),
+                                      //     padding: EdgeInsets.zero,
+                                      //     scrollDirection: Axis.vertical,
+                                      //     shrinkWrap: true,
+                                      //     itemCount: 1,
+                                      //     separatorBuilder:
+                                      //         (BuildContext context,
+                                      //                 int index) =>
+                                      //             SizedBox(height: 12),
+                                      //     itemBuilder: (context, index) {
+                                      //       return GestureDetector(
+                                      //         onTap: () {
+                                      //           //watchUserDialog(context);
+                                      //         },
+                                      //         child: Container(
+                                      //           decoration: BoxDecoration(
+                                      //               color: blueLight,
+                                      //               borderRadius:
+                                      //                   BorderRadius.circular(
+                                      //                       8)),
+                                      //           height: 48,
+                                      //           width: 319,
+                                      //           child: Column(
+                                      //               mainAxisAlignment:
+                                      //                   MainAxisAlignment
+                                      //                       .center,
+                                      //               crossAxisAlignment:
+                                      //                   CrossAxisAlignment
+                                      //                       .start,
+                                      //               children: [
+                                      //                 Row(
+                                      //                   crossAxisAlignment:
+                                      //                       CrossAxisAlignment
+                                      //                           .center,
+                                      //                   mainAxisAlignment:
+                                      //                       MainAxisAlignment
+                                      //                           .start,
+                                      //                   children: [
+                                      //                     SizedBox(width: 16),
+                                      //                     AnimatedContainer(
+                                      //                       alignment: Alignment
+                                      //                           .center,
+                                      //                       duration: Duration(
+                                      //                           milliseconds:
+                                      //                               300),
+                                      //                       height: 32,
+                                      //                       width: 32,
+                                      //                       decoration:
+                                      //                           BoxDecoration(
+                                      //                         color: blueWater,
+                                      //                         borderRadius:
+                                      //                             BorderRadius
+                                      //                                 .circular(
+                                      //                                     8),
+                                      //                         image: DecorationImage(
+                                      //                             image: NetworkImage(
+                                      //                                 currentUser
+                                      //                                     .avatar),
+                                      //                             fit: BoxFit
+                                      //                                 .cover),
+                                      //                         shape: BoxShape
+                                      //                             .rectangle,
+                                      //                       ),
+                                      //                     ),
+                                      //                     SizedBox(width: 16),
+                                      //                     Column(
+                                      //                       crossAxisAlignment:
+                                      //                           CrossAxisAlignment
+                                      //                               .start,
+                                      //                       mainAxisAlignment:
+                                      //                           MainAxisAlignment
+                                      //                               .center,
+                                      //                       children: [
+                                      //                         Row(
+                                      //                           children: [
+                                      //                             Container(
+                                      //                               width: 168,
+                                      //                               child: Text(
+                                      //                                 'Pan Cái Chảo',
+                                      //                                 style:
+                                      //                                     TextStyle(
+                                      //                                   fontSize:
+                                      //                                       content14,
+                                      //                                   fontWeight:
+                                      //                                       FontWeight.w600,
+                                      //                                   fontFamily:
+                                      //                                       'SFProText',
+                                      //                                   color:
+                                      //                                       blackLight,
+                                      //                                 ),
+                                      //                               ),
+                                      //                             ),
+                                      //                             SizedBox(
+                                      //                                 width: 43 -
+                                      //                                     24),
+                                      //                             Container(
+                                      //                               height: 16,
+                                      //                               width: 44,
+                                      //                               decoration:
+                                      //                                   BoxDecoration(
+                                      //                                 borderRadius:
+                                      //                                     BorderRadius.circular(
+                                      //                                         4.0),
+                                      //                                 color:
+                                      //                                     blueWater,
+                                      //                               ),
+                                      //                               child:
+                                      //                                   Center(
+                                      //                                 child:
+                                      //                                     Text(
+                                      //                                   'Bartender',
+                                      //                                   style:
+                                      //                                       TextStyle(
+                                      //                                     fontFamily:
+                                      //                                         'SFProText',
+                                      //                                     fontSize:
+                                      //                                         content6,
+                                      //                                     fontWeight:
+                                      //                                         FontWeight.w500,
+                                      //                                     color:
+                                      //                                         white,
+                                      //                                   ),
+                                      //                                 ),
+                                      //                               ),
+                                      //                             ),
+                                      //                           ],
+                                      //                         ),
+                                      //                         SizedBox(
+                                      //                             height: 4),
+                                      //                         Row(
+                                      //                           children: [
+                                      //                             Icon(
+                                      //                               Iconsax.sms,
+                                      //                               color:
+                                      //                                   blackLight,
+                                      //                               size: 12,
+                                      //                             ),
+                                      //                             SizedBox(
+                                      //                               width: 4,
+                                      //                             ),
+                                      //                             Text(
+                                      //                               'nhatkb2001@gmail.com',
+                                      //                               style:
+                                      //                                   TextStyle(
+                                      //                                 fontFamily:
+                                      //                                     'SFProText',
+                                      //                                 fontSize:
+                                      //                                     content8,
+                                      //                                 fontWeight:
+                                      //                                     FontWeight
+                                      //                                         .w500,
+                                      //                                 color:
+                                      //                                     grey8,
+                                      //                               ),
+                                      //                             ),
+                                      //                           ],
+                                      //                         ),
+                                      //                       ],
+                                      //                     ),
+                                      //                   ],
+                                      //                 ),
+                                      //               ]),
+                                      //         ),
+                                      //       );
+                                      //     },
+                                      //   ),
+                                      // ),
                                       // Container(
                                       //   child: Column(children: [
                                       //     Container(
@@ -406,7 +477,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       SizedBox(height: 16),
                                       Container(
                                         child: Text(
-                                          'Create an article to welcome customers to the new branch of the store with an article to welcome customers',
+                                          import.description,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: content14,
@@ -456,7 +527,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       SizedBox(height: 16),
                                       Container(
                                         child: Text(
-                                          'Create an article to welcome customers to the new branch of the store with an article to welcome customers',
+                                          import.note,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: content14,
@@ -511,7 +582,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                           padding: EdgeInsets.zero,
                                           scrollDirection: Axis.vertical,
                                           shrinkWrap: true,
-                                          itemCount: 8,
+                                          itemCount: importSubList.length,
                                           separatorBuilder:
                                               (BuildContext context,
                                                       int index) =>
@@ -594,15 +665,9 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                         children: [
                                                           Container(
                                                             child: Text(
-                                                              (index == 0 ||
-                                                                      index ==
-                                                                          2 ||
-                                                                      index ==
-                                                                          3 ||
-                                                                      index ==
-                                                                          5)
-                                                                  ? 'Glass'
-                                                                  : 'Chocolate',
+                                                              importSubList[
+                                                                      index]
+                                                                  .name,
                                                               style: TextStyle(
                                                                   fontFamily:
                                                                       "SFProText",
@@ -619,15 +684,10 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                           SizedBox(width: 0),
                                                           Container(
                                                             child: Text(
-                                                              (index == 0 ||
-                                                                      index ==
-                                                                          2 ||
-                                                                      index ==
-                                                                          3 ||
-                                                                      index ==
-                                                                          5)
-                                                                  ? ' - 24'
-                                                                  : ' - 60',
+                                                              ' - ' +
+                                                                  importSubList[
+                                                                          index]
+                                                                      .quantity,
                                                               style: TextStyle(
                                                                   fontFamily:
                                                                       "SFProText",
@@ -643,35 +703,39 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                      SizedBox(height: 2),
-                                                      Container(
-                                                        child: Text(
-                                                          (index == 0 ||
-                                                                  index == 2 ||
-                                                                  index == 3 ||
-                                                                  index == 5)
-                                                              ? 'Material'
-                                                              : 'Drink',
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                "SFProText",
-                                                            fontSize: content8,
-                                                            color: grey8,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                          ),
-                                                        ),
-                                                      )
+                                                      // SizedBox(height: 2),
+                                                      // Container(
+                                                      //   child: Text(
+                                                      //     (index == 0 ||
+                                                      //             index == 2 ||
+                                                      //             index == 3 ||
+                                                      //             index == 5)
+                                                      //         ? 'Material'
+                                                      //         : 'Drink',
+                                                      //     style: TextStyle(
+                                                      //       fontFamily:
+                                                      //           "SFProText",
+                                                      //       fontSize: content8,
+                                                      //       color: grey8,
+                                                      //       fontWeight:
+                                                      //           FontWeight.w400,
+                                                      //     ),
+                                                      //   ),
+                                                      // )
                                                     ],
                                                   ),
                                                   Spacer(),
                                                   Text(
-                                                    (index == 0 ||
-                                                            index == 2 ||
-                                                            index == 3 ||
-                                                            index == 5)
-                                                        ? '-\$103.00'
-                                                        : '-\$68.00',
+                                                    '-\$' +
+                                                        (double.parse(importSubList[
+                                                                        index]
+                                                                    .unit) *
+                                                                double.parse(
+                                                                    importSubList[
+                                                                            index]
+                                                                        .quantity))
+                                                            .toStringAsFixed(0)
+                                                            .toString(),
                                                     maxLines: 1,
                                                     softWrap: false,
                                                     overflow: TextOverflow.fade,
@@ -707,7 +771,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                           ),
                                           Spacer(),
                                           Text(
-                                            '- \$1034.00',
+                                            '- \$' + import.total,
                                             maxLines: 1,
                                             softWrap: false,
                                             overflow: TextOverflow.fade,

@@ -14,7 +14,7 @@ import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
 import 'package:ui_fresh_app/views/bartender/mainTask/btDashboardChosing.dart';
-import 'package:ui_fresh_app/views/bartender/mainTask/btDrinkEditing.dart';
+import 'package:ui_fresh_app/views/bartender/inventory/btDrinkEditing.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -32,9 +32,8 @@ class btMainTaskEditingScreen extends StatefulWidget {
       _btMainTaskEditingScreenState();
 }
 
-class _btMainTaskEditingScreenState
-    extends State<btMainTaskEditingScreen> with InputValidationMixin{
-
+class _btMainTaskEditingScreenState extends State<btMainTaskEditingScreen>
+    with InputValidationMixin {
   TextEditingController noteController = TextEditingController();
   GlobalKey<FormState> noteFormKey = GlobalKey<FormState>();
 
@@ -46,76 +45,73 @@ class _btMainTaskEditingScreenState
 
   Widget customRadio(String status, int index) {
     return Container(
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selected = index;
-          });
-        },
-        child: AnimatedContainer(
-          child: Center(
-            child: Text(
-              status,
-              style: TextStyle(
-                fontFamily: "SFProText",
-                fontSize: 14.0,
-                color: (selected == index) ? white : black,
-                fontWeight: FontWeight.w500,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              selected = index;
+            });
+          },
+          child: AnimatedContainer(
+            child: Center(
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontFamily: "SFProText",
+                  fontSize: 14.0,
+                  color: (selected == index) ? white : black,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          alignment: Alignment.center,
-          duration: Duration(milliseconds: 300),
-          height: 40,
-          width: 122,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 2, color: blueLight),
-              left: BorderSide(width: 2, color: blueLight),
-              right: BorderSide(width: 2, color: blueLight),
-              bottom: BorderSide(width: 2, color: blueLight),
+            alignment: Alignment.center,
+            duration: Duration(milliseconds: 300),
+            height: 40,
+            width: 122,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 2, color: blueLight),
+                left: BorderSide(width: 2, color: blueLight),
+                right: BorderSide(width: 2, color: blueLight),
+                bottom: BorderSide(width: 2, color: blueLight),
+              ),
+              borderRadius: BorderRadius.circular(8),
+              gradient: (selected == index)
+                  ? (index == 1)
+                      ? LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                              Color(0xFF159957),
+                              Color(0xFF159199),
+                            ],
+                          stops: [
+                              0.0,
+                              1.0,
+                            ])
+                      : LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                              Color(0xFFCB356B),
+                              Color(0xFFBD3F32),
+                            ],
+                          stops: [
+                              0.0,
+                              1.0,
+                            ])
+                  : null,
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: black.withOpacity(0.1),
+              //     spreadRadius: 0,
+              //     blurRadius: 8,
+              //     offset: Offset(0, 4),
+              //   ),
+              // ],
             ),
-            borderRadius: BorderRadius.circular(8),
-            gradient: (selected == index)
-                ? (index == 1) 
-                  ? LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                        Color(0xFF159957),
-                        Color(0xFF159199),
-                      ],
-                    stops: [
-                        0.0,
-                        1.0,
-                      ]
-                  )
-                  : LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                        Color(0xFFCB356B),
-                        Color(0xFFBD3F32),
-                      ],
-                    stops: [
-                        0.0,
-                        1.0,
-                      ]
-                  )
-                : null,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: black.withOpacity(0.1),
-            //     spreadRadius: 0,
-            //     blurRadius: 8,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
           ),
-        ),
-      )
-    );
+        ));
   }
 
   @override
@@ -173,7 +169,8 @@ class _btMainTaskEditingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -181,12 +178,15 @@ class _btMainTaskEditingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: noteController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 //validator
                                                 validator: (password) {
-                                                  if (isNoteValid(password.toString())) {
+                                                  if (isNoteValid(
+                                                      password.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -194,18 +194,23 @@ class _btMainTaskEditingScreenState
                                                 },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Create an article to welcome customers to...",
+                                                  hintText:
+                                                      "Create an article to welcome customers to...",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -230,245 +235,265 @@ class _btMainTaskEditingScreenState
                                       ),
                                       SizedBox(height: 16),
                                       Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              physics: const NeverScrollableScrollPhysics(),
-                                              padding: EdgeInsets.zero,
-                                              scrollDirection: Axis.vertical,
-                                              shrinkWrap: true,
-                                              itemCount: 8,
-                                              separatorBuilder:
-                                                  (BuildContext context,
-                                                          int index) =>
-                                                      SizedBox(
-                                                height: 1,
-                                                child: Divider(
-                                                    color: grey8, thickness: 0.2),
-                                              ),
-                                              itemBuilder: (context, index) {
-                                                return Dismissible(
-                                                  key: ValueKey(index), 
+                                          child: Column(
+                                        children: [
+                                          ListView.separated(
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            padding: EdgeInsets.zero,
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            itemCount: 8,
+                                            separatorBuilder:
+                                                (BuildContext context,
+                                                        int index) =>
+                                                    SizedBox(
+                                              height: 1,
+                                              child: Divider(
+                                                  color: grey8, thickness: 0.2),
+                                            ),
+                                            itemBuilder: (context, index) {
+                                              return Dismissible(
+                                                  key: ValueKey(index),
                                                   background: Container(
-                                                    padding: EdgeInsets.only(right: 16),
-                                                    alignment: Alignment.centerRight,
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.centerLeft,
-                                                        end: Alignment.centerRight,
-                                                        colors: [
-                                                          Color(0xFFCB356B),
-                                                          Color(0xFFBD3F32),
-                                                        ],
-                                                        stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ]
-                                                      ),
-                                                    ),
-                                                    child: Icon(Iconsax.minus, size: 24, color: white)
-                                                  ),
-                                                  child: GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              btDrinkEditingScreen(),
-                                                        ),
-                                                      );
-                                                      // .then((value) {});
-                                                    },
-                                                    child: AnimatedContainer(
-                                                      duration: Duration(milliseconds: 300),
-                                                      decoration: (index == 0)
-                                                      ? BoxDecoration(
-                                                          color: white,
-                                                          borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-                                                      ) 
-                                                      : BoxDecoration(
-                                                          color: white,
-                                                          borderRadius: BorderRadius.all(Radius.circular(0)),
-                                                      ),
-                                                      width: 319,
-                                                      height: 48,
                                                       padding: EdgeInsets.only(
-                                                          top: 8,
-                                                          left: 16,
-                                                          bottom: 8,
                                                           right: 16),
-                                                      child: Row(
-                                                        children: [
-                                                          Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                                    color:
-                                                                        blueLight,
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .all(
-                                                                      Radius
-                                                                          .circular(
-                                                                              8),
-                                                                    )),
-                                                            height: 30,
-                                                            width: 30,
-                                                            child: Center(
-                                                              child: Text(
-                                                                '${index + 1}',
-                                                                style: TextStyle(
-                                                                  fontFamily:
-                                                                      "SFProText",
-                                                                  fontSize:
-                                                                      content16,
-                                                                  color:
-                                                                      blackLight,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      decoration: BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                            begin: Alignment
+                                                                .centerLeft,
+                                                            end: Alignment
+                                                                .centerRight,
+                                                            colors: [
+                                                              Color(0xFFCB356B),
+                                                              Color(0xFFBD3F32),
+                                                            ],
+                                                            stops: [
+                                                              0.0,
+                                                              1.0,
+                                                            ]),
+                                                      ),
+                                                      child: Icon(Iconsax.minus,
+                                                          size: 24,
+                                                          color: white)),
+                                                  child: GestureDetector(
+                                                      onTap: () {
+                                                        // Navigator.push(
+                                                        //   context,
+                                                        //   MaterialPageRoute(
+                                                        //     builder: (context) =>
+                                                        //         btDrinkEditingScreen(),
+                                                        //   ),
+                                                        // );
+                                                        // .then((value) {});
+                                                      },
+                                                      child: AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 300),
+                                                        decoration: (index == 0)
+                                                            ? BoxDecoration(
+                                                                color: white,
+                                                                borderRadius: BorderRadius.only(
+                                                                    topLeft: Radius
+                                                                        .circular(
+                                                                            8),
+                                                                    topRight: Radius
+                                                                        .circular(
+                                                                            8)),
+                                                              )
+                                                            : BoxDecoration(
+                                                                color: white,
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            0)),
                                                               ),
-                                                            ),
-                                                          ),
-                                                          SizedBox(width: 16),
-                                                          Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  Container(
-                                                                    child: Text(
-                                                                      (index == 0 ||
-                                                                              index ==
-                                                                                  2 ||
-                                                                              index ==
-                                                                                  3 ||
-                                                                              index ==
-                                                                                  5)
-                                                                          ? 'Honey Tea'
-                                                                          : 'Apple',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "SFProText",
-                                                                          fontSize:
-                                                                              content12,
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight:
-                                                                              FontWeight
-                                                                                  .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(
-                                                                      width: 0),
-                                                                  Container(
-                                                                    child: Text(
-                                                                      (index == 0 ||
-                                                                              index ==
-                                                                                  2 ||
-                                                                              index ==
-                                                                                  3 ||
-                                                                              index ==
-                                                                                  5)
-                                                                          ? ' - 01'
-                                                                          : ' - 03',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              "SFProText",
-                                                                          fontSize:
-                                                                              content12,
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight:
-                                                                              FontWeight
-                                                                                  .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              SizedBox(height: 2),
-                                                              Container(
+                                                        width: 319,
+                                                        height: 48,
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 8,
+                                                                left: 16,
+                                                                bottom: 8,
+                                                                right: 16),
+                                                        child: Row(
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                      color:
+                                                                          blueLight,
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .all(
+                                                                        Radius.circular(
+                                                                            8),
+                                                                      )),
+                                                              height: 30,
+                                                              width: 30,
+                                                              child: Center(
                                                                 child: Text(
-                                                                  (index == 0 ||
-                                                                          index ==
-                                                                              2 ||
-                                                                          index ==
-                                                                              3 ||
-                                                                          index ==
-                                                                              5)
-                                                                      ? 'Juice'
-                                                                      : 'Wine',
+                                                                  '${index + 1}',
                                                                   style:
                                                                       TextStyle(
                                                                     fontFamily:
                                                                         "SFProText",
                                                                     fontSize:
-                                                                        content8,
-                                                                    color: grey8,
+                                                                        content16,
+                                                                    color:
+                                                                        blackLight,
                                                                     fontWeight:
                                                                         FontWeight
-                                                                            .w400,
+                                                                            .w600,
                                                                   ),
                                                                 ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                          Spacer(),
-                                                          Text(
-                                                            (index == 0 ||
-                                                                    index == 2 ||
-                                                                    index == 3 ||
-                                                                    index == 5)
-                                                                ? '+\$103.00'
-                                                                : '+\$29.00',
-                                                            maxLines: 1,
-                                                            softWrap: false,
-                                                            overflow:
-                                                                TextOverflow.fade,
-                                                            style: TextStyle(
-                                                              fontSize: content14,
-                                                              fontWeight:
-                                                                  FontWeight.w500,
-                                                              fontFamily:
-                                                                  'SFProText',
-                                                              foreground: Paint()
-                                                                ..shader = greenGradient,
+                                                              ),
                                                             ),
-                                                            textAlign:
-                                                                TextAlign.right,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  )
-                                                );
-                                              },
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        btDashboardChosingScreen(),
-                                                  ),
-                                                );
-                                                // .then((value) {});
-                                              },
-                                              child: AnimatedContainer(
-                                                duration: Duration(milliseconds: 300),
+                                                            SizedBox(width: 16),
+                                                            Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    Container(
+                                                                      child:
+                                                                          Text(
+                                                                        (index == 0 ||
+                                                                                index == 2 ||
+                                                                                index == 3 ||
+                                                                                index == 5)
+                                                                            ? 'Honey Tea'
+                                                                            : 'Apple',
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                "SFProText",
+                                                                            fontSize:
+                                                                                content12,
+                                                                            color:
+                                                                                blackLight,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                            height: 1.4),
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                        width:
+                                                                            0),
+                                                                    Container(
+                                                                      child:
+                                                                          Text(
+                                                                        (index == 0 ||
+                                                                                index == 2 ||
+                                                                                index == 3 ||
+                                                                                index == 5)
+                                                                            ? ' - 01'
+                                                                            : ' - 03',
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                "SFProText",
+                                                                            fontSize:
+                                                                                content12,
+                                                                            color:
+                                                                                blackLight,
+                                                                            fontWeight:
+                                                                                FontWeight.w600,
+                                                                            height: 1.4),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                SizedBox(
+                                                                    height: 2),
+                                                                Container(
+                                                                  child: Text(
+                                                                    (index == 0 ||
+                                                                            index ==
+                                                                                2 ||
+                                                                            index ==
+                                                                                3 ||
+                                                                            index ==
+                                                                                5)
+                                                                        ? 'Juice'
+                                                                        : 'Wine',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          "SFProText",
+                                                                      fontSize:
+                                                                          content8,
+                                                                      color:
+                                                                          grey8,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                    ),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                            Spacer(),
+                                                            Text(
+                                                              (index == 0 ||
+                                                                      index ==
+                                                                          2 ||
+                                                                      index ==
+                                                                          3 ||
+                                                                      index ==
+                                                                          5)
+                                                                  ? '+\$103.00'
+                                                                  : '+\$29.00',
+                                                              maxLines: 1,
+                                                              softWrap: false,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .fade,
+                                                              style: TextStyle(
+                                                                fontSize:
+                                                                    content14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                fontFamily:
+                                                                    'SFProText',
+                                                                foreground: Paint()
+                                                                  ..shader =
+                                                                      greenGradient,
+                                                              ),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .right,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )));
+                                            },
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      btDashboardChosingScreen(),
+                                                ),
+                                              );
+                                              // .then((value) {});
+                                            },
+                                            child: AnimatedContainer(
+                                                duration:
+                                                    Duration(milliseconds: 300),
                                                 width: 319,
                                                 height: 48,
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
-                                                      begin: Alignment.centerLeft,
-                                                      end: Alignment.centerRight,
+                                                      begin:
+                                                          Alignment.centerLeft,
+                                                      end:
+                                                          Alignment.centerRight,
                                                       colors: [
                                                         Color(0xFF5FAAEF),
                                                         Color(0xFF979DFA),
@@ -477,14 +502,19 @@ class _btMainTaskEditingScreenState
                                                         0.0,
                                                         1.0,
                                                       ]),
-                                                  borderRadius: BorderRadius.only(
-                                                    bottomLeft: Radius.circular(8),
-                                                    bottomRight: Radius.circular(8),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(8),
+                                                    bottomRight:
+                                                        Radius.circular(8),
                                                   ),
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: [
                                                     SizedBox(width: 21),
                                                     Container(
@@ -507,15 +537,14 @@ class _btMainTaskEditingScreenState
                                                       ),
                                                     ),
                                                   ],
-                                                )
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                      ),
+                                                )),
+                                          )
+                                        ],
+                                      )),
                                       SizedBox(height: 24),
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
                                         children: [
                                           Text(
                                             'Total Money:',
@@ -600,8 +629,7 @@ class _btMainTaskEditingScreenState
                                       //   )
                                       // ),
                                       SizedBox(height: 24)
-                                    ]
-                                ),
+                                    ]),
                               )
                             ],
                           ),
@@ -628,9 +656,7 @@ class _btMainTaskEditingScreenState
                         onTap: () {
                           if (noteFormKey.currentState!.validate()) {
                             Navigator.pop(context);
-                            showSnackBar(
-                                context,
-                                'The order have been edited!',
+                            showSnackBar(context, 'The order have been edited!',
                                 'success');
                           } else {
                             showSnackBar(context,

@@ -6,6 +6,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -28,139 +29,53 @@ class btMainTaskManagementScreen extends StatefulWidget {
   const btMainTaskManagementScreen({Key? key}) : super(key: key);
 
   @override
-  State<btMainTaskManagementScreen> createState() => _btMainTaskManagementScreenState();
+  State<btMainTaskManagementScreen> createState() =>
+      _btMainTaskManagementScreenState();
 }
 
-class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen> {
-
+class _btMainTaskManagementScreenState
+    extends State<btMainTaskManagementScreen> {
   bool haveSearch = false;
   TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
-      value: SystemUiOverlayStyle(
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.light,
-        statusBarColor: Colors.transparent
-      ),
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage(background), fit: BoxFit.cover),
+        value: SystemUiOverlayStyle(
+            statusBarBrightness: Brightness.light,
+            statusBarIconBrightness: Brightness.light,
+            statusBarColor: Colors.transparent),
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage(background), fit: BoxFit.cover),
+                ),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.only(left: appPadding, top: appPadding, right: appPadding),
-              child: Column(
-                children: [
-                  SizedBox(height: 34),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => profileManagementScreen(),
-                              ),
-                            );
-                            // .then((value) {});
-                          },
-                          child: AnimatedContainer(
-                            alignment: Alignment.center,
-                            duration: Duration(milliseconds: 300),
-                            height: 32,
-                            width: 32,
-                            decoration: BoxDecoration(
-                              color: blueWater,
-                              borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://scontent.fsgn5-5.fna.fbcdn.net/v/t1.6435-9/76888832_686654728409257_8144869486420295680_n.jpg?_nc_cat=100&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=fREdzxOPFXEAX8anDQU&tn=GQDoBzXNSN_e_0U-&_nc_ht=scontent.fsgn5-5.fna&oh=9a1d0ebec85c5fd35b8c38b2bb7efbdd&oe=61D2CAC3'),
-                                  fit: BoxFit.cover),
-                              shape: BoxShape.rectangle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: black.withOpacity(0.25),
-                                  spreadRadius: 0,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 4),
-                                ),
-                                BoxShadow(
-                                  color: black.withOpacity(0.1),
-                                  spreadRadius: 0,
-                                  blurRadius: 60,
-                                  offset: Offset(10, 10),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Spacer(),
-                      AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.fastOutSlowIn,
-                        child: (haveSearch == true)
-                        ? Container(
-                          width: 231,
-                          height: 32,
-                          child: TextFormField(
-                            controller: searchController,
-                            autofocus: true,
-                            onEditingComplete: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => btMainTaskSearchingScreen(
-                                  searchResult: searchController.text,
-                                  haveFilter: haveFilter,
-                                ),
-                              ),
-                            ),
-                            style: TextStyle(
-                              fontFamily: 'SFProText',
-                              fontSize: content14,
-                              fontWeight: FontWeight.w400,
-                              color: blackLight,
-                              height: 1.4
-                            ),
-                            decoration: InputDecoration(
-                              prefixIcon: Icon(Iconsax.search_normal_1, size: 18),
-                              contentPadding: EdgeInsets.only(left: 20, right: 0),
-                              hintText: "What're you looking for?",
-                              hintStyle: TextStyle(
-                                fontFamily: 'SFProText',
-                                fontSize: content14,
-                                fontWeight: FontWeight.w400,
-                                color: grey8,
-                                height: 1.4
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                          )
-                        )
-                        : Container(
-                          // padding: EdgeInsets.only(right: 28),
+              Container(
+                padding: EdgeInsets.only(
+                    left: appPadding, top: appPadding, right: appPadding),
+                child: Column(
+                  children: [
+                    SizedBox(height: 34),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
                           alignment: Alignment.center,
                           child: GestureDetector(
                             onTap: () {
-                              setState(() {
-                                haveSearch = true;
-                              });
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      profileManagementScreen(),
+                                ),
+                              );
+                              // .then((value) {});
                             },
                             child: AnimatedContainer(
                               alignment: Alignment.center,
@@ -168,117 +83,200 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
                               height: 32,
                               width: 32,
                               decoration: BoxDecoration(
-                                color: blackLight,
+                                color: blueWater,
                                 borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                    image: NetworkImage(currentUser.avatar),
+                                    fit: BoxFit.cover),
+                                shape: BoxShape.rectangle,
                                 boxShadow: [
                                   BoxShadow(
-                                      color: black.withOpacity(0.25),
-                                      spreadRadius: 0,
-                                      blurRadius: 64,
-                                      offset: Offset(8, 8)),
-                                  BoxShadow(
-                                    color: black.withOpacity(0.2),
+                                    color: black.withOpacity(0.25),
                                     spreadRadius: 0,
                                     blurRadius: 4,
                                     offset: Offset(0, 4),
                                   ),
+                                  BoxShadow(
+                                    color: black.withOpacity(0.1),
+                                    spreadRadius: 0,
+                                    blurRadius: 60,
+                                    offset: Offset(10, 10),
+                                  ),
                                 ],
                               ),
-                              child: Container(
-                                padding: EdgeInsets.zero,
-                                alignment: Alignment.center,
-                                child: Icon(
-                                  Iconsax.search_normal_1,
-                                  size: 18, 
-                                  color: white
-                                )
-                              ),
-                            ),
-                          )
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Container(
-                        // padding: EdgeInsets.only(right: 28),
-                        alignment: Alignment.center,
-                        child: GestureDetector(
-                          onTap: () {
-                            showFilter(context);
-                          },
-                          child: AnimatedContainer(
-                            alignment: Alignment.center,
-                            duration: Duration(milliseconds: 300),
-                            height: 32,
-                            width: 32,
-                            decoration: BoxDecoration(
-                              color: (haveFilter == true) ? blackLight : white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: black.withOpacity(0.25),
-                                    spreadRadius: 0,
-                                    blurRadius: 64,
-                                    offset: Offset(8, 8)),
-                                BoxShadow(
-                                  color: black.withOpacity(0.2),
-                                  spreadRadius: 0,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.zero,
-                              alignment: Alignment.center,
-                              child: Icon(
-                                Iconsax.setting_4,
-                                size: 18, 
-                                color: (haveFilter == true) ? white : blackLight
-                              )
                             ),
                           ),
-                        )
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 32),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.zero,
-                    child: Text(
-                      'Orders List',
-                      style: TextStyle(
-                        color: blackLight,
-                        fontSize: title24,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'SFProText',
+                        ),
+                        SizedBox(width: 16),
+                        Spacer(),
+                        AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.fastOutSlowIn,
+                          child: (haveSearch == true)
+                              ? Container(
+                                  width: 231,
+                                  height: 32,
+                                  child: TextFormField(
+                                    controller: searchController,
+                                    autofocus: true,
+                                    onEditingComplete: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            btMainTaskSearchingScreen(
+                                          searchResult: searchController.text,
+                                          haveFilter: haveFilter,
+                                        ),
+                                      ),
+                                    ),
+                                    style: TextStyle(
+                                        fontFamily: 'SFProText',
+                                        fontSize: content14,
+                                        fontWeight: FontWeight.w400,
+                                        color: blackLight,
+                                        height: 1.4),
+                                    decoration: InputDecoration(
+                                      prefixIcon: Icon(Iconsax.search_normal_1,
+                                          size: 18),
+                                      contentPadding:
+                                          EdgeInsets.only(left: 20, right: 0),
+                                      hintText: "What're you looking for?",
+                                      hintStyle: TextStyle(
+                                          fontFamily: 'SFProText',
+                                          fontSize: content14,
+                                          fontWeight: FontWeight.w400,
+                                          color: grey8,
+                                          height: 1.4),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                      ),
+                                    ),
+                                  ))
+                              : Container(
+                                  // padding: EdgeInsets.only(right: 28),
+                                  alignment: Alignment.center,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        haveSearch = true;
+                                      });
+                                    },
+                                    child: AnimatedContainer(
+                                      alignment: Alignment.center,
+                                      duration: Duration(milliseconds: 300),
+                                      height: 32,
+                                      width: 32,
+                                      decoration: BoxDecoration(
+                                        color: blackLight,
+                                        borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: black.withOpacity(0.25),
+                                              spreadRadius: 0,
+                                              blurRadius: 64,
+                                              offset: Offset(8, 8)),
+                                          BoxShadow(
+                                            color: black.withOpacity(0.2),
+                                            spreadRadius: 0,
+                                            blurRadius: 4,
+                                            offset: Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Container(
+                                          padding: EdgeInsets.zero,
+                                          alignment: Alignment.center,
+                                          child: Icon(Iconsax.search_normal_1,
+                                              size: 18, color: white)),
+                                    ),
+                                  )),
+                        ),
+                        SizedBox(width: 8),
+                        Container(
+                            // padding: EdgeInsets.only(right: 28),
+                            alignment: Alignment.center,
+                            child: GestureDetector(
+                              onTap: () {
+                                showFilter(context);
+                              },
+                              child: AnimatedContainer(
+                                alignment: Alignment.center,
+                                duration: Duration(milliseconds: 300),
+                                height: 32,
+                                width: 32,
+                                decoration: BoxDecoration(
+                                  color:
+                                      (haveFilter == true) ? blackLight : white,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: black.withOpacity(0.25),
+                                        spreadRadius: 0,
+                                        blurRadius: 64,
+                                        offset: Offset(8, 8)),
+                                    BoxShadow(
+                                      color: black.withOpacity(0.2),
+                                      spreadRadius: 0,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Container(
+                                    padding: EdgeInsets.zero,
+                                    alignment: Alignment.center,
+                                    child: Icon(Iconsax.setting_4,
+                                        size: 18,
+                                        color: (haveFilter == true)
+                                            ? white
+                                            : blackLight)),
+                              ),
+                            )),
+                      ],
+                    ),
+                    SizedBox(height: 32),
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.zero,
+                      child: Text(
+                        'Orders List',
+                        style: TextStyle(
+                          color: blackLight,
+                          fontSize: title24,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'SFProText',
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 32),
-                  Column(
-                    children: [
-                      Container(
-                        height: 670-45,
-                        width: 319,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
+                    SizedBox(height: 32),
+                    Column(
+                      children: [
+                        Container(
+                            height: 670 - 45,
+                            width: 319,
+                            child: SingleChildScrollView(
+                                child: Column(children: [
                               ListView.separated(
                                 physics: const NeverScrollableScrollPhysics(),
                                 padding: EdgeInsets.zero,
                                 scrollDirection: Axis.vertical,
                                 shrinkWrap: true,
                                 itemCount: 16,
-                                separatorBuilder: (BuildContext context, int index) =>
-                                    SizedBox(height: 24),
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        SizedBox(height: 24),
                                 itemBuilder: (context, index) {
                                   return GestureDetector(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => btDrinkDetailScreen(),
+                                          builder: (context) =>
+                                              btDrinkDetailScreen(),
                                         ),
                                       );
                                       // .then((value) {});
@@ -287,26 +285,33 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
                                       duration: Duration(milliseconds: 300),
                                       child: Row(
                                         children: [
-                                          Image.asset('assets/images/accountant/drinkavatar.png'),
+                                          Image.asset(
+                                              'assets/images/accountant/drinkavatar.png'),
                                           SizedBox(width: 16),
                                           Container(
                                             child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
                                               children: [
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
                                                   children: [
                                                     Container(
                                                       child: Text(
-                                                        'Drink',                          
+                                                        'Drink',
                                                         maxLines: 1,
                                                         softWrap: false,
-                                                        overflow: TextOverflow.fade,
+                                                        overflow:
+                                                            TextOverflow.fade,
                                                         style: TextStyle(
                                                             fontSize: content16,
-                                                            fontWeight: FontWeight.w600,
-                                                            fontFamily: 'SFProText',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontFamily:
+                                                                'SFProText',
                                                             color: blackLight,
                                                             height: 1.0),
                                                       ),
@@ -320,13 +325,20 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
                                                             ' #' + '2022',
                                                             maxLines: 1,
                                                             softWrap: false,
-                                                            overflow: TextOverflow.fade,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .fade,
                                                             style: TextStyle(
-                                                              fontSize: content14,
-                                                              fontWeight: FontWeight.w500,
-                                                              fontFamily: 'SFProText',
+                                                              fontSize:
+                                                                  content14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontFamily:
+                                                                  'SFProText',
                                                               foreground: Paint()
-                                                                ..shader = greenGradient,
+                                                                ..shader =
+                                                                    greenGradient,
                                                             ),
                                                           ),
                                                         )
@@ -336,19 +348,23 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
                                                 ),
                                                 SizedBox(height: 4),
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
                                                   children: [
                                                     Container(
                                                       width: 145,
                                                       child: Text(
                                                         '02.00 pm, 08 Oct 2021',
                                                         maxLines: 1,
-                                                        overflow: TextOverflow.fade,
+                                                        overflow:
+                                                            TextOverflow.fade,
                                                         softWrap: false,
                                                         style: TextStyle(
                                                             fontSize: content12,
-                                                            fontWeight: FontWeight.w400,
-                                                            fontFamily: 'SFProText',
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontFamily:
+                                                                'SFProText',
                                                             color: grey8,
                                                             height: 1.4),
                                                       ),
@@ -383,19 +399,15 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
                                 },
                               ),
                               SizedBox(height: 112)
-                            ]
-                          )
-                        )
-                      ),
-                    ],
-                  )
-                ],
+                            ]))),
+                      ],
+                    )
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      )
-    );
+            ],
+          ),
+        ));
   }
 
   //Bottom Sheet - start
@@ -422,22 +434,21 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
     return FlutterSliderHandler(
       decoration: BoxDecoration(),
       child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.rectangle,
-          borderRadius: new BorderRadius.all(Radius.circular(8)),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.blue.withOpacity(0.3),
-                spreadRadius: 0.05,
-                blurRadius: 5,
-                offset: Offset(0, 1))
-          ],
-        ),
-        child: Icon(Iconsax.coin, size: 20, color: blackLight)
-      ),
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.rectangle,
+            borderRadius: new BorderRadius.all(Radius.circular(8)),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.blue.withOpacity(0.3),
+                  spreadRadius: 0.05,
+                  blurRadius: 5,
+                  offset: Offset(0, 1))
+            ],
+          ),
+          child: Icon(Iconsax.coin, size: 20, color: blackLight)),
     );
   }
 
@@ -898,5 +909,5 @@ class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen>
     );
   }
   // /Bottom Sheet - end
-  
+
 }
