@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
@@ -9,11 +10,16 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/models/drinkModel.dart';
+import 'package:ui_fresh_app/models/importModel.dart';
 
 //import views
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 import 'package:ui_fresh_app/views/bartender/inventory/btImportCreating.dart';
 import 'package:ui_fresh_app/views/bartender/inventory/btImportDetail.dart';
+import 'package:ui_fresh_app/views/bartender/mainTask/btDrinkDetail.dart';
+import 'package:ui_fresh_app/views/bartender/inventory/btDrinkEditing.dart';
 
 class btInventoryManagementScreen extends StatefulWidget {
   const btInventoryManagementScreen({Key? key}) : super(key: key);
@@ -46,18 +52,51 @@ class _btInventoryManagementScreenState
     _tabController?.dispose();
   }
 
-  List<String> listImage = [
-    'https://i.imgur.com/6GfgeBS.png',
-    'https://i.imgur.com/vnQWQls.png',
-    'https://i.imgur.com/vnQWQls.png',
-    'https://i.imgur.com/6GfgeBS.png',
-    'https://i.imgur.com/6GfgeBS.png',
-    'https://i.imgur.com/6GfgeBS.png',
-    'https://i.imgur.com/vnQWQls.png',
-    'https://i.imgur.com/vnQWQls.png'
-  ];
+  // List<String> listImage = [
+  //   'https://i.imgur.com/6GfgeBS.png',
+  //   'https://i.imgur.com/vnQWQls.png',
+  //   'https://i.imgur.com/vnQWQls.png',
+  //   'https://i.imgur.com/6GfgeBS.png',
+  //   'https://i.imgur.com/6GfgeBS.png',
+  //   'https://i.imgur.com/6GfgeBS.png',
+  //   'https://i.imgur.com/vnQWQls.png',
+  //   'https://i.imgur.com/vnQWQls.png'
+  // ];
 
-  List<String> listPrice = ['93', '64', '25', '33', '44', '55', '4', '9'];
+  // List<String> listPrice = ['93', '64', '25', '33', '44', '55', '4', '9'];
+  List<Drink> goodList = [];
+  Future getGoodList() async {
+    FirebaseFirestore.instance.collection('goods').snapshots().listen((value) {
+      setState(() {
+        goodList.clear();
+        value.docs.forEach((element) {
+          goodList.add(Drink.fromDocument(element.data()));
+        });
+      });
+    });
+  }
+
+  List<Import> importList = [];
+  Future getImportList() async {
+    FirebaseFirestore.instance
+        .collection('imports')
+        .orderBy('time', descending: true)
+        .snapshots()
+        .listen((value) {
+      setState(() {
+        importList.clear();
+        value.docs.forEach((element) {
+          importList.add(Import.fromDocument(element.data()));
+        });
+      });
+    });
+  }
+
+  void initState() {
+    super.initState();
+    getGoodList();
+    getImportList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,8 +145,7 @@ class _btInventoryManagementScreenState
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
                               image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://scontent.fsgn5-5.fna.fbcdn.net/v/t1.6435-9/76888832_686654728409257_8144869486420295680_n.jpg?_nc_cat=100&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=fREdzxOPFXEAX8anDQU&tn=GQDoBzXNSN_e_0U-&_nc_ht=scontent.fsgn5-5.fna&oh=9a1d0ebec85c5fd35b8c38b2bb7efbdd&oe=61D2CAC3'),
+                                  image: NetworkImage(currentUser.avatar),
                                   fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
@@ -206,8 +244,7 @@ class _btInventoryManagementScreenState
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    btImportCreatingScreen(),
+                                builder: (context) => btImportCreatingScreen(),
                               ),
                             );
                           },
@@ -324,35 +361,47 @@ class _btInventoryManagementScreenState
                         shrinkWrap: true,
                         padding: EdgeInsets.zero,
                         scrollDirection: Axis.horizontal,
-                        itemCount: 8,
+                        itemCount: goodList.length,
                         separatorBuilder: (BuildContext context, int index) =>
                             SizedBox(width: 16),
                         itemBuilder: (context, index) {
-                          return Container(
-                            // height: 234,
-                            width: 120,
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                      color: blueLight,
-                                      borderRadius: BorderRadius.circular(16)),
-                                  height: 178,
-                                  width: 107,
-                                  child: Image.network(listImage[index]),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  listPrice[index],
-                                  style: TextStyle(
-                                    fontSize: title20,
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: 'SFProText',
-                                    color: blackLight,
+                          return GestureDetector(
+                            onTap: () {
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => btDrinkEditingScreen(
+                              //         idDrink: drinkList[index].id),
+                              //   ),
+                              // );
+                            },
+                            child: Container(
+                              // height: 234,
+                              width: 120,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                        color: blueLight,
+                                        borderRadius:
+                                            BorderRadius.circular(16)),
+                                    height: 178,
+                                    width: 107,
+                                    child: Image.network(goodList[index].image),
                                   ),
-                                ),
-                              ],
+                                  SizedBox(height: 8),
+                                  Text(
+                                    goodList[index].quantity,
+                                    style: TextStyle(
+                                      fontSize: title20,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'SFProText',
+                                      color: blackLight,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           );
                         }),
@@ -390,7 +439,7 @@ class _btInventoryManagementScreenState
                             padding: EdgeInsets.zero,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
-                            itemCount: 8,
+                            itemCount: importList.length,
                             separatorBuilder:
                                 (BuildContext context, int index) =>
                                     SizedBox(height: 24),
@@ -401,7 +450,8 @@ class _btInventoryManagementScreenState
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          btImportDetailScreen(),
+                                          btImportDetailScreen(
+                                              idImport: importList[index].id),
                                     ),
                                   );
                                 },
@@ -473,7 +523,7 @@ class _btInventoryManagementScreenState
                                                 Container(
                                                   width: 145,
                                                   child: Text(
-                                                    '02.00 pm, 08 Oct 2021',
+                                                    importList[index].time,
                                                     maxLines: 1,
                                                     overflow: TextOverflow.fade,
                                                     softWrap: false,
@@ -495,7 +545,7 @@ class _btInventoryManagementScreenState
                                       Container(
                                         width: 102,
                                         child: Text(
-                                          '- ' + '\$68.00',
+                                          '- ' + '\$' + importList[index].total,
                                           maxLines: 1,
                                           overflow: TextOverflow.fade,
                                           softWrap: false,

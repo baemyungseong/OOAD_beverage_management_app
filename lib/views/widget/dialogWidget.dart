@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
@@ -12,6 +13,7 @@ import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/models/appUser.dart';
+import 'package:ui_fresh_app/models/drinkModel.dart';
 import 'package:ui_fresh_app/views/account/accountMessageDetail.dart';
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 
@@ -702,8 +704,16 @@ Future addTroubleDialog(BuildContext context, String idTrouble) {
       });
 }
 
-addGoodDialog(BuildContext context) {
-  showDialog(
+Future addGoodDialog(BuildContext context, List valueReturn) {
+  final nameController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final quantityController = TextEditingController();
+  final categoryController = TextEditingController();
+  final unitController = TextEditingController();
+  bool check = false;
+  String idGood = '';
+  String idImportSub = '';
+  return showDialog(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
@@ -722,7 +732,7 @@ addGoodDialog(BuildContext context) {
                     padding: EdgeInsets.only(
                         top: 16, bottom: 16, left: 24, right: 24),
                     width: 299,
-                    height: 514,
+                    height: 514 - 65,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -782,6 +792,7 @@ addGoodDialog(BuildContext context) {
                           width: 251,
                           height: 36,
                           child: TextFormField(
+                            controller: nameController,
                             // initialValue:
                             //     'Tại sao em lại ra đi hả Bùi Khắc Lam',
                             autofocus: false,
@@ -794,7 +805,7 @@ addGoodDialog(BuildContext context) {
                             decoration: InputDecoration(
                               contentPadding:
                                   EdgeInsets.only(left: 20, right: 0),
-                              hintText: "What're your trouble?",
+                              hintText: "What's the good name?",
                               hintStyle: TextStyle(
                                   fontFamily: 'SFProText',
                                   fontSize: content12,
@@ -813,8 +824,54 @@ addGoodDialog(BuildContext context) {
                         SizedBox(
                           height: 20,
                         ),
+                        // Text(
+                        //   'Description',
+                        //   style: TextStyle(
+                        //     fontSize: content14,
+                        //     fontWeight: FontWeight.w500,
+                        //     fontFamily: 'SFProText',
+                        //     color: blackLight,
+                        //   ),
+                        // ),
+                        // SizedBox(
+                        //   height: 12,
+                        // ),
+                        // Container(
+                        //   width: 251,
+                        //   height: 36,
+                        //   child: TextFormField(
+                        //     controller: descriptionController,
+                        //     // initialValue:
+                        //     //     'Tại sao em lại ra đi hả Bùi Khắc Lam',
+                        //     autofocus: false,
+                        //     style: TextStyle(
+                        //         fontFamily: 'SFProText',
+                        //         fontSize: content12,
+                        //         fontWeight: FontWeight.w400,
+                        //         color: blackLight,
+                        //         height: 1.4),
+                        //     decoration: InputDecoration(
+                        //       contentPadding:
+                        //           EdgeInsets.only(left: 20, right: 0),
+                        //       hintText: "What's description?",
+                        //       hintStyle: TextStyle(
+                        //           fontFamily: 'SFProText',
+                        //           fontSize: content12,
+                        //           fontWeight: FontWeight.w400,
+                        //           color: grey8,
+                        //           height: 1.4),
+                        //       filled: true,
+                        //       fillColor: blueLight,
+                        //       border: OutlineInputBorder(
+                        //         borderSide: BorderSide.none,
+                        //         borderRadius: BorderRadius.circular(8.0),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // SizedBox(height: 20),
                         Text(
-                          'Goods\'\s Name',
+                          'Quantity',
                           style: TextStyle(
                             fontSize: content14,
                             fontWeight: FontWeight.w500,
@@ -829,6 +886,7 @@ addGoodDialog(BuildContext context) {
                           width: 251,
                           height: 36,
                           child: TextFormField(
+                            controller: quantityController,
                             // initialValue:
                             //     'Tại sao em lại ra đi hả Bùi Khắc Lam',
                             autofocus: false,
@@ -841,52 +899,7 @@ addGoodDialog(BuildContext context) {
                             decoration: InputDecoration(
                               contentPadding:
                                   EdgeInsets.only(left: 20, right: 0),
-                              hintText: "What're your trouble?",
-                              hintStyle: TextStyle(
-                                  fontFamily: 'SFProText',
-                                  fontSize: content12,
-                                  fontWeight: FontWeight.w400,
-                                  color: grey8,
-                                  height: 1.4),
-                              filled: true,
-                              fillColor: blueLight,
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Goods\'\s Name',
-                          style: TextStyle(
-                            fontSize: content14,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'SFProText',
-                            color: blackLight,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 12,
-                        ),
-                        Container(
-                          width: 251,
-                          height: 36,
-                          child: TextFormField(
-                            // initialValue:
-                            //     'Tại sao em lại ra đi hả Bùi Khắc Lam',
-                            autofocus: false,
-                            style: TextStyle(
-                                fontFamily: 'SFProText',
-                                fontSize: content12,
-                                fontWeight: FontWeight.w400,
-                                color: blackLight,
-                                height: 1.4),
-                            decoration: InputDecoration(
-                              contentPadding:
-                                  EdgeInsets.only(left: 20, right: 0),
-                              hintText: "What're your trouble?",
+                              hintText: "How many goods are imported?",
                               hintStyle: TextStyle(
                                   fontFamily: 'SFProText',
                                   fontSize: content12,
@@ -919,6 +932,7 @@ addGoodDialog(BuildContext context) {
                           width: 122,
                           height: 36,
                           child: TextFormField(
+                            controller: unitController,
                             style: TextStyle(
                                 fontFamily: 'SFProText',
                                 fontSize: content14,
@@ -962,7 +976,28 @@ addGoodDialog(BuildContext context) {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.pop(context);
+                                setState(() {
+                                  valueReturn.add(nameController.text);
+                                  valueReturn.add(quantityController.text);
+                                  valueReturn.add(unitController.text);
+                                  FirebaseFirestore.instance
+                                      .collection('importSubs')
+                                      .add({
+                                    'idGood': '',
+                                    'idImport': '',
+                                    'quantity': quantityController.text,
+                                    'unit': unitController.text,
+                                    'name': nameController.text,
+                                  }).then((value) => FirebaseFirestore.instance
+                                              .collection('importSubs')
+                                              .doc(value.id)
+                                              .update({
+                                            'id': idImportSub = value.id,
+                                          }).whenComplete(() {
+                                            valueReturn.add(idImportSub);
+                                            Navigator.pop(context, valueReturn);
+                                          }));
+                                });
                               },
                               child: AnimatedContainer(
                                 duration: Duration(milliseconds: 300),
@@ -1046,7 +1081,8 @@ addGoodDialog(BuildContext context) {
       });
 }
 
-watchUserDialog(BuildContext context, String _name, String _email, String _phone_number, String _dob, String _avatar) {
+watchUserDialog(BuildContext context, String _name, String _email,
+    String _phone_number, String _dob, String _avatar) {
   return showGeneralDialog(
     barrierLabel: "Label",
     barrierDismissible: true,
@@ -2179,17 +2215,17 @@ searchDialog(
             ),
           );
         });
-      });   
+      });
 }
 
 displayAvatar(String _url) => ClipRRect(
-  borderRadius: BorderRadius.circular(8.0),
-  child: CachedNetworkImage(
-    imageUrl: _url,
-    height: 56,
-    width: 56,
-    fit: BoxFit.cover,
-    placeholder: (context, url) => 
-      Center(child: CircularProgressIndicator()),
-  ),
-);   
+      borderRadius: BorderRadius.circular(8.0),
+      child: CachedNetworkImage(
+        imageUrl: _url,
+        height: 56,
+        width: 56,
+        fit: BoxFit.cover,
+        placeholder: (context, url) =>
+            Center(child: CircularProgressIndicator()),
+      ),
+    );

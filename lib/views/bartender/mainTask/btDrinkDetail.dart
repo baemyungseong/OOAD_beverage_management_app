@@ -6,6 +6,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -198,7 +199,8 @@ class _btDrinkDetailScreenState extends State<btDrinkDetailScreen> {
                                                                           8),
                                                               image: DecorationImage(
                                                                   image: NetworkImage(
-                                                                      'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
+                                                                      currentUser
+                                                                          .avatar),
                                                                   fit: BoxFit
                                                                       .cover),
                                                               shape: BoxShape

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +7,8 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/models/drinkModel.dart';
+import 'package:ui_fresh_app/models/goodModel.dart';
 import 'package:ui_fresh_app/views/bartender/inventory/btImportEditing.dart';
 
 //import widgets
@@ -24,13 +27,11 @@ class btImportCreatingScreen extends StatefulWidget {
   btImportCreatingScreen({Key? key}) : super(key: key);
 
   @override
-  _btImportCreatingScreenState createState() =>
-      _btImportCreatingScreenState();
+  _btImportCreatingScreenState createState() => _btImportCreatingScreenState();
 }
 
-class _btImportCreatingScreenState
-    extends State<btImportCreatingScreen> with InputValidationMixin {
-
+class _btImportCreatingScreenState extends State<btImportCreatingScreen>
+    with InputValidationMixin {
   TextEditingController senderController = TextEditingController();
   GlobalKey<FormState> senderFormKey = GlobalKey<FormState>();
   TextEditingController receiverController = TextEditingController();
@@ -45,79 +46,207 @@ class _btImportCreatingScreenState
   late DateTime selectDate = DateTime.now();
 
   int selected = 1;
+  double total = 0.0;
+  double cost = 0.0;
+
+  List<Good> goodList = [];
+  List goodIdList = [];
+  List importSubIdList = [];
+  String idGood = '';
+  List quantity = [];
+  List name = [];
+  List unit = [];
+  void initState() {
+    super.initState();
+  }
+
+  List valueReturn = [];
+
+  Future getGoodList(String idGood) async {
+    FirebaseFirestore.instance.collection('goods').get().then((value) {
+      value.docs.forEach((element) {
+        setState(() {
+          if (idGood.contains(element.data()['id'] as String)) {
+            var check = goodList.where((element) => element.id == idGood);
+            if (check.isEmpty) {
+              goodIdList.add(element.data()['id'] as String);
+              goodList.add(Good.fromDocument(element.data()));
+            }
+          }
+        });
+      });
+    });
+  }
+
+  String newIdImport = '';
+  int n = 0;
+  bool check = false;
+  String oldIdGood = '';
+  String newIdGood = '';
+  double sum = 0.0;
+  Future createImport() async {
+    FirebaseFirestore.instance.collection('imports').add({
+      'id': '',
+      "sender": senderController.text,
+      "receiver": receiverController.text,
+      "description": descriptionController.text,
+      "note": noteController.text,
+      "time": "${DateFormat('yMMMMd').format(selectDate)}" +
+          ", at " +
+          "${DateFormat('hh:mm a').format(selectDate)}",
+      "goodsDetail": importSubIdList,
+      'total': total.toStringAsFixed(0).toString(),
+    }).then((value) {
+      setState(() {
+        n = 0;
+        FirebaseFirestore.instance.collection("imports").doc(value.id).update({
+          'id': newIdImport = value.id,
+        });
+        // .whenComplete(() {
+        name.forEach((element1) {
+          FirebaseFirestore.instance.collection('goods').get().then((value1) {
+            value1.docs.forEach((element2) {
+              if (element1 == element2.data()['name'] as String) {
+                check = true;
+                oldIdGood = '';
+                oldIdGood = element2.data()['id'] as String;
+                sum = (double.parse(quantity[n] + ".0") +
+                    double.parse((element2.data()["quantity"]) as String));
+                print("name");
+                print(element2.data()['name'] as String);
+                print("Ket qua");
+                print(check);
+                print("oldIdGood");
+                print(oldIdGood);
+                print(element2.data()['id'] as String);
+                print("Sum");
+                print(sum);
+                FirebaseFirestore.instance
+                    .collection('goods')
+                    .doc(oldIdGood)
+                    .update({
+                  'quantity': sum.toStringAsFixed(0).toString(),
+                }).whenComplete(() {
+                  importSubIdList.forEach((element3) {
+                    FirebaseFirestore.instance
+                        .collection('importSubs')
+                        .doc(element3)
+                        .update({
+                      'idImport': newIdImport,
+                      'idGood': oldIdGood,
+                    });
+                  });
+                });
+              }
+            });
+          });
+          // .then((value) {
+          //   if (check == false) {
+          //     FirebaseFirestore.instance.collection('goods').add({
+          //       'name': name[n],
+          //       'image': 'https://i.imgur.com/RIkxRfd.png',
+          //       'quantity': quantity[n],
+          //     }).then((value5) {
+          //       FirebaseFirestore.instance
+          //           .collection('goods')
+          //           .doc(value5.id)
+          //           .update({
+          //         'id': newIdGood = value5.id,
+          //       }).whenComplete(() {
+          //         importSubIdList.forEach((element) {
+          //           FirebaseFirestore.instance
+          //               .collection('importSubs')
+          //               .doc(element)
+          //               .update({
+          //             'idImport': newIdImport,
+          //             'idGood': newIdGood,
+          //           });
+          //         });
+          //       });
+          //     });
+          //   }
+          // });
+
+          // setState(() {
+          //   n = n + 1;
+          //   print(n);
+          // });
+        });
+
+        // });
+      });
+    });
+  }
 
   Widget customRadio(String status, int index) {
     return Container(
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selected = index;
-          });
-        },
-        child: AnimatedContainer(
-          child: Center(
-            child: Text(
-              status,
-              style: TextStyle(
-                fontFamily: "SFProText",
-                fontSize: 14.0,
-                color: (selected == index) ? white : blackLight,
-                fontWeight: FontWeight.w500,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              selected = index;
+            });
+          },
+          child: AnimatedContainer(
+            child: Center(
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontFamily: "SFProText",
+                  fontSize: 14.0,
+                  color: (selected == index) ? white : blackLight,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          alignment: Alignment.center,
-          duration: Duration(milliseconds: 300),
-          height: 40,
-          width: 122,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 2, color: blueLight),
-              left: BorderSide(width: 2, color: blueLight),
-              right: BorderSide(width: 2, color: blueLight),
-              bottom: BorderSide(width: 2, color: blueLight),
+            alignment: Alignment.center,
+            duration: Duration(milliseconds: 300),
+            height: 40,
+            width: 122,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 2, color: blueLight),
+                left: BorderSide(width: 2, color: blueLight),
+                right: BorderSide(width: 2, color: blueLight),
+                bottom: BorderSide(width: 2, color: blueLight),
+              ),
+              borderRadius: BorderRadius.circular(8),
+              gradient: (selected == index)
+                  ? (index == 1)
+                      ? LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                              Color(0xFF159957),
+                              Color(0xFF159199),
+                            ],
+                          stops: [
+                              0.0,
+                              1.0,
+                            ])
+                      : LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                              Color(0xFFCB356B),
+                              Color(0xFFBD3F32),
+                            ],
+                          stops: [
+                              0.0,
+                              1.0,
+                            ])
+                  : null,
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: black.withOpacity(0.1),
+              //     spreadRadius: 0,
+              //     blurRadius: 8,
+              //     offset: Offset(0, 4),
+              //   ),
+              // ],
             ),
-            borderRadius: BorderRadius.circular(8),
-            gradient: (selected == index)
-                ? (index == 1) 
-                  ? LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                        Color(0xFF159957),
-                        Color(0xFF159199),
-                      ],
-                    stops: [
-                        0.0,
-                        1.0,
-                      ]
-                  )
-                  : LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                        Color(0xFFCB356B),
-                        Color(0xFFBD3F32),
-                      ],
-                    stops: [
-                        0.0,
-                        1.0,
-                      ]
-                  )
-                : null,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: black.withOpacity(0.1),
-            //     spreadRadius: 0,
-            //     blurRadius: 8,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
           ),
-        ),
-      )
-    );
+        ));
   }
 
   @override
@@ -236,8 +365,9 @@ class _btImportCreatingScreenState
                                         child: GestureDetector(
                                           onTap: () async {
                                             String category = "dob";
-                                            DateTime? dt = await datePickerDialog(
-                                                context, selectDate, category);
+                                            DateTime? dt =
+                                                await datePickerDialog(context,
+                                                    selectDate, category);
                                             if (dt != null) {
                                               selectDate = dt;
                                               setState(() {
@@ -248,20 +378,24 @@ class _btImportCreatingScreenState
                                           },
                                           child: AnimatedContainer(
                                               alignment: Alignment.center,
-                                              duration: Duration(milliseconds: 300),
+                                              duration:
+                                                  Duration(milliseconds: 300),
                                               height: 48,
                                               width: 180,
                                               decoration: BoxDecoration(
                                                 color: blueLight,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   SizedBox(width: 12),
                                                   Container(
                                                       padding: EdgeInsets.zero,
-                                                      alignment: Alignment.center,
+                                                      alignment:
+                                                          Alignment.center,
                                                       child: Icon(
                                                         Iconsax.calendar_1,
                                                         size: 16,
@@ -273,7 +407,8 @@ class _btImportCreatingScreenState
                                                     style: TextStyle(
                                                       color: grey8,
                                                       fontFamily: 'Poppins',
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -319,7 +454,8 @@ class _btImportCreatingScreenState
                                                     TextInputType.text,
                                                 //validator
                                                 validator: (sender) {
-                                                  if (isSenderValid(sender.toString())) {
+                                                  if (isSenderValid(
+                                                      sender.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -335,7 +471,7 @@ class _btImportCreatingScreenState
                                                       fontWeight:
                                                           FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Broken Glass",
+                                                  hintText: "Who's the sender?",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
@@ -390,7 +526,8 @@ class _btImportCreatingScreenState
                                                     TextInputType.text,
                                                 //validator
                                                 validator: (receiver) {
-                                                  if (isReceiverValid(receiver.toString())) {
+                                                  if (isReceiverValid(
+                                                      receiver.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -406,7 +543,8 @@ class _btImportCreatingScreenState
                                                       fontWeight:
                                                           FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Broken Glass",
+                                                  hintText:
+                                                      "Who's the receiver?",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
@@ -479,7 +617,8 @@ class _btImportCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -487,12 +626,16 @@ class _btImportCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
-                                                controller: descriptionController,
-                                                keyboardType: TextInputType.text,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                                controller:
+                                                    descriptionController,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 //validator
                                                 validator: (description) {
-                                                  if (isDescriptionValid(description.toString())) {
+                                                  if (isDescriptionValid(
+                                                      description.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -500,18 +643,23 @@ class _btImportCreatingScreenState
                                                 },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Create an article to welcome customers to...",
+                                                  hintText:
+                                                      "What's the description of....",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -543,7 +691,8 @@ class _btImportCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -551,12 +700,15 @@ class _btImportCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: noteController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 //validator
                                                 validator: (note) {
-                                                  if (isNoteValid(note.toString())) {
+                                                  if (isNoteValid(
+                                                      note.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -564,18 +716,22 @@ class _btImportCreatingScreenState
                                                 },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Create an article to welcome customers to...",
+                                                  hintText: "What's the note?",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -600,54 +756,89 @@ class _btImportCreatingScreenState
                                       ),
                                       SizedBox(height: 16),
                                       Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              physics: const NeverScrollableScrollPhysics(),
-                                              padding: EdgeInsets.zero,
-                                              scrollDirection: Axis.vertical,
-                                              shrinkWrap: true,
-                                              itemCount: 0,
-                                              separatorBuilder:
-                                                  (BuildContext context,
-                                                          int index) =>
-                                                      SizedBox(
-                                                height: 1,
-                                                child: Divider(
-                                                    color: grey8, thickness: 0.2),
-                                              ),
-                                              itemBuilder: (context, index) {
-                                                return Dismissible(
-                                                  key: ValueKey(index), 
+                                          child: Column(
+                                        children: [
+                                          ListView.separated(
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            padding: EdgeInsets.zero,
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            itemCount: name.length,
+                                            separatorBuilder:
+                                                (BuildContext context,
+                                                        int index) =>
+                                                    SizedBox(
+                                              height: 1,
+                                              child: Divider(
+                                                  color: grey8, thickness: 0.2),
+                                            ),
+                                            itemBuilder: (context, index) {
+                                              return Dismissible(
+                                                  onDismissed: (direction) {
+                                                    // Remove the item from the data source.
+                                                    setState(() {
+                                                      total = total -
+                                                          double.parse(quantity[
+                                                                      index] +
+                                                                  ".0") *
+                                                              double.parse(
+                                                                  unit[index] +
+                                                                      ".0");
+                                                      name.removeAt(index);
+                                                      quantity.removeAt(index);
+                                                      unit.removeAt(index);
+                                                      importSubIdList
+                                                          .removeAt(index);
+                                                      // goodIdList
+                                                      //     .removeAt(index);
+                                                      // goodList.removeAt(index);
+                                                    });
+                                                  },
+                                                  key: ValueKey(index),
                                                   background: Container(
-                                                    padding: EdgeInsets.only(right: 16),
-                                                    alignment: Alignment.centerRight,
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.centerLeft,
-                                                        end: Alignment.centerRight,
-                                                        colors: [
-                                                          Color(0xFFCB356B),
-                                                          Color(0xFFBD3F32),
-                                                        ],
-                                                        stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ]
+                                                      padding: EdgeInsets.only(
+                                                          right: 16),
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      decoration: BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                            begin: Alignment
+                                                                .centerLeft,
+                                                            end: Alignment
+                                                                .centerRight,
+                                                            colors: [
+                                                              Color(0xFFCB356B),
+                                                              Color(0xFFBD3F32),
+                                                            ],
+                                                            stops: [
+                                                              0.0,
+                                                              1.0,
+                                                            ]),
                                                       ),
-                                                    ),
-                                                    child: Icon(Iconsax.minus, size: 24, color: white)
-                                                  ),
+                                                      child: Icon(Iconsax.minus,
+                                                          size: 24,
+                                                          color: white)),
                                                   child: Container(
                                                     decoration: (index == 0)
-                                                    ? BoxDecoration(
-                                                        color: white,
-                                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-                                                    ) 
-                                                    : BoxDecoration(
-                                                        color: white,
-                                                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                                                    ),
+                                                        ? BoxDecoration(
+                                                            color: white,
+                                                            borderRadius: BorderRadius.only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        8),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        8)),
+                                                          )
+                                                        : BoxDecoration(
+                                                            color: white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            0)),
+                                                          ),
                                                     width: 319,
                                                     height: 48,
                                                     padding: EdgeInsets.only(
@@ -698,15 +889,7 @@ class _btImportCreatingScreenState
                                                               children: [
                                                                 Container(
                                                                   child: Text(
-                                                                    (index == 0 ||
-                                                                            index ==
-                                                                                2 ||
-                                                                            index ==
-                                                                                3 ||
-                                                                            index ==
-                                                                                5)
-                                                                        ? 'Broken Glass'
-                                                                        : 'Broken Plastic Glass',
+                                                                    name[index],
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             "SFProText",
@@ -725,15 +908,11 @@ class _btImportCreatingScreenState
                                                                     width: 0),
                                                                 Container(
                                                                   child: Text(
-                                                                    (index == 0 ||
-                                                                            index ==
-                                                                                2 ||
-                                                                            index ==
-                                                                                3 ||
-                                                                            index ==
-                                                                                5)
-                                                                        ? ' - 98'
-                                                                        : ' - 34',
+                                                                    (quantity[index] !=
+                                                                            0)
+                                                                        ? ("- " +
+                                                                            quantity[index])
+                                                                        : ('0'),
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             "SFProText",
@@ -751,40 +930,45 @@ class _btImportCreatingScreenState
                                                               ],
                                                             ),
                                                             SizedBox(height: 2),
-                                                            Container(
-                                                              child: Text(
-                                                                (index == 0 ||
-                                                                        index ==
-                                                                            2 ||
-                                                                        index ==
-                                                                            3 ||
-                                                                        index ==
-                                                                            5)
-                                                                    ? 'Compensation'
-                                                                    : 'Cost',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      "SFProText",
-                                                                  fontSize:
-                                                                      content8,
-                                                                  color: grey8,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                ),
-                                                              ),
-                                                            )
+                                                            // Container(
+                                                            //   child: Text(
+                                                            //     (index == 0 ||
+                                                            //             index ==
+                                                            //                 2 ||
+                                                            //             index ==
+                                                            //                 3 ||
+                                                            //             index ==
+                                                            //                 5)
+                                                            //         ? 'Compensation'
+                                                            //         : 'Cost',
+                                                            //     style:
+                                                            //         TextStyle(
+                                                            //       fontFamily:
+                                                            //           "SFProText",
+                                                            //       fontSize:
+                                                            //           content8,
+                                                            //       color: grey8,
+                                                            //       fontWeight:
+                                                            //           FontWeight
+                                                            //               .w400,
+                                                            //     ),
+                                                            //   ),
+                                                            // )
                                                           ],
                                                         ),
                                                         Spacer(),
                                                         Text(
-                                                          (index == 0 ||
-                                                                  index == 2 ||
-                                                                  index == 3 ||
-                                                                  index == 5)
-                                                              ? '-\$103.00'
-                                                              : '-\$29.00',
+                                                          (quantity[index] !=
+                                                                  null)
+                                                              ? ("- \$" +
+                                                                  (double.parse(unit[index] +
+                                                                              ".0") *
+                                                                          double.parse(quantity[index] +
+                                                                              ".0"))
+                                                                      .toStringAsFixed(
+                                                                          0)
+                                                                      .toString())
+                                                              : ("- \$"),
                                                           maxLines: 1,
                                                           softWrap: false,
                                                           overflow:
@@ -796,29 +980,59 @@ class _btImportCreatingScreenState
                                                             fontFamily:
                                                                 'SFProText',
                                                             foreground: Paint()
-                                                              ..shader = redGradient,
+                                                              ..shader =
+                                                                  redGradient,
                                                           ),
                                                           textAlign:
                                                               TextAlign.right,
                                                         ),
                                                       ],
                                                     ),
-                                                  )
-                                                );
-                                              },
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                addGoodDialog(context);
-                                              },
-                                              child: AnimatedContainer(
-                                                duration: Duration(milliseconds: 300),
+                                                  ));
+                                            },
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // setState(() {
+                                              valueReturn.clear();
+                                              addGoodDialog(
+                                                      context, valueReturn)
+                                                  .then((value) {
+                                                print("value[0]");
+                                                print(value[0]);
+                                                print("value[1]");
+                                                print(value[1]);
+                                                print("value[2]");
+                                                print(value[2]);
+                                                print("value[3]");
+                                                print(value[3]);
+                                                // getGoodList(
+                                                //     value[0].toString());
+                                                setState(() {
+                                                  name.add(value[0]);
+                                                  quantity.add(value[1]);
+                                                  unit.add(value[2]);
+                                                  total = total +
+                                                      double.parse(
+                                                              value[1] + ".0") *
+                                                          double.parse(
+                                                              value[2] + ".0");
+                                                  importSubIdList.add(value[3]);
+                                                });
+                                              });
+                                              // });
+                                            },
+                                            child: AnimatedContainer(
+                                                duration:
+                                                    Duration(milliseconds: 300),
                                                 width: 319,
                                                 height: 48,
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
-                                                      begin: Alignment.centerLeft,
-                                                      end: Alignment.centerRight,
+                                                      begin:
+                                                          Alignment.centerLeft,
+                                                      end:
+                                                          Alignment.centerRight,
                                                       colors: [
                                                         Color(0xFF5FAAEF),
                                                         Color(0xFF979DFA),
@@ -827,14 +1041,19 @@ class _btImportCreatingScreenState
                                                         0.0,
                                                         1.0,
                                                       ]),
-                                                  borderRadius: BorderRadius.only(
-                                                    bottomLeft: Radius.circular(8),
-                                                    bottomRight: Radius.circular(8),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(8),
+                                                    bottomRight:
+                                                        Radius.circular(8),
                                                   ),
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: [
                                                     SizedBox(width: 21),
                                                     Container(
@@ -857,15 +1076,14 @@ class _btImportCreatingScreenState
                                                       ),
                                                     ),
                                                   ],
-                                                )
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                      ),
+                                                )),
+                                          )
+                                        ],
+                                      )),
                                       SizedBox(height: 24),
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
                                         children: [
                                           Text(
                                             'Total Money:',
@@ -878,7 +1096,12 @@ class _btImportCreatingScreenState
                                           ),
                                           Spacer(),
                                           Text(
-                                            '- \$2069.00',
+                                            (total == 0.0)
+                                                ? ('- \$' + '0')
+                                                : ('- \$' +
+                                                    ((total)
+                                                        .toStringAsFixed(0)
+                                                        .toString())),
                                             maxLines: 1,
                                             softWrap: false,
                                             overflow: TextOverflow.fade,
@@ -950,8 +1173,7 @@ class _btImportCreatingScreenState
                                       //   )
                                       // ),
                                       SizedBox(height: 24)
-                                    ]
-                                ),
+                                    ]),
                               )
                             ],
                           ),
@@ -968,6 +1190,34 @@ class _btImportCreatingScreenState
                       IconButton(
                         padding: EdgeInsets.only(left: 28),
                         onPressed: () {
+                          FirebaseFirestore.instance
+                              .collection('importSubs')
+                              .snapshots()
+                              .listen((value) {
+                            value.docs.forEach((element) {
+                              if (importSubIdList
+                                  .contains(element.data()['id'] as String)) {
+                                FirebaseFirestore.instance
+                                    .collection('importSubs')
+                                    .doc(element.data()['id'] as String)
+                                    .delete();
+                              }
+                            });
+                          });
+                          // FirebaseFirestore.instance
+                          //     .collection('goods')
+                          //     .snapshots()
+                          //     .listen((value) {
+                          //   value.docs.forEach((element){
+                          //     if (goodIdList
+                          //         .contains(element.data()['id'] as String)) {
+                          //       FirebaseFirestore.instance
+                          //           .collection('goods')
+                          //           .doc(element.data()['id'] as String)
+                          //           .delete();
+                          //     }
+                          //   });
+                          // });
                           Navigator.pop(context);
                         },
                         icon: Icon(Iconsax.arrow_square_left,
@@ -980,10 +1230,9 @@ class _btImportCreatingScreenState
                               receiverFormKey.currentState!.validate() &&
                               descriptionFormKey.currentState!.validate() &&
                               noteFormKey.currentState!.validate()) {
+                            createImport();
                             Navigator.pop(context);
-                            showSnackBar(
-                                context,
-                                'The order have been edited!',
+                            showSnackBar(context, 'The order have been edited!',
                                 'success');
                           } else {
                             showSnackBar(context,

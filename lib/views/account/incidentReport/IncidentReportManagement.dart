@@ -41,6 +41,11 @@ class _IncidentReportManagementScreenState
     extends State<IncidentReportManagementScreen>
     with SingleTickerProviderStateMixin {
   TextEditingController searchController = TextEditingController();
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,7 +244,7 @@ class _IncidentReportManagementScreenState
                         height: 40,
                         child: TextFormField(
                           controller: searchController,
-                          autofocus: true,
+                          autofocus: false,
                           onEditingComplete: () => Navigator.push(
                             context,
                             MaterialPageRoute(

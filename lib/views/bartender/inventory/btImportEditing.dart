@@ -23,13 +23,11 @@ class btImportEditingScreen extends StatefulWidget {
   btImportEditingScreen({Key? key}) : super(key: key);
 
   @override
-  _btImportEditingScreenState createState() =>
-      _btImportEditingScreenState();
+  _btImportEditingScreenState createState() => _btImportEditingScreenState();
 }
 
-class _btImportEditingScreenState
-    extends State<btImportEditingScreen> with InputValidationMixin {
-
+class _btImportEditingScreenState extends State<btImportEditingScreen>
+    with InputValidationMixin {
   TextEditingController senderController = TextEditingController();
   GlobalKey<FormState> senderFormKey = GlobalKey<FormState>();
   TextEditingController receiverController = TextEditingController();
@@ -47,76 +45,73 @@ class _btImportEditingScreenState
 
   Widget customRadio(String status, int index) {
     return Container(
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selected = index;
-          });
-        },
-        child: AnimatedContainer(
-          child: Center(
-            child: Text(
-              status,
-              style: TextStyle(
-                fontFamily: "SFProText",
-                fontSize: 14.0,
-                color: (selected == index) ? white : blackLight,
-                fontWeight: FontWeight.w500,
+        alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              selected = index;
+            });
+          },
+          child: AnimatedContainer(
+            child: Center(
+              child: Text(
+                status,
+                style: TextStyle(
+                  fontFamily: "SFProText",
+                  fontSize: 14.0,
+                  color: (selected == index) ? white : blackLight,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-          alignment: Alignment.center,
-          duration: Duration(milliseconds: 300),
-          height: 40,
-          width: 122,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 2, color: blueLight),
-              left: BorderSide(width: 2, color: blueLight),
-              right: BorderSide(width: 2, color: blueLight),
-              bottom: BorderSide(width: 2, color: blueLight),
+            alignment: Alignment.center,
+            duration: Duration(milliseconds: 300),
+            height: 40,
+            width: 122,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 2, color: blueLight),
+                left: BorderSide(width: 2, color: blueLight),
+                right: BorderSide(width: 2, color: blueLight),
+                bottom: BorderSide(width: 2, color: blueLight),
+              ),
+              borderRadius: BorderRadius.circular(8),
+              gradient: (selected == index)
+                  ? (index == 1)
+                      ? LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                              Color(0xFF159957),
+                              Color(0xFF159199),
+                            ],
+                          stops: [
+                              0.0,
+                              1.0,
+                            ])
+                      : LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                              Color(0xFFCB356B),
+                              Color(0xFFBD3F32),
+                            ],
+                          stops: [
+                              0.0,
+                              1.0,
+                            ])
+                  : null,
+              // boxShadow: [
+              //   BoxShadow(
+              //     color: black.withOpacity(0.1),
+              //     spreadRadius: 0,
+              //     blurRadius: 8,
+              //     offset: Offset(0, 4),
+              //   ),
+              // ],
             ),
-            borderRadius: BorderRadius.circular(8),
-            gradient: (selected == index)
-                ? (index == 1) 
-                  ? LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                        Color(0xFF159957),
-                        Color(0xFF159199),
-                      ],
-                    stops: [
-                        0.0,
-                        1.0,
-                      ]
-                  )
-                  : LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                        Color(0xFFCB356B),
-                        Color(0xFFBD3F32),
-                      ],
-                    stops: [
-                        0.0,
-                        1.0,
-                      ]
-                  )
-                : null,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: black.withOpacity(0.1),
-            //     spreadRadius: 0,
-            //     blurRadius: 8,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
           ),
-        ),
-      )
-    );
+        ));
   }
 
   @override
@@ -235,8 +230,9 @@ class _btImportEditingScreenState
                                         child: GestureDetector(
                                           onTap: () async {
                                             String category = "dob";
-                                            DateTime? dt = await datePickerDialog(
-                                                context, selectDate, category);
+                                            DateTime? dt =
+                                                await datePickerDialog(context,
+                                                    selectDate, category);
                                             if (dt != null) {
                                               selectDate = dt;
                                               setState(() {
@@ -247,20 +243,24 @@ class _btImportEditingScreenState
                                           },
                                           child: AnimatedContainer(
                                               alignment: Alignment.center,
-                                              duration: Duration(milliseconds: 300),
+                                              duration:
+                                                  Duration(milliseconds: 300),
                                               height: 48,
                                               width: 180,
                                               decoration: BoxDecoration(
                                                 color: blueLight,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   SizedBox(width: 12),
                                                   Container(
                                                       padding: EdgeInsets.zero,
-                                                      alignment: Alignment.center,
+                                                      alignment:
+                                                          Alignment.center,
                                                       child: Icon(
                                                         Iconsax.calendar_1,
                                                         size: 16,
@@ -272,7 +272,8 @@ class _btImportEditingScreenState
                                                     style: TextStyle(
                                                       color: grey8,
                                                       fontFamily: 'Poppins',
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -318,7 +319,8 @@ class _btImportEditingScreenState
                                                     TextInputType.text,
                                                 //validator
                                                 validator: (sender) {
-                                                  if (isSenderValid(sender.toString())) {
+                                                  if (isSenderValid(
+                                                      sender.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -389,7 +391,8 @@ class _btImportEditingScreenState
                                                     TextInputType.text,
                                                 //validator
                                                 validator: (receiver) {
-                                                  if (isReceiverValid(receiver.toString())) {
+                                                  if (isReceiverValid(
+                                                      receiver.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -478,7 +481,8 @@ class _btImportEditingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -486,12 +490,16 @@ class _btImportEditingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
-                                                controller: descriptionController,
-                                                keyboardType: TextInputType.text,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                                controller:
+                                                    descriptionController,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 //validator
                                                 validator: (description) {
-                                                  if (isDescriptionValid(description.toString())) {
+                                                  if (isDescriptionValid(
+                                                      description.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -499,18 +507,23 @@ class _btImportEditingScreenState
                                                 },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Create an article to welcome customers to...",
+                                                  hintText:
+                                                      "Create an article to welcome customers to...",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -542,7 +555,8 @@ class _btImportEditingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -550,12 +564,15 @@ class _btImportEditingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: noteController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 //validator
                                                 validator: (note) {
-                                                  if (isNoteValid(note.toString())) {
+                                                  if (isNoteValid(
+                                                      note.toString())) {
                                                     return null;
                                                   } else {
                                                     return '';
@@ -563,18 +580,23 @@ class _btImportEditingScreenState
                                                 },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Create an article to welcome customers to...",
+                                                  hintText:
+                                                      "Create an article to welcome customers to...",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -599,54 +621,69 @@ class _btImportEditingScreenState
                                       ),
                                       SizedBox(height: 16),
                                       Container(
-                                        child: Column(
-                                          children: [
-                                            ListView.separated(
-                                              physics: const NeverScrollableScrollPhysics(),
-                                              padding: EdgeInsets.zero,
-                                              scrollDirection: Axis.vertical,
-                                              shrinkWrap: true,
-                                              itemCount: 8,
-                                              separatorBuilder:
-                                                  (BuildContext context,
-                                                          int index) =>
-                                                      SizedBox(
-                                                height: 1,
-                                                child: Divider(
-                                                    color: grey8, thickness: 0.2),
-                                              ),
-                                              itemBuilder: (context, index) {
-                                                return Dismissible(
-                                                  key: ValueKey(index), 
+                                          child: Column(
+                                        children: [
+                                          ListView.separated(
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            padding: EdgeInsets.zero,
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            itemCount: 8,
+                                            separatorBuilder:
+                                                (BuildContext context,
+                                                        int index) =>
+                                                    SizedBox(
+                                              height: 1,
+                                              child: Divider(
+                                                  color: grey8, thickness: 0.2),
+                                            ),
+                                            itemBuilder: (context, index) {
+                                              return Dismissible(
+                                                  key: ValueKey(index),
                                                   background: Container(
-                                                    padding: EdgeInsets.only(right: 16),
-                                                    alignment: Alignment.centerRight,
-                                                    decoration: BoxDecoration(
-                                                      gradient: LinearGradient(
-                                                        begin: Alignment.centerLeft,
-                                                        end: Alignment.centerRight,
-                                                        colors: [
-                                                          Color(0xFFCB356B),
-                                                          Color(0xFFBD3F32),
-                                                        ],
-                                                        stops: [
-                                                          0.0,
-                                                          1.0,
-                                                        ]
+                                                      padding: EdgeInsets.only(
+                                                          right: 16),
+                                                      alignment:
+                                                          Alignment.centerRight,
+                                                      decoration: BoxDecoration(
+                                                        gradient: LinearGradient(
+                                                            begin: Alignment
+                                                                .centerLeft,
+                                                            end: Alignment
+                                                                .centerRight,
+                                                            colors: [
+                                                              Color(0xFFCB356B),
+                                                              Color(0xFFBD3F32),
+                                                            ],
+                                                            stops: [
+                                                              0.0,
+                                                              1.0,
+                                                            ]),
                                                       ),
-                                                    ),
-                                                    child: Icon(Iconsax.minus, size: 24, color: white)
-                                                  ),
+                                                      child: Icon(Iconsax.minus,
+                                                          size: 24,
+                                                          color: white)),
                                                   child: Container(
                                                     decoration: (index == 0)
-                                                    ? BoxDecoration(
-                                                        color: white,
-                                                        borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
-                                                    ) 
-                                                    : BoxDecoration(
-                                                        color: white,
-                                                        borderRadius: BorderRadius.all(Radius.circular(0)),
-                                                    ),
+                                                        ? BoxDecoration(
+                                                            color: white,
+                                                            borderRadius: BorderRadius.only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        8),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        8)),
+                                                          )
+                                                        : BoxDecoration(
+                                                            color: white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            0)),
+                                                          ),
                                                     width: 319,
                                                     height: 48,
                                                     padding: EdgeInsets.only(
@@ -795,29 +832,32 @@ class _btImportEditingScreenState
                                                             fontFamily:
                                                                 'SFProText',
                                                             foreground: Paint()
-                                                              ..shader = redGradient,
+                                                              ..shader =
+                                                                  redGradient,
                                                           ),
                                                           textAlign:
                                                               TextAlign.right,
                                                         ),
                                                       ],
                                                     ),
-                                                  )
-                                                );
-                                              },
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                addGoodDialog(context);
-                                              },
-                                              child: AnimatedContainer(
-                                                duration: Duration(milliseconds: 300),
+                                                  ));
+                                            },
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // addGoodDialog(context);
+                                            },
+                                            child: AnimatedContainer(
+                                                duration:
+                                                    Duration(milliseconds: 300),
                                                 width: 319,
                                                 height: 48,
                                                 decoration: BoxDecoration(
                                                   gradient: LinearGradient(
-                                                      begin: Alignment.centerLeft,
-                                                      end: Alignment.centerRight,
+                                                      begin:
+                                                          Alignment.centerLeft,
+                                                      end:
+                                                          Alignment.centerRight,
                                                       colors: [
                                                         Color(0xFF5FAAEF),
                                                         Color(0xFF979DFA),
@@ -826,14 +866,19 @@ class _btImportEditingScreenState
                                                         0.0,
                                                         1.0,
                                                       ]),
-                                                  borderRadius: BorderRadius.only(
-                                                    bottomLeft: Radius.circular(8),
-                                                    bottomRight: Radius.circular(8),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    bottomLeft:
+                                                        Radius.circular(8),
+                                                    bottomRight:
+                                                        Radius.circular(8),
                                                   ),
                                                 ),
                                                 child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
                                                   children: [
                                                     SizedBox(width: 21),
                                                     Container(
@@ -856,15 +901,14 @@ class _btImportEditingScreenState
                                                       ),
                                                     ),
                                                   ],
-                                                )
-                                              ),
-                                            )
-                                          ],
-                                        )
-                                      ),
+                                                )),
+                                          )
+                                        ],
+                                      )),
                                       SizedBox(height: 24),
                                       Row(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
                                         children: [
                                           Text(
                                             'Total Money:',
@@ -949,8 +993,7 @@ class _btImportEditingScreenState
                                       //   )
                                       // ),
                                       SizedBox(height: 24)
-                                    ]
-                                ),
+                                    ]),
                               )
                             ],
                           ),
@@ -980,9 +1023,7 @@ class _btImportEditingScreenState
                               descriptionFormKey.currentState!.validate() &&
                               noteFormKey.currentState!.validate()) {
                             Navigator.pop(context);
-                            showSnackBar(
-                                context,
-                                'The order have been edited!',
+                            showSnackBar(context, 'The order have been edited!',
                                 'success');
                           } else {
                             showSnackBar(context,
