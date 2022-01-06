@@ -80,7 +80,6 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
 
   String newIdImport = '';
   int n = 0;
-  bool check = false;
   String oldIdGood = '';
   String newIdGood = '';
   double sum = 0.0;
@@ -94,11 +93,13 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
       "time": "${DateFormat('yMMMMd').format(selectDate)}" +
           ", at " +
           "${DateFormat('hh:mm a').format(selectDate)}",
+      'status': '',
       "goodsDetail": importSubIdList,
       'total': total.toStringAsFixed(0).toString(),
     }).then((value) {
+      var check = false;
+      n = 0;
       setState(() {
-        n = 0;
         FirebaseFirestore.instance.collection("imports").doc(value.id).update({
           'id': newIdImport = value.id,
         });
@@ -141,32 +142,31 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
             });
           });
           // .then((value) {
-          //   if (check == false) {
-          //     FirebaseFirestore.instance.collection('goods').add({
-          //       'name': name[n],
-          //       'image': 'https://i.imgur.com/RIkxRfd.png',
-          //       'quantity': quantity[n],
-          //     }).then((value5) {
-          //       FirebaseFirestore.instance
-          //           .collection('goods')
-          //           .doc(value5.id)
-          //           .update({
-          //         'id': newIdGood = value5.id,
-          //       }).whenComplete(() {
-          //         importSubIdList.forEach((element) {
-          //           FirebaseFirestore.instance
-          //               .collection('importSubs')
-          //               .doc(element)
-          //               .update({
-          //             'idImport': newIdImport,
-          //             'idGood': newIdGood,
-          //           });
+          // if (check == false) {
+          //   FirebaseFirestore.instance.collection('goods').add({
+          //     'name': element1,
+          //     'image': 'https://i.imgur.com/RIkxRfd.png',
+          //     'quantity': quantity[n],
+          //   }).then((value5) {
+          //     FirebaseFirestore.instance
+          //         .collection('goods')
+          //         .doc(value5.id)
+          //         .update({
+          //       'id': newIdGood = value5.id,
+          //     }).whenComplete(() {
+          //       importSubIdList.forEach((element) {
+          //         FirebaseFirestore.instance
+          //             .collection('importSubs')
+          //             .doc(element)
+          //             .update({
+          //           'idImport': newIdImport,
+          //           'idGood': newIdGood,
           //         });
           //       });
           //     });
-          //   }
+          //   });
+          // }
           // });
-
           // setState(() {
           //   n = n + 1;
           //   print(n);

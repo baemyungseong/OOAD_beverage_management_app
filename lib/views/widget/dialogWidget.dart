@@ -12,6 +12,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 import 'package:ui_fresh_app/models/appUser.dart';
 import 'package:ui_fresh_app/models/drinkModel.dart';
 import 'package:ui_fresh_app/views/account/accountMessageDetail.dart';
@@ -1419,6 +1420,387 @@ removeIncidentReportDialog(
                       child: Center(
                         child: Text(
                           'Remove',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: white,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, anim1, anim2, child) {
+      return SlideTransition(
+        position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim1),
+        child: child,
+      );
+    },
+  );
+}
+
+removeImportDialog(BuildContext context, String idImport, List importSub) {
+  return showGeneralDialog(
+    barrierLabel: "Label",
+    barrierDismissible: true,
+    barrierColor: Colors.black.withOpacity(0.5),
+    transitionDuration: Duration(milliseconds: 400),
+    context: context,
+    pageBuilder: (context, anim1, anim2) {
+      return Align(
+        alignment: Alignment.center,
+        child: Container(
+          height: 194,
+          width: 299,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFFCB356B),
+                            Color(0xFFBD3F32),
+                          ],
+                          stops: [
+                            0.0,
+                            1.0,
+                          ]),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Iconsax.close_circle,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    child: Text(
+                      'Do you want to remove \nthis Incident Report?',
+                      style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20,
+                        color: blackLight,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      FirebaseFirestore.instance
+                          .collection("importSubs")
+                          .get()
+                          .then((value) {
+                        value.docs.forEach((element) {
+                          if (importSub
+                              .contains(element.data()['id'] as String)) {
+                            FirebaseFirestore.instance
+                                .collection("importSubs")
+                                .doc(element.data()['id'] as String)
+                                .delete();
+                          }
+                        });
+                      }).whenComplete(() => FirebaseFirestore.instance
+                              .collection("imports")
+                              .doc(idImport)
+                              .delete());
+                      Navigator.of(context)
+                        ..pop()
+                        ..pop();
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFFCB356B),
+                              Color(0xFFBD3F32),
+                            ],
+                            stops: [
+                              0.0,
+                              1.0,
+                            ]),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: black.withOpacity(0.25),
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Remove',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: white,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, anim1, anim2, child) {
+      return SlideTransition(
+        position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim1),
+        child: child,
+      );
+    },
+  );
+}
+
+checkoutImportDialog(BuildContext context, String idImport) {
+  return showGeneralDialog(
+    barrierLabel: "Label",
+    barrierDismissible: true,
+    barrierColor: Colors.black.withOpacity(0.5),
+    transitionDuration: Duration(milliseconds: 400),
+    context: context,
+    pageBuilder: (context, anim1, anim2) {
+      return Align(
+        alignment: Alignment.center,
+        child: Container(
+          height: 194,
+          width: 299,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFF159957),
+                            Color(0xFF159199),
+                          ],
+                          stops: [
+                            0.0,
+                            1.0,
+                          ]),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Iconsax.message_question,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    child: Text(
+                      'Do you want to check out \nthis Drink?',
+                      style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20,
+                        color: blackLight,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      FirebaseFirestore.instance
+                          .collection("imports")
+                          .doc(idImport)
+                          .update({
+                        "status": 'Checkout',
+                      });
+                      Navigator.pop(context);
+                      showSnackBar(
+                          context, 'The order has been passed!', "success");
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFF159957),
+                              Color(0xFF159199),
+                            ],
+                            stops: [
+                              0.0,
+                              1.0,
+                            ]),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: black.withOpacity(0.25),
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Confirm',
                           style: TextStyle(
                             fontFamily: "SFProText",
                             fontSize: 16,

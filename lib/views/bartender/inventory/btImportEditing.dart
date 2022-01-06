@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -6,6 +7,9 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/models/goodModel.dart';
+import 'package:ui_fresh_app/models/importModel.dart';
+import 'package:ui_fresh_app/models/importSubModel.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -20,10 +24,12 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
 class btImportEditingScreen extends StatefulWidget {
-  btImportEditingScreen({Key? key}) : super(key: key);
+  String idImport;
+  btImportEditingScreen({Key? key, required this.idImport}) : super(key: key);
 
   @override
-  _btImportEditingScreenState createState() => _btImportEditingScreenState();
+  _btImportEditingScreenState createState() =>
+      _btImportEditingScreenState(idImport);
 }
 
 class _btImportEditingScreenState extends State<btImportEditingScreen>
@@ -38,10 +44,103 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
   GlobalKey<FormState> noteFormKey = GlobalKey<FormState>();
 
   bool isCheckout = false;
+  String idImport = '';
 
   late DateTime selectDate = DateTime.now();
 
   int selected = 1;
+
+  _btImportEditingScreenState(this.idImport);
+
+  Import import = Import(
+      id: '',
+      sender: '',
+      description: '',
+      receiver: '',
+      note: '',
+      status: '',
+      goodsDetail: [],
+      total: '',
+      time: '');
+  Future getImportDetail() async {
+    FirebaseFirestore.instance
+        .collection('imports')
+        .where('id', isEqualTo: idImport)
+        .snapshots()
+        .listen((value) {
+      setState(() {
+        import = Import.fromDocument(value.docs.first.data());
+        importSubIdList = import.goodsDetail;
+        senderController.text = import.sender;
+        receiverController.text = import.receiver;
+        descriptionController.text = import.description;
+        noteController.text = import.note;
+        selectDate = DateFormat('yMMMMd').parse(import.time);
+        total = double.parse(import.total + ".0");
+        print("total");
+        print(total);
+      });
+    });
+  }
+
+  List importSubIdList = [];
+  List<ImportSub> importSubList = [];
+  Future getImportSubList() async {
+    FirebaseFirestore.instance
+        .collection("imports")
+        .doc(idImport)
+        .snapshots()
+        .listen((value1) {
+      FirebaseFirestore.instance.collection("importSubs").get().then((value2) {
+        setState(() {
+          importSubList.clear();
+          importSubIdList = value1.data()!["goodsDetail"];
+          value2.docs.forEach((element) {
+            if (importSubIdList.contains(element.data()['id'] as String)) {
+              importSubList.add(ImportSub.fromDocument(element.data()));
+              name.add(element.data()['name'] as String);
+              unit.add(element.data()['unit'] as String);
+              quantity.add(element.data()['quantity'] as String);
+              goodIdList.add(element.data()['idGood'] as String);
+            }
+          });
+        });
+      });
+    });
+  }
+
+  Future updateImportDetail() async {
+    setState(() {
+      FirebaseFirestore.instance
+          .collection("incidentReports")
+          .doc(idImport)
+          .update({
+        'sender': senderController.text,
+        "receiver": receiverController.text,
+        "description": descriptionController.text,
+        "note": noteController.text,
+        "time": "${DateFormat('yMMMMd').format(selectDate)}" +
+            ", at " +
+            "${DateFormat('hh:mm a').format(selectDate)}",
+        'total': total.toStringAsFixed(0).toString(),
+      });
+    });
+  }
+
+  List<Good> goodList = [];
+  List goodIdList = [];
+  String idGood = '';
+  List quantity = [];
+  List name = [];
+  List unit = [];
+  double total = 0.0;
+  List valueReturn = [];
+
+  void initState() {
+    super.initState();
+    getImportDetail();
+    getImportSubList();
+  }
 
   Widget customRadio(String status, int index) {
     return Container(
@@ -629,7 +728,7 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                             padding: EdgeInsets.zero,
                                             scrollDirection: Axis.vertical,
                                             shrinkWrap: true,
-                                            itemCount: 8,
+                                            itemCount: name.length,
                                             separatorBuilder:
                                                 (BuildContext context,
                                                         int index) =>
@@ -640,6 +739,26 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                             ),
                                             itemBuilder: (context, index) {
                                               return Dismissible(
+                                                  onDismissed: (direction) {
+                                                    // Remove the item from the data source.
+                                                    setState(() {
+                                                      total = total -
+                                                          double.parse(quantity[
+                                                                      index] +
+                                                                  ".0") *
+                                                              double.parse(
+                                                                  unit[index] +
+                                                                      ".0");
+                                                      name.removeAt(index);
+                                                      quantity.removeAt(index);
+                                                      unit.removeAt(index);
+                                                      importSubIdList
+                                                          .removeAt(index);
+                                                      // goodIdList
+                                                      //     .removeAt(index);
+                                                      // goodList.removeAt(index);
+                                                    });
+                                                  },
                                                   key: ValueKey(index),
                                                   background: Container(
                                                       padding: EdgeInsets.only(
@@ -734,15 +853,7 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                                               children: [
                                                                 Container(
                                                                   child: Text(
-                                                                    (index == 0 ||
-                                                                            index ==
-                                                                                2 ||
-                                                                            index ==
-                                                                                3 ||
-                                                                            index ==
-                                                                                5)
-                                                                        ? 'Broken Glass'
-                                                                        : 'Broken Plastic Glass',
+                                                                    name[index],
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             "SFProText",
@@ -761,15 +872,11 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                                                     width: 0),
                                                                 Container(
                                                                   child: Text(
-                                                                    (index == 0 ||
-                                                                            index ==
-                                                                                2 ||
-                                                                            index ==
-                                                                                3 ||
-                                                                            index ==
-                                                                                5)
-                                                                        ? ' - 98'
-                                                                        : ' - 34',
+                                                                    (quantity[index] !=
+                                                                            0)
+                                                                        ? ("- " +
+                                                                            quantity[index])
+                                                                        : ('0'),
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             "SFProText",
@@ -787,40 +894,45 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                                               ],
                                                             ),
                                                             SizedBox(height: 2),
-                                                            Container(
-                                                              child: Text(
-                                                                (index == 0 ||
-                                                                        index ==
-                                                                            2 ||
-                                                                        index ==
-                                                                            3 ||
-                                                                        index ==
-                                                                            5)
-                                                                    ? 'Compensation'
-                                                                    : 'Cost',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontFamily:
-                                                                      "SFProText",
-                                                                  fontSize:
-                                                                      content8,
-                                                                  color: grey8,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400,
-                                                                ),
-                                                              ),
-                                                            )
+                                                            // Container(
+                                                            //   child: Text(
+                                                            //     (index == 0 ||
+                                                            //             index ==
+                                                            //                 2 ||
+                                                            //             index ==
+                                                            //                 3 ||
+                                                            //             index ==
+                                                            //                 5)
+                                                            //         ? 'Compensation'
+                                                            //         : 'Cost',
+                                                            //     style:
+                                                            //         TextStyle(
+                                                            //       fontFamily:
+                                                            //           "SFProText",
+                                                            //       fontSize:
+                                                            //           content8,
+                                                            //       color: grey8,
+                                                            //       fontWeight:
+                                                            //           FontWeight
+                                                            //               .w400,
+                                                            //     ),
+                                                            //   ),
+                                                            // )
                                                           ],
                                                         ),
                                                         Spacer(),
                                                         Text(
-                                                          (index == 0 ||
-                                                                  index == 2 ||
-                                                                  index == 3 ||
-                                                                  index == 5)
-                                                              ? '-\$103.00'
-                                                              : '-\$29.00',
+                                                          (quantity[index] !=
+                                                                  null)
+                                                              ? ("- \$" +
+                                                                  (double.parse(unit[index] +
+                                                                              ".0") *
+                                                                          double.parse(quantity[index] +
+                                                                              ".0"))
+                                                                      .toStringAsFixed(
+                                                                          0)
+                                                                      .toString())
+                                                              : ("- \$"),
                                                           maxLines: 1,
                                                           softWrap: false,
                                                           overflow:
@@ -845,7 +957,34 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                           ),
                                           GestureDetector(
                                             onTap: () {
-                                              // addGoodDialog(context);
+                                              // setState(() {
+                                              valueReturn.clear();
+                                              addGoodDialog(
+                                                      context, valueReturn)
+                                                  .then((value) {
+                                                print("value[0]");
+                                                print(value[0]);
+                                                print("value[1]");
+                                                print(value[1]);
+                                                print("value[2]");
+                                                print(value[2]);
+                                                print("value[3]");
+                                                print(value[3]);
+                                                // getGoodList(
+                                                //     value[0].toString());
+                                                setState(() {
+                                                  name.add(value[0]);
+                                                  quantity.add(value[1]);
+                                                  unit.add(value[2]);
+                                                  total = total +
+                                                      double.parse(
+                                                              value[1] + ".0") *
+                                                          double.parse(
+                                                              value[2] + ".0");
+                                                  importSubIdList.add(value[3]);
+                                                });
+                                              });
+                                              // });
                                             },
                                             child: AnimatedContainer(
                                                 duration:
@@ -921,7 +1060,10 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                           ),
                                           Spacer(),
                                           Text(
-                                            '- \$2069.00',
+                                            '- \$' +
+                                                total
+                                                    .toStringAsFixed(0)
+                                                    .toString(),
                                             maxLines: 1,
                                             softWrap: false,
                                             overflow: TextOverflow.fade,
@@ -1022,6 +1164,7 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                               receiverFormKey.currentState!.validate() &&
                               descriptionFormKey.currentState!.validate() &&
                               noteFormKey.currentState!.validate()) {
+                            updateImportDetail();
                             Navigator.pop(context);
                             showSnackBar(context, 'The order have been edited!',
                                 'success');
