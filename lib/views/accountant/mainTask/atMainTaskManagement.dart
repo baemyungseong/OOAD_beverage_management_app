@@ -6,6 +6,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -28,11 +29,12 @@ class atMainTaskManagementScreen extends StatefulWidget {
   const atMainTaskManagementScreen({Key? key}) : super(key: key);
 
   @override
-  State<atMainTaskManagementScreen> createState() => _atMainTaskManagementScreenState();
+  State<atMainTaskManagementScreen> createState() =>
+      _atMainTaskManagementScreenState();
 }
 
-class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>  with SingleTickerProviderStateMixin {
-  
+class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
+    with SingleTickerProviderStateMixin {
   bool haveSearch = false;
   bool isHorizontal = false;
   TextEditingController searchController = TextEditingController();
@@ -40,7 +42,6 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
   TabController? _tabController;
   int _selectedIndex = 0;
   double _currentPosition = 1.0;
-
 
   void initState() {
     super.initState();
@@ -117,8 +118,7 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
                                 color: blueWater,
                                 borderRadius: BorderRadius.circular(8),
                                 image: DecorationImage(
-                                    image: NetworkImage(
-                                        'https://scontent.fsgn5-5.fna.fbcdn.net/v/t1.6435-9/76888832_686654728409257_8144869486420295680_n.jpg?_nc_cat=100&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=fREdzxOPFXEAX8anDQU&tn=GQDoBzXNSN_e_0U-&_nc_ht=scontent.fsgn5-5.fna&oh=9a1d0ebec85c5fd35b8c38b2bb7efbdd&oe=61D2CAC3'),
+                                    image: NetworkImage(currentUser.avatar),
                                     fit: BoxFit.cover),
                                 shape: BoxShape.rectangle,
                                 boxShadow: [
@@ -146,28 +146,25 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
                             Container(
                                 alignment: Alignment.topLeft,
                                 child: Text(
-                                  'Noob Chảo',
+                                  currentUser.name,
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'SFProText',
-                                    color: black,
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.2
-                                  ),
+                                      fontSize: 16,
+                                      fontFamily: 'SFProText',
+                                      color: black,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.2),
                                 )),
                             SizedBox(height: 1),
                             Container(
                                 // alignment: Alignment.topLeft,
-                                child: Text('Accountant',
+                                child: Text(currentUser.role,
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontFamily: 'SFProText',
                                       color: grey8,
                                       fontWeight: FontWeight.w400,
                                       // height: 1.4
-                                    )
-                                )
-                            ),
+                                    ))),
                           ],
                         ),
                         Spacer(),
@@ -210,8 +207,7 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
                                             ? white
                                             : blackLight)),
                               ),
-                            )
-                        ),
+                            )),
                         SizedBox(width: 28)
                       ],
                     ),
@@ -229,8 +225,7 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
                             onEditingComplete: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    atMainTaskSearchingScreen(
+                                builder: (context) => atMainTaskSearchingScreen(
                                   searchResult: searchController.text,
                                   haveFilter: haveFilter,
                                 ),
@@ -248,7 +243,8 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
                                 size: 18,
                                 color: black,
                               ),
-                              contentPadding: EdgeInsets.only(left: 20, right: 0),
+                              contentPadding:
+                                  EdgeInsets.only(left: 20, right: 0),
                               hintText: "What're you looking for?",
                               hintStyle: TextStyle(
                                   fontFamily: 'SFProText',
@@ -285,143 +281,159 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
                     Column(
                       children: [
                         Container(
-                          height: 553,
-                          width: 319,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                ListView.separated(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: EdgeInsets.zero,
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: 16,
-                                  separatorBuilder: (BuildContext context, int index) =>
-                                      SizedBox(height: 24),
-                                  itemBuilder: (context, index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => atMaintaskDetailScreen(),
-                                          ),
-                                        );
-                                        // .then((value) {});
-                                      },
-                                      child: AnimatedContainer(
-                                        duration: Duration(milliseconds: 300),
-                                        child: Row(
-                                          children: [
-                                            Image.asset('assets/images/accountant/drinkavatar.png'),
-                                            SizedBox(width: 16),
-                                            Container(
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        child: Text(
-                                                          'Drink',
-                                                          maxLines: 1,
-                                                          softWrap: false,
-                                                          overflow: TextOverflow.fade,
-                                                          style: TextStyle(
-                                                              fontSize: content16,
-                                                              fontWeight: FontWeight.w600,
-                                                              fontFamily: 'SFProText',
-                                                              color: blackLight,
-                                                              height: 1.0),
-                                                        ),
+                            height: 553,
+                            width: 319,
+                            child: SingleChildScrollView(
+                                child: Column(children: [
+                              ListView.separated(
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                itemCount: 16,
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        SizedBox(height: 24),
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              atMaintaskDetailScreen(),
+                                        ),
+                                      );
+                                      // .then((value) {});
+                                    },
+                                    child: AnimatedContainer(
+                                      duration: Duration(milliseconds: 300),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                              'assets/images/accountant/drinkavatar.png'),
+                                          SizedBox(width: 16),
+                                          Container(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      child: Text(
+                                                        'Drink',
+                                                        maxLines: 1,
+                                                        softWrap: false,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        style: TextStyle(
+                                                            fontSize: content16,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            color: blackLight,
+                                                            height: 1.0),
                                                       ),
-                                                      Column(
-                                                        children: [
-                                                          SizedBox(height: 1),
-                                                          Container(
-                                                            width: 64,
-                                                            child: Text(
-                                                              ' #' + '2092',
-                                                              maxLines: 1,
-                                                              softWrap: false,
-                                                              overflow: TextOverflow.fade,
-                                                              style: TextStyle(
-                                                                fontSize: content14,
-                                                                fontWeight: FontWeight.w500,
-                                                                fontFamily: 'SFProText',
-                                                                foreground: Paint()
-                                                                  ..shader = greenGradient,
-                                                              ),
+                                                    ),
+                                                    Column(
+                                                      children: [
+                                                        SizedBox(height: 1),
+                                                        Container(
+                                                          width: 64,
+                                                          child: Text(
+                                                            ' #' + '2092',
+                                                            maxLines: 1,
+                                                            softWrap: false,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .fade,
+                                                            style: TextStyle(
+                                                              fontSize:
+                                                                  content14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              fontFamily:
+                                                                  'SFProText',
+                                                              foreground: Paint()
+                                                                ..shader =
+                                                                    greenGradient,
                                                             ),
-                                                          )
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 4),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        width: 145,
-                                                        child: Text(
-                                                          '02.00 pm, 08 Oct 2021',
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow.fade,
-                                                          softWrap: false,
-                                                          style: TextStyle(
-                                                              fontSize: content12,
-                                                              fontWeight: FontWeight.w400,
-                                                              fontFamily: 'SFProText',
-                                                              color: grey8,
-                                                              height: 1.4),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                                SizedBox(height: 4),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      width: 145,
+                                                      child: Text(
+                                                        '02.00 pm, 08 Oct 2021',
+                                                        maxLines: 1,
+                                                        overflow:
+                                                            TextOverflow.fade,
+                                                        softWrap: false,
+                                                        style: TextStyle(
+                                                            fontSize: content12,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            color: grey8,
+                                                            height: 1.4),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Spacer(),
+                                          Container(
+                                            width: 102,
+                                            child: Text(
+                                              (index == 2 ||
+                                                      index == 5 ||
+                                                      index == 7 ||
+                                                      index == 8 ||
+                                                      index == 10 ||
+                                                      index == 12 ||
+                                                      index == 14 ||
+                                                      index == 15)
+                                                  ? '- ' + '\$68.00'
+                                                  : '+ ' + '\$137.00',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.fade,
+                                              softWrap: false,
+                                              textAlign: TextAlign.right,
+                                              style: TextStyle(
+                                                fontSize: content16,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: 'SFProText',
+                                                foreground: Paint()
+                                                  ..shader = greenGradient,
                                               ),
                                             ),
-                                            Spacer(),
-                                            Container(
-                                              width: 102,
-                                              child: Text(
-                                                (index == 2 ||
-                                                        index == 5 ||
-                                                        index == 7 ||
-                                                        index == 8 ||
-                                                        index == 10 ||
-                                                        index == 12 ||
-                                                        index == 14 ||
-                                                        index == 15)
-                                                    ? '- ' + '\$68.00'
-                                                    : '+ ' + '\$137.00',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.fade,
-                                                softWrap: false,
-                                                textAlign: TextAlign.right,
-                                                style: TextStyle(
-                                                  fontSize: content16,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: 'SFProText',
-                                                  foreground: Paint()
-                                                    ..shader = greenGradient,
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
+                                          )
+                                        ],
                                       ),
-                                    );
-                                  },
-                                ),
-                                SizedBox(height: 112)
-                              ]
-                            )
-                          )
-                        ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 112)
+                            ]))),
                       ],
                     )
                   ],
@@ -429,8 +441,7 @@ class _atMainTaskManagementScreenState extends State<atMainTaskManagementScreen>
               ),
             ],
           ),
-        )
-    );
+        ));
   }
 
   //Bottom Sheet - start
