@@ -1190,12 +1190,12 @@ watchUserDialog(BuildContext context, String _name, String _email,
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => messageDetailScreen(),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => messageDetailScreen(),
+                      //   ),
+                      // );
                       // .then((value) {});
                     },
                     child: Container(
@@ -2511,13 +2511,13 @@ searchDialog(
                             itemBuilder: (context, index) {
                               return GestureDetector(
                                 onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          messageDetailScreen(),
-                                    ),
-                                  );
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) =>
+                                  //         messageDetailScreen(),
+                                  //   ),
+                                  // );
                                   // .then((value) {});
                                 },
                                 child: AnimatedContainer(
