@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:intl/intl.dart';
 import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 
@@ -12,6 +13,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 import 'package:ui_fresh_app/models/appUser.dart';
 import 'package:ui_fresh_app/models/drinkModel.dart';
 import 'package:ui_fresh_app/views/account/accountMessageDetail.dart';
@@ -2190,6 +2192,332 @@ searchDialog(
                                                 ),
                                                 Text(
                                                   'Accountant',
+                                                  style: TextStyle(
+                                                    fontFamily: 'SFProText',
+                                                    fontSize: content8,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: blackLight,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ]),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+      });
+}
+
+searchMessageDialog(BuildContext context, List<appUser> appUser1) {
+  String newMessageId = '';
+  String messageId = '';
+  List<appUser> userListSearch = [];
+  final searchEmailController = TextEditingController();
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            backgroundColor: white,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0)),
+            insetPadding: EdgeInsets.zero,
+            contentPadding: EdgeInsets.zero,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            content: Stack(
+              children: <Widget>[
+                Form(
+                  child: Container(
+                    padding: EdgeInsets.only(
+                        top: 24, bottom: 24, left: 16, right: 16),
+                    width: 299,
+                    height: 229,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 240,
+                              height: 32,
+                              child: TextFormField(
+                                controller: searchEmailController,
+                                onChanged: (val) {
+                                  FirebaseFirestore.instance
+                                      .collection("users")
+                                      .where("email",
+                                          isEqualTo: searchEmailController.text)
+                                      .get()
+                                      .then((value) {
+                                    setState(() {
+                                      userListSearch.clear();
+                                      value.docs.forEach((element) {
+                                        var check = userListSearch.where(
+                                            (element) =>
+                                                element.email ==
+                                                searchEmailController.text);
+                                        if (check.isEmpty) {
+                                          userListSearch.add(
+                                              appUser.fromDocument(element));
+                                        } else {
+                                          showSnackBar(
+                                              context,
+                                              "This email is searched ",
+                                              "error");
+                                        }
+                                      });
+                                    });
+                                  });
+                                },
+                                onEditingComplete: () {
+                                  FirebaseFirestore.instance
+                                      .collection("users")
+                                      .where("email",
+                                          isEqualTo: searchEmailController.text)
+                                      .get()
+                                      .then((value) {
+                                    userListSearch.clear();
+                                    setState(() {
+                                      value.docs.forEach((element) {
+                                        var check = userListSearch.where(
+                                            (element) =>
+                                                element.email ==
+                                                searchEmailController.text);
+                                        if (check.isEmpty) {
+                                          userListSearch.add(
+                                              appUser.fromDocument(element));
+                                        } else {
+                                          showSnackBar(
+                                              context,
+                                              "This email is searched ",
+                                              "error");
+                                        }
+                                      });
+                                    });
+                                  });
+                                },
+                                style: TextStyle(
+                                    fontFamily: 'SFProText',
+                                    fontSize: content14,
+                                    fontWeight: FontWeight.w400,
+                                    color: blackLight,
+                                    height: 1.4),
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Iconsax.search_normal_1,
+                                    size: 18,
+                                    color: black,
+                                  ),
+                                  contentPadding:
+                                      EdgeInsets.only(left: 20, right: 0),
+                                  hintText: "What're you looking for?",
+                                  hintStyle: TextStyle(
+                                      fontFamily: 'SFProText',
+                                      fontSize: content14,
+                                      fontWeight: FontWeight.w400,
+                                      color: grey8,
+                                      height: 1.4),
+                                  filled: true,
+                                  fillColor: whiteLight,
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide.none,
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.zero,
+                                alignment: Alignment.center,
+                                child: Icon(Iconsax.close_square,
+                                    size: 19, color: blackLight),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 17,
+                        ),
+                        Container(
+                          height: 128,
+                          padding: EdgeInsets.only(left: 16, right: 11),
+                          child: ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            itemCount: userListSearch.length,
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    SizedBox(height: 16),
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  FirebaseFirestore.instance
+                                      .collection("messages")
+                                      .get()
+                                      .then((value) {
+                                    value.docs.forEach((element) {
+                                      if ((currentUser.id ==
+                                                      (element.data()['userId1']
+                                                          as String) &&
+                                                  userListSearch[index].id ==
+                                                      (element.data()['userId2']
+                                                          as String)) ||
+                                              (currentUser.id ==
+                                                      (element.data()['userId2']
+                                                          as String) &&
+                                                  userListSearch[index].id ==
+                                                      (element.data()['userId1']
+                                                          as String))
+                                          //      &&
+                                          // element.data()['timeSend'] != null
+                                          ) {
+                                        newMessageId = element.id;
+                                        print(newMessageId);
+                                      }
+                                    });
+                                    setState(() {
+                                      if (newMessageId == '') {
+                                        FirebaseFirestore.instance
+                                            .collection("messages")
+                                            .add({
+                                          'userId1': currentUser.id,
+                                          'userId2': userListSearch[index].id,
+                                          'name1': currentUser.name,
+                                          'name2': userListSearch[index].name,
+                                          'background1': currentUser.avatar,
+                                          'background2':
+                                              userListSearch[index].avatar,
+                                          'contentList':
+                                              FieldValue.arrayUnion([""]),
+                                          'lastTimeSend':
+                                              "${DateFormat('hh:mm a').format(DateTime.now())}",
+                                          'lastMessage': '',
+                                        }).then((value) {
+                                          setState(() {
+                                            FirebaseFirestore.instance
+                                                .collection("messages")
+                                                .doc(value.id)
+                                                .update({
+                                              'messageId': value.id,
+                                            });
+                                          });
+                                          messageId = value.id;
+                                        });
+                                      } else {
+                                        (currentUser.id ==
+                                                userListSearch[index].id)
+                                            ? Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      messageDetailScreen(
+                                                          required,
+                                                          uid: currentUser.id,
+                                                          uid2: userListSearch[
+                                                                  index]
+                                                              .id,
+                                                          messagesId:
+                                                              newMessageId),
+                                                ),
+                                              )
+                                            : Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      messageDetailScreen(
+                                                          required,
+                                                          uid: userListSearch[
+                                                                  index]
+                                                              .id,
+                                                          uid2: currentUser.id,
+                                                          messagesId:
+                                                              newMessageId),
+                                                ),
+                                              );
+                                      }
+                                    });
+                                  });
+                                },
+                                child: AnimatedContainer(
+                                  duration: Duration(milliseconds: 300),
+                                  decoration: BoxDecoration(
+                                    color: white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  height: 32,
+                                  width: 200,
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            AnimatedContainer(
+                                              alignment: Alignment.center,
+                                              duration:
+                                                  Duration(milliseconds: 300),
+                                              height: 32,
+                                              width: 32,
+                                              decoration: BoxDecoration(
+                                                color: blueWater,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                image: DecorationImage(
+                                                    image: NetworkImage(
+                                                        userListSearch[index]
+                                                            .avatar),
+                                                    fit: BoxFit.cover),
+                                                shape: BoxShape.rectangle,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 8,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  width: 200,
+                                                  child: Text(
+                                                    userListSearch[index].name,
+                                                    style: TextStyle(
+                                                      fontFamily: 'SFProText',
+                                                      fontSize: content12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: blackLight,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(
+                                                  height: 2,
+                                                ),
+                                                Text(
+                                                  userListSearch[index].role,
                                                   style: TextStyle(
                                                     fontFamily: 'SFProText',
                                                     fontSize: content8,

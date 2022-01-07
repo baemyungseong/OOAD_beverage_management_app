@@ -93,13 +93,28 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
             messageId = value.id;
           });
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => messageDetailScreen(required,
-                  uid: uid, uid2: userIdS2, messagesId: newMessageId),
-            ),
-          );
+          (currentUser.id == userIdS2)
+              ? Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => messageDetailScreen(required,
+                        uid: uid, uid2: userIdS2, messagesId: newMessageId),
+                  ),
+                )
+              : Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => messageDetailScreen(required,
+                        uid: userIdS2, uid2: uid, messagesId: newMessageId),
+                  ),
+                );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => messageDetailScreen(required,
+          //         uid: uid, uid2: userIdS2, messagesId: newMessageId),
+          //   ),
+          // );
         }
       });
     });
@@ -310,7 +325,7 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                               //         Screen(required, uid: uid),
                               //   ),
                               // );
-                              searchDialog(context);
+                              searchMessageDialog(context, userList);
                             },
                             child: AnimatedContainer(
                               alignment: Alignment.center,
@@ -466,7 +481,7 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                                   MainAxisAlignment.end,
                                               children: [
                                                 Container(
-                                                  width: 180,
+                                                  width: 100,
                                                   child: Text(
                                                     (currentUser.id ==
                                                             messagesList[index]
