@@ -286,7 +286,7 @@ class _messageDetailScreenState extends State<messageDetailScreen> {
                                                   SizedBox(height: 16),
                                           itemCount: chatting.length,
                                           itemBuilder: (context, index) {
-                                            return (uid ==
+                                            return (currentUser.id ==
                                                     chatting[index].userId)
                                                 ? Container(
                                                     // padding: EdgeInsets.only(
