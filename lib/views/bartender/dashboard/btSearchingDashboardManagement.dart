@@ -13,8 +13,6 @@ import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/bartender/mainTask/btDrinkAdding.dart';
-
 //import others
 import 'package:iconsax/iconsax.dart';
 import 'package:another_xlider/another_xlider.dart';

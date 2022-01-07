@@ -7,14 +7,13 @@ import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/views/account/incidentReport/IncidentReportCreating.dart';
+import 'package:ui_fresh_app/views/bartender/dashboard/btDashboardManagement.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/bartender/mainTask/btDashboardChosing.dart';
-import 'package:ui_fresh_app/views/bartender/inventory/btDrinkEditing.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -478,7 +477,7 @@ class _btMainTaskEditingScreenState extends State<btMainTaskEditingScreen>
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (context) =>
-                                                      btDashboardChosingScreen(),
+                                                      btDashboardManagementScreen(),
                                                 ),
                                               );
                                               // .then((value) {});

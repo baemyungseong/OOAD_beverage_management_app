@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,6 +13,9 @@ import 'package:ui_fresh_app/views/bartender/inventory/btImportCreating.dart';
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
+//import models
+import 'package:ui_fresh_app/models/drinkTypeModel.dart';
+
 //import views
 import 'package:ui_fresh_app/views/serve/dashboard/svDrinkChosing.dart';
 
@@ -20,6 +24,10 @@ import 'package:iconsax/iconsax.dart';
 import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
+
+//import Firebase stuffs
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class btCreateDrinkDetailScreen extends StatefulWidget {
   btCreateDrinkDetailScreen({Key? key}) : super(key: key);
@@ -39,169 +47,19 @@ class _btCreateDrinkDetailScreenState
   TextEditingController priceController = TextEditingController();
   GlobalKey<FormState> priceFormKey = GlobalKey<FormState>();
 
-  int selectVolume = 0;
-  int selectCondition = 0;
-  int selectSugar = 0;
-
-  Widget customRadioVolume(String category, int index) {
-    return Container(
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectVolume = index;
-          });
-        },
-        child: AnimatedContainer(
-          child: Center(
-            child: (category == "no") 
-            ? Icon(Iconsax.slash, size: 12, color: blackLight)
-            : Text(
-              category,
-              style: TextStyle(
-                fontFamily: "SFProText",
-                fontSize: 10.0,
-                color: blackLight,
-                fontWeight: FontWeight.w500,
-              ),
-            )
-          ),
-          alignment: Alignment.center,
-          duration: Duration(milliseconds: 300),
-          height: 24,
-          width: 64,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 1, color: blueLight),
-              left: BorderSide(width: 1, color: blueLight),
-              right: BorderSide(width: 1, color: blueLight),
-              bottom: BorderSide(width: 1, color: blueLight),
-            ),
-            borderRadius: BorderRadius.circular(4),
-            color: (selectVolume == index)
-                ? blueLight
-                : null,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: black.withOpacity(0.1),
-            //     spreadRadius: 0,
-            //     blurRadius: 8,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
-          ),
-        ),
-      )
-    );
-  }
-
-  Widget customRadioCondition(String category, int index) {
-    return Container(
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectCondition = index;
-          });
-        },
-        child: AnimatedContainer(
-          child: Center(
-            child: (category == "no") 
-            ? Icon(Iconsax.slash, size: 12, color: blackLight)
-            : Text(
-              category,
-              style: TextStyle(
-                fontFamily: "SFProText",
-                fontSize: 10.0,
-                color: blackLight,
-                fontWeight: FontWeight.w500,
-              ),
-            )
-          ),
-          alignment: Alignment.center,
-          duration: Duration(milliseconds: 300),
-          height: 24,
-          width: 64,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 1, color: blueLight),
-              left: BorderSide(width: 1, color: blueLight),
-              right: BorderSide(width: 1, color: blueLight),
-              bottom: BorderSide(width: 1, color: blueLight),
-            ),
-            borderRadius: BorderRadius.circular(4),
-            color: (selectCondition == index)
-                ? blueLight
-                : null,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: black.withOpacity(0.1),
-            //     spreadRadius: 0,
-            //     blurRadius: 8,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
-          ),
-        ),
-      )
-    );
-  }
-
-  Widget customRadioSugar(String category, int index) {
-    return Container(
-      alignment: Alignment.center,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            selectSugar = index;
-          });
-        },
-        child: AnimatedContainer(
-          child: Center(
-            child: (category == "no") 
-            ? Icon(Iconsax.slash, size: 12, color: blackLight)
-            : Text(
-              category,
-              style: TextStyle(
-                fontFamily: "SFProText",
-                fontSize: 10.0,
-                color: blackLight,
-                fontWeight: FontWeight.w500,
-              ),
-            )
-          ),
-          alignment: Alignment.center,
-          duration: Duration(milliseconds: 300),
-          height: 24,
-          width: 64,
-          decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(width: 1, color: blueLight),
-              left: BorderSide(width: 1, color: blueLight),
-              right: BorderSide(width: 1, color: blueLight),
-              bottom: BorderSide(width: 1, color: blueLight),
-            ),
-            borderRadius: BorderRadius.circular(4),
-            color: (selectSugar == index)
-                ? blueLight
-                : null,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: black.withOpacity(0.1),
-            //     spreadRadius: 0,
-            //     blurRadius: 8,
-            //     offset: Offset(0, 4),
-            //   ),
-            // ],
-          ),
-        ),
-      )
-    );
-  }
-
   void initState() {
     super.initState();
+    isTapDrinkType = false;
   }
+
+  
+  List<String> categories = ["Tea", "Juice", "Beer", "Wine"];
+  var drinkTypes = [];
+  String selectedCategory = "Tea";
+  String selectedDrinkType = "";
+  bool isTapDrinkType = false;
+  var drinkImages = [];
+  var drinkImageURL = "";
 
   @override
   Widget build(BuildContext context) {
@@ -232,6 +90,109 @@ class _btCreateDrinkDetailScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 24),
+                      Container(
+                        child: Text(
+                          'Category',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 20.0,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: 48,
+                              width: 319,
+                              padding: EdgeInsets.only(left: 20, right: 12),
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: blueLight
+                              ),
+                              child: Text(
+                                selectedCategory,
+                                style: TextStyle(
+                                  fontFamily: 'SFProText',
+                                  fontSize: content14,
+                                  fontWeight: FontWeight.w400,
+                                  color: blackLight),                                
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 18),
+                              child: Theme(
+                                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                child: ExpansionTile(
+                                  key: UniqueKey(),
+                                  iconColor: grey8,
+                                  collapsedIconColor: black,
+                                  title: Text(''),
+                                  children: [
+                                    SizedBox(height: 16),
+                                    ListView.separated(
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: EdgeInsets.zero,
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: categories.length,
+                                      separatorBuilder: (BuildContext context, int index) => SizedBox(height: 16),
+                                      itemBuilder: (context, index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedCategory = categories[index];
+                                              isTapDrinkType = false;
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 48,
+                                            width: 319,
+                                            padding: EdgeInsets.only(left: 20, right: 12),
+                                            alignment: Alignment.centerLeft,
+                                            decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(8),
+                                            color: categories[index] == selectedCategory ? blueWater : blueLight,
+                                            ),
+                                            child: Text(
+                                              categories[index],
+                                              style: TextStyle(
+                                                fontFamily: 'SFProText',
+                                                fontSize: content14,
+                                                fontWeight: FontWeight.w400,
+                                                color: categories[index] == selectedCategory ? white : blackLight,
+                                              ),                                
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],                                  
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        child: Text(
+                          'Drink Type',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 20.0,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      controlChooseDrinkType(),
+                      SizedBox(height: 16),                                                                                                            
                       Container(
                         child: Text(
                           'Name',
@@ -424,112 +385,6 @@ class _btCreateDrinkDetailScreenState
                           ),
                         ),
                       ),
-                      SizedBox(height: 24),
-                      Container(
-                        child: Text(
-                          'Option',
-                          style: TextStyle(
-                            fontFamily: "SFProText",
-                            fontSize: 20.0,
-                            color: blackLight,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Container(
-                            child: Text(
-                              'Volume:',
-                              style: TextStyle(
-                                fontFamily: "SFProText",
-                                fontSize: 14.0,
-                                color: blackLight,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 24),
-                          Row(
-                            children: [
-                              customRadioVolume('500ml', 1),
-                              SizedBox(width: 16),
-                              customRadioVolume('1000ml', 2),
-                              SizedBox(width: 16),
-                              customRadioVolume('no', 3),
-                            ],
-                          ),
-                        ]
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Container(
-                            child: Text(
-                              'Condition:',
-                              style: TextStyle(
-                                fontFamily: "SFProText",
-                                fontSize: 14.0,
-                                color: blackLight,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 24),
-                          Row(
-                            children: [
-                              customRadioCondition('Cold', 1),
-                              SizedBox(width: 16),
-                              customRadioCondition('Hot', 2),
-                              SizedBox(width: 16),
-                              customRadioCondition('no', 3),
-                            ],
-                          ),
-                        ]
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: Text(
-                              'Sugar:',
-                              style: TextStyle(
-                                fontFamily: "SFProText",
-                                fontSize: 14.0,
-                                color: blackLight,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 24),
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  customRadioSugar('100%', 1),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('70%', 2),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('50%', 3),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  customRadioSugar('30%', 4),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('0%', 5),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('no', 6),
-                                ],
-                              ),
-                            ],
-                          )
-                        ]
-                      ),
-                      SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -555,10 +410,7 @@ class _btCreateDrinkDetailScreenState
                             onTap: () {
                               if (nameFormKey.currentState!.validate() &&
                                   descriptionFormKey.currentState!.validate() &&
-                                  priceFormKey.currentState!.validate() &&
-                                  selectVolume != 0 &&
-                                  selectCondition != 0 &&
-                                  selectSugar != 0) {
+                                  priceFormKey.currentState!.validate()) {
                                 Navigator.pop(context);
                                 showSnackBar(context, 'The drink have been created!', 'success');
                               } else {
@@ -621,68 +473,244 @@ class _btCreateDrinkDetailScreenState
                           )),
                     ],
                   ),
-                  SizedBox(height: 56),
-                  Stack(
-                    children: [
-                      Container(
-                        alignment: Alignment.topCenter,
-                        child: Container(
-                            child: Image.network(
-                                'https://i.imgur.com/6GfgeBS.png',
-                                scale: 4.926)),
-                      ),
-                      Container(
-                        child: GestureDetector(
-                          onTap: () {
-                            // Navigator.pop(context);
-                            // removeDialog(context);
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => svDrinkCartScreen(),
-                            //   ),
-                            // );
-                            // // .then((value) {});
-                            print("pressed");
-                          },
-                          child: AnimatedContainer(
-                            margin: EdgeInsets.only(left: 260, top: 256),
-                            alignment: Alignment.center,
-                            duration: Duration(milliseconds: 300),
-                            height: 32,
-                            width: 32,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: blueWater,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: black.withOpacity(0.25),
-                                    spreadRadius: 0,
-                                    blurRadius: 64,
-                                    offset: Offset(8, 8)),
-                                BoxShadow(
-                                  color: black.withOpacity(0.2),
-                                  spreadRadius: 0,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Icon(Iconsax.edit, size: 18, color: white)
-                            ),
-                          ),
-                        )
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 16)
+                  controlShowDrinkImage(),
+                  SizedBox(height: 16),
                 ]))
           ],
         )
       ])),
     );
+  }
+
+  controlGetDrinkImageCorrectly() async {
+    await getDrinkImages();
+    await getDrinkTypes();
+    getCorrectImage();
+  }
+
+  controlShowDrinkImage() {
+    return FutureBuilder(
+      future: controlGetDrinkImageCorrectly(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: 
+              SizedBox(
+                child: CircularProgressIndicator(
+                  color: blackLight,
+                  strokeWidth: 3,
+                ),
+                height: 25.0,
+                width: 25.0,
+              ),
+          );          
+        }
+        return Stack(
+          children: [
+            Container(
+              alignment: Alignment.topCenter,
+              child: Container(
+                  child: displayDrinkImage(drinkImageURL, 300, 300),
+              ),
+            ),
+          ],
+        );  
+      }
+    );
+  }
+
+  controlChooseDrinkType() {
+    return FutureBuilder(
+      future: getDrinkTypes(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: 
+              SizedBox(
+                child: CircularProgressIndicator(
+                  color: blackLight,
+                  strokeWidth: 3,
+                ),
+                height: 25.0,
+                width: 25.0,
+              ),
+          );
+        }                    
+        return Container(
+          child: Stack(
+            children: [
+              Container(
+                height: 48,
+                width: 319,
+                padding: EdgeInsets.only(left: 20, right: 12),
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: blueLight
+                ),
+                child: Text(
+                  selectedDrinkType,
+                  style: TextStyle(
+                    fontFamily: 'SFProText',
+                    fontSize: content14,
+                    fontWeight: FontWeight.w400,
+                    color: blackLight),                                
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(right: 18),
+                child: Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    key: UniqueKey(),
+                    iconColor: grey8,
+                    collapsedIconColor: black,
+                    title: Text(''),
+                    children: [
+                      SizedBox(height: 16),
+                      ListView.separated(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: drinkTypes.length,
+                        separatorBuilder: (BuildContext context, int index) => SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedDrinkType = drinkTypes[index];
+                                isTapDrinkType = true;
+                              });
+                            },
+                            child: Container(
+                              height: 48,
+                              width: 319,
+                              padding: EdgeInsets.only(left: 20, right: 12),
+                              alignment: Alignment.centerLeft,
+                              decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: drinkTypes[index] == selectedDrinkType ? blueWater : blueLight,
+                              ),
+                              child: Text(
+                                drinkTypes[index],
+                                style: TextStyle(
+                                  fontFamily: 'SFProText',
+                                  fontSize: content14,
+                                  fontWeight: FontWeight.w400,
+                                  color: drinkTypes[index] == selectedDrinkType ? white : blackLight,
+                                ),                                
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],                                  
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );    
+      }                    
+    );    
+  }
+
+  displayDrinkImage(String _url, double _height, double _width) => ClipRRect(
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      placeholder: (context, url) => 
+        Center(child: SizedBox(
+            child: CircularProgressIndicator(
+              color: blackLight,
+              strokeWidth: 3,
+            ),
+            height: 25.0,
+            width: 25.0,
+          ),
+        ),
+    ),
+  );
+
+  getCorrectImage() {
+    for (int i = 0; i < drinkImages.length; i++) {
+      if (drinkImages[i].toString().contains(selectedDrinkType.replaceAll(" ", "%20"))) {
+        drinkImageURL = drinkImages[i];
+      }
+    }
+  }
+
+  getDrinkImages() async {
+    drinkImages.clear();
+    firebase_storage.ListResult result = await teasReference.listAll();
+    switch (selectedCategory) {
+      case "Tea":
+        result = await teasReference.listAll();
+        break;
+      case "Juice":
+        result = await juicesReference.listAll();
+        break;
+      case "Beer":
+        result = await beersReference.listAll();     
+        break;
+      case "Wine":
+        result = await winesReference.listAll();      
+        break;                                
+    }
+
+    result.items.forEach((firebase_storage.Reference ref) async {
+      var drinkImg;
+      drinkImg = await ref.getDownloadURL();
+      drinkImages.add(drinkImg);
+    });
+  }
+
+  getDrinkTypes() async {
+    drinkTypes.clear();
+    firebase_storage.ListResult result = await teasReference.listAll();
+    switch (selectedCategory) {
+      case "Tea":
+        result = await teasReference.listAll();
+        break;
+      case "Juice":
+        result = await juicesReference.listAll();
+        break;
+      case "Beer":
+        result = await beersReference.listAll();     
+        break;
+      case "Wine":
+        result = await winesReference.listAll();      
+        break;                                
+    }
+
+    result.items.forEach((firebase_storage.Reference ref) async {
+      var drinkType;
+      drinkType = ref.toString();
+      drinkType = pathImageToName(drinkType);
+      drinkTypes.add(drinkType);
+      isTapDrinkType == false ? selectedDrinkType = drinkTypes[0] : selectedDrinkType;
+    });
+  }
+
+  String pathImageToName(String _path) {
+    int startIndex = 0;
+    switch (selectedCategory) {
+      case "Tea":
+        startIndex = 57;
+        break;
+      case "Juice":
+        startIndex = 59;
+        break;
+      case "Beer":
+        startIndex = 58;
+        break;
+      case "Wine":
+        startIndex = 58;
+        break;                                
+    }
+    return _path.substring(startIndex, _path.lastIndexOf('.'));
   }
 }
 
