@@ -9,7 +9,8 @@ class Message {
   final String name1;
   final String lastMessage;
   final String name2;
-  final String background;
+  final String background1;
+  final String background2;
 
   Message({
     required this.contentList,
@@ -20,7 +21,8 @@ class Message {
     required this.lastMessage,
     required this.name2,
     required this.name1,
-    required this.background,
+    required this.background1,
+    required this.background2,
   });
   factory Message.fromDocument(Map<String, dynamic> doc) {
     return Message(
@@ -30,7 +32,8 @@ class Message {
         userId2: doc['userId2'],
         lastMessage: doc['lastMessage'],
         lastTimeSend: doc['lastTimeSend'],
-        background: doc['background'],
+        background1: doc['background1'],
+        background2: doc['background2'],
         name1: doc['name1'],
         name2: doc['name2']);
   }

@@ -54,13 +54,14 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
   String newMessageId = "";
   String messageId = '';
   List assignedMessage = [];
-  Future createMessage(String userIdS2, String userName2) async {
+  Future createMessage(
+      String userIdS2, String userName2, String background2) async {
     FirebaseFirestore.instance.collection("messages").get().then((value) {
       value.docs.forEach((element) {
-        if (("$userName" + "_" + "$userName2") ==
-                    ((element.data()['name1'] as String)) ||
-                (("$userName" + "_" + "$userName2") ==
-                    (element.data()['name2'] as String))
+        if ((uid == (element.data()['userId1'] as String) &&
+                    userIdS2 == (element.data()['userId2'] as String)) ||
+                (uid == (element.data()['userId2'] as String) &&
+                    userIdS2 == (element.data()['userId1'] as String))
             //      &&
             // element.data()['timeSend'] != null
             ) {
@@ -73,9 +74,10 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
           FirebaseFirestore.instance.collection("messages").add({
             'userId1': uid,
             'userId2': userIdS2,
-            'name1': "$userName" + "_" + "$userName2",
-            'name2': "$userName2" + "_" + "$userName",
-            'background': 'https://i.imgur.com/YtZkAbe.jpg',
+            'name1': "$userName",
+            'name2': "$userName2",
+            'background1': currentUser.avatar,
+            'background2': background2,
             'contentList': FieldValue.arrayUnion([""]),
             'lastTimeSend': "${DateFormat('hh:mm a').format(DateTime.now())}",
             'lastMessage': '',
@@ -340,8 +342,10 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                   alignment: Alignment.center,
                                   child: GestureDetector(
                                     onTap: () {
-                                      createMessage(userList[index].id,
-                                          userList[index].name);
+                                      createMessage(
+                                          userList[index].id,
+                                          userList[index].name,
+                                          userList[index].avatar);
                                       getMessage();
                                     },
                                     child: AnimatedContainer(
@@ -397,17 +401,32 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                               alignment: Alignment.center,
                               child: GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            messageDetailScreen(required,
-                                                uid: uid,
-                                                uid2: userList[index].id,
-                                                messagesId: messagesList[index]
-                                                    .messageId),
-                                      ),
-                                    );
+                                    (currentUser.id ==
+                                            messagesList[index].userId2)
+                                        ? Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  messageDetailScreen(required,
+                                                      uid: uid,
+                                                      uid2: userList[index].id,
+                                                      messagesId:
+                                                          messagesList[index]
+                                                              .messageId),
+                                            ),
+                                          )
+                                        : Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  messageDetailScreen(required,
+                                                      uid: userList[index].id,
+                                                      uid2: uid,
+                                                      messagesId:
+                                                          messagesList[index]
+                                                              .messageId),
+                                            ),
+                                          );
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -422,8 +441,13 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                           image: DecorationImage(
                                               image: NetworkImage(
                                                   // '${projects[index]!["background"]}'),
-                                                  messagesList[index]
-                                                      .background),
+                                                  (currentUser.id ==
+                                                          messagesList[index]
+                                                              .userId1)
+                                                      ? messagesList[index]
+                                                          .background2
+                                                      : messagesList[index]
+                                                          .background1),
                                               fit: BoxFit.cover),
                                           shape: BoxShape.circle,
                                         ),
@@ -448,9 +472,9 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                                             messagesList[index]
                                                                 .userId1)
                                                         ? messagesList[index]
-                                                            .name1
+                                                            .name2
                                                         : messagesList[index]
-                                                            .name2,
+                                                            .name1,
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                     maxLines: 1,
