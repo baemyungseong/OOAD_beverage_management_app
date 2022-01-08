@@ -415,7 +415,7 @@ class _btCreateDrinkDetailScreenState
                                   priceFormKey.currentState!.validate()) {
                                 controlAddNewDrink();    
                                 Navigator.pop(context);
-                                showSnackBar(context, 'The drink have been created!', 'success');
+                                showSnackBar(context, 'The drink has been added successfully!', 'success');
                               } else {
                                 showSnackBar(context, 'Please complete all information!', 'danger');
                               }

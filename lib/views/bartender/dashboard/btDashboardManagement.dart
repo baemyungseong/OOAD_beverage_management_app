@@ -358,8 +358,6 @@ class _btDashboardManagementScreenState
                                     onTap: () {
                                       setState(() {
                                         isHorizontal = true;
-                                        _tabController!.index = 0;
-                                        // showFilter(context);
                                       });
                                     },
                                     child: AnimatedContainer(
@@ -397,7 +395,6 @@ class _btDashboardManagementScreenState
                                     onTap: () {
                                       setState(() {
                                         isHorizontal = false;
-                                        _tabController!.index = 0;
                                         _currentPosition = 0.0;
                                         scale = viewportFraction;
                                       });
@@ -608,7 +605,8 @@ class _btDashboardManagementScreenState
                             padding: EdgeInsets.only(top: 32),
                             width: double.maxFinite,
                             height: 512,
-                            child: TabBarView(
+                            child: 
+                            TabBarView(
                                 controller: _tabController,
                                 children: [
                                   _selectedIndex == 0 ? viewDrinksPerTabHorizontal() : Container(),
@@ -672,296 +670,316 @@ class _btDashboardManagementScreenState
     ),
   );
 
+  Future<void> controlRefresh() async {
+    setState(() {
+    });
+  }
+
   viewDrinksPerTab() {
     return Container(
     padding:
         EdgeInsets.only(left: 28, right: 28),
-    child: SingleChildScrollView(
-        child: Column(
-      children: [
-        FutureBuilder(
-          future: getAllDrinksInCategory(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Container(
-                padding: EdgeInsets.only(top: 30),
-                child: 
-                  SizedBox(
-                    child: CircularProgressIndicator(
-                      color: blackLight,
-                      strokeWidth: 3,
-                    ),
-                    height: 25.0,
-                    width: 25.0,
-                  ),
-              );  
-            }
-            return GridView.builder(
-            padding: EdgeInsets.only(
-                top: 32, bottom: 120),
-            physics:
-                NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: (150 / 244),
-              crossAxisCount: 2,
-              crossAxisSpacing: 19,
-              mainAxisSpacing: 24,
-            ),
-            itemCount: drinksList.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            btCustomizeDrinkDetailScreen(),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    width: 150,
-                    height: 236,
-                    child: Stack(children: [
-                      Container(
-                        width: 150,
-                        height: 196,
-                        margin:
-                            EdgeInsets.only(
-                                top: 48),
-                        padding:
-                            EdgeInsets.only(
-                                left: 8,
-                                right: 8,
-                                bottom: 16),
-                        decoration: BoxDecoration(
-                            color: blueLight,
-                            borderRadius:
-                                BorderRadius
-                                    .circular(
-                                        16)),
-                        child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
-                            mainAxisAlignment:
-                                MainAxisAlignment
-                                    .end,
-                            children: [
-                              Container(
-                                  alignment:
-                                      Alignment
-                                          .topLeft,
-                                  child: Text(
-                                    drinksList[index].name,
-                                    style: TextStyle(
-                                        fontSize:
-                                            content16,
-                                        fontFamily:
-                                            'SFProText',
-                                        color:
-                                            blackLight,
-                                        fontWeight: FontWeight
-                                            .w600,
-                                        height:
-                                            1.4),
-                                  )),
-                              SizedBox(
-                                  height: 4),
-                              Container(
-                                  width: 134,
-                                  alignment:
-                                      Alignment
-                                          .centerLeft,
-                                  padding:
-                                      EdgeInsets
-                                          .zero,
-                                  child: Text(
-                                    drinksList[index].description,
-                                    maxLines:
-                                        2,
-                                    overflow:
-                                        TextOverflow
-                                            .ellipsis,
-                                    style: TextStyle(
-                                        fontSize:
-                                            8,
-                                        fontFamily:
-                                            'SFProText',
-                                        color:
-                                            grey8,
-                                        fontWeight: FontWeight
-                                            .w400,
-                                        height:
-                                            1.4),
-                                    textAlign:
-                                        TextAlign
-                                            .left,
-                                  )),
-                              SizedBox(
-                                  height: 8),
-                              Container(
-                                  alignment:
-                                      Alignment
-                                          .topLeft,
-                                  child: Text(
-                                    "\$ " + drinksList[index].unit_price + ".00",
-                                    style: TextStyle(
-                                        fontSize:
-                                            content16,
-                                        fontFamily:
-                                            'SFProText',
-                                        color:
-                                            blackLight,
-                                        fontWeight: FontWeight
-                                            .w600,
-                                        height:
-                                            1.4),
-                                  )),
-                            ]),
-                      ),
-                      Container(
-                        width: 150,
-                        height: 135,
-                        alignment: Alignment.topCenter,
-                        child: Container(
-                          child: displayDrinkImage(drinksList[index].image, 220, 220),
+    child: RefreshIndicator(
+      onRefresh: () => controlRefresh(),
+      child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+          children: [
+            FutureBuilder(
+              future: getAllDrinksInCategory(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.only(top: 30),
+                    child: 
+                      SizedBox(
+                        child: CircularProgressIndicator(
+                          color: blackLight,
+                          strokeWidth: 3,
                         ),
-                      )
-                    ]),
-                  ));
-            });
-          }
-        ),
-      ],
-    )));  
+                        height: 25.0,
+                        width: 25.0,
+                      ),
+                  );  
+                }
+                return GridView.builder(
+                padding: EdgeInsets.only(
+                    top: 32, bottom: 120),
+                physics:
+                    NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                  childAspectRatio: (150 / 244),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 19,
+                  mainAxisSpacing: 24,
+                ),
+                itemCount: drinksList.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                btCustomizeDrinkDetailScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 150,
+                        height: 236,
+                        child: Stack(children: [
+                          Container(
+                            width: 150,
+                            height: 196,
+                            margin:
+                                EdgeInsets.only(
+                                    top: 48),
+                            padding:
+                                EdgeInsets.only(
+                                    left: 8,
+                                    right: 8,
+                                    bottom: 16),
+                            decoration: BoxDecoration(
+                                color: blueLight,
+                                borderRadius:
+                                    BorderRadius
+                                        .circular(
+                                            16)),
+                            child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment
+                                        .end,
+                                children: [
+                                  Container(
+                                      alignment:
+                                          Alignment
+                                              .topLeft,
+                                      child: Text(
+                                        drinksList[index].name,
+                                        style: TextStyle(
+                                            fontSize:
+                                                content16,
+                                            fontFamily:
+                                                'SFProText',
+                                            color:
+                                                blackLight,
+                                            fontWeight: FontWeight
+                                                .w600,
+                                            height:
+                                                1.4),
+                                      )),
+                                  SizedBox(
+                                      height: 4),
+                                  Container(
+                                      width: 134,
+                                      alignment:
+                                          Alignment
+                                              .centerLeft,
+                                      padding:
+                                          EdgeInsets
+                                              .zero,
+                                      child: Text(
+                                        drinksList[index].description,
+                                        maxLines:
+                                            2,
+                                        overflow:
+                                            TextOverflow
+                                                .ellipsis,
+                                        style: TextStyle(
+                                            fontSize:
+                                                8,
+                                            fontFamily:
+                                                'SFProText',
+                                            color:
+                                                grey8,
+                                            fontWeight: FontWeight
+                                                .w400,
+                                            height:
+                                                1.4),
+                                        textAlign:
+                                            TextAlign
+                                                .left,
+                                      )),
+                                  SizedBox(
+                                      height: 8),
+                                  Container(
+                                      alignment:
+                                          Alignment
+                                              .topLeft,
+                                      child: Text(
+                                        "\$ " + drinksList[index].unit_price + ".00",
+                                        style: TextStyle(
+                                            fontSize:
+                                                content16,
+                                            fontFamily:
+                                                'SFProText',
+                                            color:
+                                                blackLight,
+                                            fontWeight: FontWeight
+                                                .w600,
+                                            height:
+                                                1.4),
+                                      )),
+                                ]),
+                          ),
+                          Container(
+                            width: 150,
+                            height: 135,
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              child: displayDrinkImage(drinksList[index].image, 220, 220),
+                            ),
+                          )
+                        ]),
+                      ));
+                });
+              }
+            ),
+          ],
+        )),
+      ),
+    );  
   }
 
   viewDrinksPerTabHorizontal() {
-    return FutureBuilder(
-      future: getAllDrinksInCategory(),
-      builder: (context, _) {
-        return PageView.builder(
-        controller: pageController,
-        onPageChanged: (num) {
-            if (num + 1 == 3) {
-              _currentPosition = 2.0;
-            } else if (num == 0) {
-              _currentPosition = 0.0;
-            } else {
-              _currentPosition =
-                  num.toDouble();
-            }
-        },
-        scrollDirection: Axis.horizontal,
-        itemCount: drinksList.length,
-        itemBuilder: (context, index) {
-          double scale = max(
-              viewportFraction,
-              (1 -
-                      (pageOffset! - index)
-                          .abs()) +
-                  viewportFraction);
-          return Container(
-            width: 160,
-            height: 377,
-            child: Column(children: [
-              Container(
-                width: 160,
-                height: 196 + (scale * 50),
-                decoration: BoxDecoration(
-                    color: blueLight,
-                    borderRadius:
-                        BorderRadius.circular(
-                            16)),
-                child: Center(
-                  child: Container(
-                    child: displayDrinkImage(drinksList[index].image, 200, 200),
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              (_currentPosition == index)
-                  ? Column(
-                      children: [
-                        Container(
-                            alignment:
-                                Alignment
-                                    .center,
-                            child: Text(
-                                  drinksList[index].name,
-                              style: TextStyle(
-                                  fontSize:
-                                      content18,
-                                  fontFamily:
-                                      'SFProText',
-                                  color:
-                                      blackLight,
-                                  fontWeight:
-                                      FontWeight
-                                          .w600,
-                                  height:
-                                      1.4),
-                            )),
-                        SizedBox(height: 4),
-                        Container(
-                            width: 160,
-                            alignment:
-                                Alignment
-                                    .center,
-                            padding:
-                                EdgeInsets
-                                    .zero,
-                            child: Text(
-                              drinksList[index].description,
-                              maxLines: 2,
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis,
-                              style: TextStyle(
-                                  fontSize: 8,
-                                  fontFamily:
-                                      'SFProText',
-                                  color:
-                                      grey8,
-                                  fontWeight:
-                                      FontWeight
-                                          .w400,
-                                  height:
-                                      1.4),
-                              textAlign:
-                                  TextAlign
-                                      .center,
-                            )),
-                        SizedBox(height: 8),
-                        Container(
-                            alignment:
-                                Alignment
-                                    .center,
-                            child: Text(
-                              "\$" + drinksList[index].unit_price + ".00",
-                              style: TextStyle(
-                                  fontSize:
-                                      title24,
-                                  fontFamily:
-                                      'SFProText',
-                                  color:
-                                      blackLight,
-                                  fontWeight:
-                                      FontWeight
-                                          .w700,
-                                  height:
-                                      1.4),
-                            )),
-                      ],
-                    )
-                  : Column()
-            ]),
-          );
-        });
-      }
+    return RefreshIndicator(
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverFillRemaining(
+            child: FutureBuilder(
+              future: getAllDrinksInCategory(),
+              builder: (context, _) {
+                return PageView.builder(
+                controller: pageController,
+                onPageChanged: (num) {
+                    if (num + 1 == 3) {
+                      _currentPosition = 2.0;
+                    } else if (num == 0) {
+                      _currentPosition = 0.0;
+                    } else {
+                      _currentPosition =
+                          num.toDouble();
+                    }
+                },
+                scrollDirection: Axis.horizontal,
+                itemCount: drinksList.length,
+                itemBuilder: (context, index) {
+                  double scale = max(
+                      viewportFraction,
+                      (1 -
+                              (pageOffset! - index)
+                                  .abs()) +
+                          viewportFraction);
+                  return Container(
+                    width: 160,
+                    height: 377,
+                    child: Column(children: [
+                      Container(
+                        width: 160,
+                        height: 196 + (scale * 50),
+                        decoration: BoxDecoration(
+                            color: blueLight,
+                            borderRadius:
+                                BorderRadius.circular(
+                                    16)),
+                        child: Center(
+                          child: Container(
+                            child: displayDrinkImage(drinksList[index].image, 200, 200),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      (_currentPosition == index)
+                          ? Column(
+                              children: [
+                                Container(
+                                    alignment:
+                                        Alignment
+                                            .center,
+                                    child: Text(
+                                          drinksList[index].name,
+                                      style: TextStyle(
+                                          fontSize:
+                                              content18,
+                                          fontFamily:
+                                              'SFProText',
+                                          color:
+                                              blackLight,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w600,
+                                          height:
+                                              1.4),
+                                    )),
+                                SizedBox(height: 4),
+                                Container(
+                                    width: 160,
+                                    alignment:
+                                        Alignment
+                                            .center,
+                                    padding:
+                                        EdgeInsets
+                                            .zero,
+                                    child: Text(
+                                      drinksList[index].description,
+                                      maxLines: 2,
+                                      overflow:
+                                          TextOverflow
+                                              .ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 8,
+                                          fontFamily:
+                                              'SFProText',
+                                          color:
+                                              grey8,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w400,
+                                          height:
+                                              1.4),
+                                      textAlign:
+                                          TextAlign
+                                              .center,
+                                    )),
+                                SizedBox(height: 8),
+                                Container(
+                                    alignment:
+                                        Alignment
+                                            .center,
+                                    child: Text(
+                                      "\$ " + drinksList[index].unit_price + ".00",
+                                      style: TextStyle(
+                                          fontSize:
+                                              title24,
+                                          fontFamily:
+                                              'SFProText',
+                                          color:
+                                              blackLight,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w700,
+                                          height:
+                                              1.4),
+                                    )),
+                              ],
+                            )
+                          : Column()
+                    ]),
+                  );
+                });
+              }
+            ),
+          ),
+        ],        
+      ), 
+      onRefresh: () => controlRefresh(),
     );
   }
 
