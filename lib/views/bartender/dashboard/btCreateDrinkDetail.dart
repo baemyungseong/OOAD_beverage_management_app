@@ -13,9 +13,6 @@ import 'package:ui_fresh_app/views/bartender/inventory/btImportCreating.dart';
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
-//import models
-import 'package:ui_fresh_app/models/drinkTypeModel.dart';
-
 //import views
 import 'package:ui_fresh_app/views/serve/dashboard/svDrinkChosing.dart';
 
@@ -26,8 +23,13 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
 //import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 
 class btCreateDrinkDetailScreen extends StatefulWidget {
   btCreateDrinkDetailScreen({Key? key}) : super(key: key);
@@ -411,6 +413,7 @@ class _btCreateDrinkDetailScreenState
                               if (nameFormKey.currentState!.validate() &&
                                   descriptionFormKey.currentState!.validate() &&
                                   priceFormKey.currentState!.validate()) {
+                                controlAddNewDrink();    
                                 Navigator.pop(context);
                                 showSnackBar(context, 'The drink have been created!', 'success');
                               } else {
@@ -635,6 +638,7 @@ class _btCreateDrinkDetailScreenState
   );
 
   getCorrectImage() {
+    drinkImageURL = "";
     for (int i = 0; i < drinkImages.length; i++) {
       if (drinkImages[i].toString().contains(selectedDrinkType.replaceAll(" ", "%20"))) {
         drinkImageURL = drinkImages[i];
@@ -711,6 +715,20 @@ class _btCreateDrinkDetailScreenState
         break;                                
     }
     return _path.substring(startIndex, _path.lastIndexOf('.'));
+  }
+
+  controlAddNewDrink() {
+    drinksReference.add({
+      "id": "",
+      "category": selectedCategory,
+      "name": nameController.text,
+      "description": descriptionController.text,
+      "unit price": priceController.text,
+      "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+      "image": drinkImageURL,
+    }).then(
+      (DocumentReference docRef) => docRef.update({"id": docRef.id})
+    );
   }
 }
 
