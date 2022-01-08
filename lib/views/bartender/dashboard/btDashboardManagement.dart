@@ -719,15 +719,7 @@ class _btDashboardManagementScreenState
                 itemCount: drinksList.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                btCustomizeDrinkDetailScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => controlSelectDrink(drinksList[index].id, drinksList[index].image, drinksList[index].name, drinksList[index].description, drinksList[index].unit_price),
                       child: Container(
                         width: 150,
                         height: 236,
@@ -877,9 +869,8 @@ class _btDashboardManagementScreenState
                               (pageOffset! - index)
                                   .abs()) +
                           viewportFraction);
-                  return Container(
-                    width: 160,
-                    height: 377,
+                  return GestureDetector(
+                    onTap: () => controlSelectDrink(drinksList[index].id, drinksList[index].image, drinksList[index].name, drinksList[index].description, drinksList[index].unit_price),
                     child: Column(children: [
                       Container(
                         width: 160,
@@ -983,6 +974,23 @@ class _btDashboardManagementScreenState
     );
   }
 
+controlSelectDrink(String _drinkID, String _drinkImageURL, String _drinkName, String _drinkDescription, String _drinkUnitPrice) async {
+  var doc = await drinksReference.doc(_drinkID).get();
+  if (doc.exists) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            btCustomizeDrinkDetailScreen(_drinkID, _drinkImageURL, _drinkName, _drinkDescription, _drinkUnitPrice),
+      ),
+    );
+  }
+  else {
+    setState(() {
+      showSnackBar(context, 'The drink has already been removed, please try another one!', 'error');      
+    });
+  }
+}
 
 
 
@@ -1479,5 +1487,4 @@ class _btDashboardManagementScreenState
     );
   }
   // /Bottom Sheet - end
-
 }
