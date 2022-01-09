@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 import 'package:ui_fresh_app/views/account/accountNotifications.dart';
@@ -21,21 +22,24 @@ import 'package:meta/meta.dart';
 import 'package:iconsax/iconsax.dart';
 
 class atDashboardScreen extends StatefulWidget {
-
   atDashboardScreen({Key? key}) : super(key: key);
 
   @override
   _atDashboardScreenState createState() => _atDashboardScreenState();
 }
 
-class _atDashboardScreenState extends State<atDashboardScreen> with SingleTickerProviderStateMixin {
-
+class _atDashboardScreenState extends State<atDashboardScreen>
+    with SingleTickerProviderStateMixin {
   _atDashboardScreenState();
 
   late String task;
 
-  List<Widget> revenueCards = [atRevenueAndExpenditureCardWidget('Day', 2069.0, '09/12/2021'), atRevenueAndExpenditureCardWidget('Week', 9146.0, '09/12/2021'),
-  atRevenueAndExpenditureCardWidget('Month', 157976231.0, '09/12/2021'), atRevenueAndExpenditureCardWidget('Year', 72894732.0, '09/12/2021')];
+  List<Widget> revenueCards = [
+    atRevenueAndExpenditureCardWidget('Day', 2069.0, '09/12/2021'),
+    atRevenueAndExpenditureCardWidget('Week', 9146.0, '09/12/2021'),
+    atRevenueAndExpenditureCardWidget('Month', 157976231.0, '09/12/2021'),
+    atRevenueAndExpenditureCardWidget('Year', 72894732.0, '09/12/2021')
+  ];
 
   double _currentPosition = 0;
 
@@ -49,14 +53,16 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
     _animatedController = AnimationController(
         vsync: this, duration: Duration(milliseconds: 2000));
 
-    _animationRev = Tween<double>(begin: 0, end: 37).animate(_animatedController)
-      ..addListener(() {
-        setState(() {});
-      });
-    _animationExp = Tween<double>(begin: 37, end: 100).animate(_animatedController)
-      ..addListener(() {
-        setState(() {});
-      });
+    _animationRev =
+        Tween<double>(begin: 0, end: 37).animate(_animatedController)
+          ..addListener(() {
+            setState(() {});
+          });
+    _animationExp =
+        Tween<double>(begin: 37, end: 100).animate(_animatedController)
+          ..addListener(() {
+            setState(() {});
+          });
     _animatedController.forward();
   }
 
@@ -70,12 +76,12 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
     return Scaffold(
       body: Stack(
         children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage(background), fit: BoxFit.cover),
-              ),
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage(background), fit: BoxFit.cover),
             ),
+          ),
           Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,8 +101,7 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    profileManagementScreen(),
+                                builder: (context) => profileManagementScreen(),
                               ),
                             ).then((value) {});
                           },
@@ -108,11 +113,9 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                             decoration: BoxDecoration(
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      // '${projects[index]!["background"]}'),
-                                      'https://i.imgur.com/FpZ9xFI.jpg'),
-                                  fit: BoxFit.cover),
+                              image: DecorationImage(image: NetworkImage(
+                                  // '${projects[index]!["background"]}'),
+                                  currentUser.avatar), fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
                                 BoxShadow(
@@ -139,28 +142,25 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                           Container(
                               alignment: Alignment.topLeft,
                               child: Text(
-                                'Noob Chảo',
+                                currentUser.name,
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'SFProText',
-                                  color: black,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2
-                                ),
+                                    fontSize: 16,
+                                    fontFamily: 'SFProText',
+                                    color: black,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2),
                               )),
                           SizedBox(height: 2),
                           Container(
                               // alignment: Alignment.topLeft,
-                              child: Text('Accountant',
+                              child: Text(currentUser.role,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontFamily: 'SFProText',
                                     color: grey8,
                                     fontWeight: FontWeight.w400,
                                     // height: 1.4
-                                  )
-                              )
-                          ),
+                                  ))),
                           SizedBox(height: 2)
                         ],
                       ),
@@ -168,88 +168,88 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                       Row(
                         children: [
                           Container(
-                            alignment: Alignment.center,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => accountNotificationsScreen(),
-                                  ),
-                                ).then((value) {});
-                              },
-                              child: AnimatedContainer(
-                                alignment: Alignment.center,
-                                duration: Duration(milliseconds: 300),
-                                height: 32,
-                                width: 32,
-                                decoration: BoxDecoration(
-                                  color: blackLight,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: black.withOpacity(0.25),
-                                        spreadRadius: 0,
-                                        blurRadius: 64,
-                                        offset: Offset(8, 8)),
-                                    BoxShadow(
-                                      color: black.withOpacity(0.2),
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 4),
+                              alignment: Alignment.center,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          accountNotificationsScreen(),
                                     ),
-                                  ],
+                                  ).then((value) {});
+                                },
+                                child: AnimatedContainer(
+                                  alignment: Alignment.center,
+                                  duration: Duration(milliseconds: 300),
+                                  height: 32,
+                                  width: 32,
+                                  decoration: BoxDecoration(
+                                    color: blackLight,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: black.withOpacity(0.25),
+                                          spreadRadius: 0,
+                                          blurRadius: 64,
+                                          offset: Offset(8, 8)),
+                                      BoxShadow(
+                                        color: black.withOpacity(0.2),
+                                        spreadRadius: 0,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                      padding: EdgeInsets.zero,
+                                      alignment: Alignment.center,
+                                      child: Icon(Iconsax.notification,
+                                          size: 18, color: white)),
                                 ),
-                                child: Container(
-                                    padding: EdgeInsets.zero,
-                                    alignment: Alignment.center,
-                                    child: Icon(Iconsax.notification,
-                                        size: 18, color: white)),
-                              ),
-                            )
-                          ),
+                              )),
                           SizedBox(width: 8),
                           Container(
-                            alignment: Alignment.center,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => accountMessagesScreen(),
-                                  ),
-                                ).then((value) {});
-                              },
-                              child: AnimatedContainer(
-                                alignment: Alignment.center,
-                                duration: Duration(milliseconds: 300),
-                                height: 32,
-                                width: 32,
-                                decoration: BoxDecoration(
-                                  color: blueWater,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: black.withOpacity(0.25),
-                                        spreadRadius: 0,
-                                        blurRadius: 64,
-                                        offset: Offset(8, 8)),
-                                    BoxShadow(
-                                      color: black.withOpacity(0.2),
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 4),
+                              alignment: Alignment.center,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          accountMessagesScreen(),
                                     ),
-                                  ],
+                                  ).then((value) {});
+                                },
+                                child: AnimatedContainer(
+                                  alignment: Alignment.center,
+                                  duration: Duration(milliseconds: 300),
+                                  height: 32,
+                                  width: 32,
+                                  decoration: BoxDecoration(
+                                    color: blueWater,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: black.withOpacity(0.25),
+                                          spreadRadius: 0,
+                                          blurRadius: 64,
+                                          offset: Offset(8, 8)),
+                                      BoxShadow(
+                                        color: black.withOpacity(0.2),
+                                        spreadRadius: 0,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                      padding: EdgeInsets.zero,
+                                      alignment: Alignment.center,
+                                      child: Icon(Iconsax.message,
+                                          size: 18, color: white)),
                                 ),
-                                child: Container(
-                                    padding: EdgeInsets.zero,
-                                    alignment: Alignment.center,
-                                    child: Icon(Iconsax.message,
-                                        size: 18, color: white)),
-                              ),
-                            )
-                          ),
+                              )),
                         ],
                       ),
                     ],
@@ -263,11 +263,10 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                       child: Text(
                         "Dashboard",
                         style: TextStyle(
-                          fontFamily: "SFProText",
-                          fontSize: 24.0,
-                          color: black,
-                          fontWeight: FontWeight.w700
-                        ),
+                            fontFamily: "SFProText",
+                            fontSize: 24.0,
+                            color: black,
+                            fontWeight: FontWeight.w700),
                       ),
                     ),
                     Spacer(),
@@ -287,41 +286,37 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                                 borderRadius: BorderRadius.circular(8.0)),
                           )),
                     ),
-                  ], 
+                  ],
                 ),
                 SizedBox(height: 24),
                 Container(
-                  height: 180,
-                  decoration: BoxDecoration(color: Colors.transparent),
-                  child: 
-                  PageView.builder(
-                    controller: PageController(
-                        initialPage: 0,
-                        keepPage: true,
-                        viewportFraction: 1),
-                    itemCount: revenueCards.length,
-                    scrollDirection: Axis.horizontal,
-                    onPageChanged: (num) {
-                      setState(() {
-                        if (num == revenueCards.length) {
-                          _currentPosition = 3.0;
-                        } else {
-                          _currentPosition = num.toDouble();
-                        }
-                      });
-                    }, 
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          Padding(
-                          padding: EdgeInsets.only(left: 28, right: 28),
-                          child: revenueCards[index]
-                          ),
-                        ],
-                      );
-                    }
-                  )
-                ),
+                    height: 180,
+                    decoration: BoxDecoration(color: Colors.transparent),
+                    child: PageView.builder(
+                        controller: PageController(
+                            initialPage: 0,
+                            keepPage: true,
+                            viewportFraction: 1),
+                        itemCount: revenueCards.length,
+                        scrollDirection: Axis.horizontal,
+                        onPageChanged: (num) {
+                          setState(() {
+                            if (num == revenueCards.length) {
+                              _currentPosition = 3.0;
+                            } else {
+                              _currentPosition = num.toDouble();
+                            }
+                          });
+                        },
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              Padding(
+                                  padding: EdgeInsets.only(left: 28, right: 28),
+                                  child: revenueCards[index]),
+                            ],
+                          );
+                        })),
                 SizedBox(height: 64),
                 Container(
                   padding: EdgeInsets.only(left: appPadding, right: appPadding),
@@ -331,10 +326,11 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.only(left: appPadding, right: appPadding),
-                      child: 
-                        CustomPaint(
-                        foregroundPainter: atCircleProgressDashboard(_animationRev.value, _animationExp.value),
+                      padding:
+                          EdgeInsets.only(left: appPadding, right: appPadding),
+                      child: CustomPaint(
+                        foregroundPainter: atCircleProgressDashboard(
+                            _animationRev.value, _animationExp.value),
                         child: Container(
                             width: 160,
                             height: 160,
@@ -342,8 +338,7 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                               child: Center(
                                 child: Container(
                                   child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         '26',
@@ -368,9 +363,8 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                                   ),
                                 ),
                               ),
-                            )
-                          ),
-                        ),
+                            )),
+                      ),
                     ),
                     Spacer(),
                     Container(
@@ -386,12 +380,10 @@ class _atDashboardScreenState extends State<atDashboardScreen> with SingleTicker
                                   width: 64,
                                   alignment: Alignment.centerRight,
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                          margin:
-                                              EdgeInsets.only(right: 8),
+                                          margin: EdgeInsets.only(right: 8),
                                           height: 10,
                                           width: 10,
                                           decoration: BoxDecoration(

@@ -264,26 +264,26 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
 
   controlSearchUser() {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-    });
+    setState(() {});
   }
 
   getAllAccountsSeached() async {
     await getAllAccounts();
     List<appUser> searchList = [];
     for (int i = 0; i < accountsList.length; i++) {
-      if (searchController.text.toLowerCase() == accountsList[i].role.toLowerCase()) {
+      if (searchController.text.toLowerCase() ==
+          accountsList[i].role.toLowerCase()) {
         searchList.add(accountsList[i]);
-      }
-      else if (accountsList[i].name.toLowerCase().
-      contains(searchController.text.toLowerCase())) {
+      } else if (accountsList[i]
+          .name
+          .toLowerCase()
+          .contains(searchController.text.toLowerCase())) {
         searchList.add(accountsList[i]);
       }
     }
     accountsList.clear();
     accountsList = List.from(searchList);
   }
-  
 
   getAllAccounts() async {
     accountsList.clear();
@@ -297,20 +297,20 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
       }
     }
     accountsList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
-    accountsList = accountsList.reversed.toList();    
+    accountsList = accountsList.reversed.toList();
   }
 
   displayAvatar(String _url, double _height, double _width) => ClipRRect(
-    borderRadius: BorderRadius.circular(8.0),
-    child: CachedNetworkImage(
-      imageUrl: _url,
-      height: _height,
-      width: _width,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => 
-        Center(child: CircularProgressIndicator()),
-    ),
-  );
+        borderRadius: BorderRadius.circular(8.0),
+        child: CachedNetworkImage(
+          imageUrl: _url,
+          height: _height,
+          width: _width,
+          fit: BoxFit.cover,
+          placeholder: (context, url) =>
+              Center(child: CircularProgressIndicator()),
+        ),
+      );
 
   loadAccounts() {
     return Column(
@@ -320,25 +320,25 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
           width: 319,
           child: RefreshIndicator(
             child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),             
-                child:
-                FutureBuilder(
-                  future: searchController.text.isEmpty ? getAllAccounts() : getAllAccountsSeached(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: 
-                          SizedBox(
-                            child: CircularProgressIndicator(
-                              color: blackLight,
-                              strokeWidth: 3,
-                            ),
-                            height: 25.0,
-                            width: 25.0,
-                          ),
-                      );
-                    }
-                    return Column(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: FutureBuilder(
+                future: searchController.text.isEmpty
+                    ? getAllAccounts()
+                    : getAllAccountsSeached(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: SizedBox(
+                        child: CircularProgressIndicator(
+                          color: blackLight,
+                          strokeWidth: 3,
+                        ),
+                        height: 25.0,
+                        width: 25.0,
+                      ),
+                    );
+                  }
+                  return Column(
                     children: [
                       ListView.separated(
                         physics: const NeverScrollableScrollPhysics(),
@@ -350,110 +350,151 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                         SizedBox(height: 24),
                         itemBuilder: (context, index) {
                           return Dismissible(
-                            onDismissed: (direction) => controlDeleteUser(accountsList[index].email, accountsList[index].encoded_pw, accountsList[index].key, accountsList[index].id),
-                            direction: DismissDirection.endToStart,
-                            key: ValueKey(index),
-                            background: Container(
-                              padding: EdgeInsets.only(right: 32),
-                              alignment: Alignment.centerRight,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                    colors: [
-                                      Color(0xFFCB356B),
-                                      Color(0xFFBD3F32),
-                                    ],
-                                    stops: [
-                                      0.0,
-                                      1.0,
-                                    ]),
-                              ),
-                              child: Icon(Iconsax.minus, size: 24, color: white)),
-                            child: GestureDetector(
-                              onTap: () {
-                                watchUserDialog(context, accountsList[index].name, accountsList[index].email, 
-                                accountsList[index].phone_number, accountsList[index].dob, accountsList[index].avatar);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.only(left: 24, top: 16, bottom: 16, right: 16),
-                                decoration: BoxDecoration(
-                                  color: blueLight,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                height: 80,
-                                width: 319,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          AnimatedContainer(
-                                            alignment: Alignment.center,
-                                            duration: Duration(milliseconds: 300),
-                                            child: displayAvatar(accountsList[index].avatar, 48, 48),
-                                          ),
-                                          SizedBox(width: 24),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    accountsList[index].name,
-                                                    style: TextStyle(
-                                                      fontSize: content16,
-                                                      fontWeight: FontWeight.w600,
-                                                      fontFamily: 'SFProText',
-                                                      color: blackLight,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 50,
-                                                  ),
-                                                  Container(
-                                                    height: 18,
-                                                    width: 56,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4.0),
-                                                      color: blueWater,
-                                                    ),
-                                                    child: Center(
+                              onDismissed: (direction) => controlDeleteUser(
+                                  accountsList[index].email,
+                                  accountsList[index].encoded_pw,
+                                  accountsList[index].key,
+                                  accountsList[index].id),
+                              direction: DismissDirection.endToStart,
+                              key: ValueKey(index),
+                              background: Container(
+                                  padding: EdgeInsets.only(right: 32),
+                                  alignment: Alignment.centerRight,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          Color(0xFFCB356B),
+                                          Color(0xFFBD3F32),
+                                        ],
+                                        stops: [
+                                          0.0,
+                                          1.0,
+                                        ]),
+                                  ),
+                                  child: Icon(Iconsax.minus,
+                                      size: 24, color: white)),
+                              child: GestureDetector(
+                                onTap: () {
+                                  watchUserDialog(
+                                      context,
+                                      accountsList[index].name,
+                                      accountsList[index].email,
+                                      accountsList[index].phone_number,
+                                      accountsList[index].dob,
+                                      accountsList[index].avatar);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: 24, top: 16, bottom: 16, right: 0),
+                                  decoration: BoxDecoration(
+                                    color: blueLight,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  height: 80,
+                                  width: 319,
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            AnimatedContainer(
+                                              alignment: Alignment.center,
+                                              duration:
+                                                  Duration(milliseconds: 300),
+                                              child: displayAvatar(
+                                                  accountsList[index].avatar,
+                                                  48,
+                                                  48),
+                                            ),
+                                            SizedBox(width: 22),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      width: 118,
                                                       child: Text(
-                                                        StringUtils.capitalize(accountsList[index].role),
+                                                        accountsList[index]
+                                                            .name,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        maxLines: 1,
                                                         style: TextStyle(
-                                                          fontFamily: 'SFProText',
-                                                          fontSize: content8,
-                                                          fontWeight: FontWeight.w500,
-                                                          color: white,
+                                                          fontSize: content16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontFamily:
+                                                              'SFProText',
+                                                          color: blackLight,
                                                         ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              SizedBox(height: 8),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Iconsax.sms,
-                                                    color: blackLight,
-                                                    size: 18,
-                                                  ),
-                                                  SizedBox(
-                                                    width: 6,
-                                                  ),
-                                                  Text(
-                                                    accountsList[index].email,
-                                                    style: TextStyle(
-                                                      fontFamily: 'SFProText',
-                                                      fontSize: content12,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: grey8,
+                                                    SizedBox(
+                                                      width: 50 - 16,
+                                                    ),
+                                                    Container(
+                                                      height: 18,
+                                                      width: 56,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
+                                                        color: blueWater,
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          StringUtils
+                                                              .capitalize(
+                                                                  accountsList[
+                                                                          index]
+                                                                      .role),
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            fontSize: content8,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: white,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(height: 8),
+                                                Row(
+                                                  children: [
+                                                    Icon(
+                                                      Iconsax.sms,
+                                                      color: blackLight,
+                                                      size: 18,
+                                                    ),
+                                                    SizedBox(
+                                                      width: 6,
+                                                    ),
+                                                    Container(
+                                                      width: 200,
+                                                      child: Text(
+                                                        accountsList[index]
+                                                            .email,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        maxLines: 1,
+                                                        style: TextStyle(
+                                                          fontFamily:
+                                                              'SFProText',
+                                                          fontSize: content12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: grey8,
+                                                        ),
                                                       ),
                                                     ),
                                                   ],
@@ -462,32 +503,30 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                                             ),
                                           ],
                                         ),
-                                      ]
-                                  ),
+                                      ]),
                                 ),
-                              )
-                            );
-                          },
-                        ),
-                        SizedBox(height: 112),
-                      ],
-                    );                            
-                  },
-                ), 
-              ), 
+                              ));
+                        },
+                      ),
+                      SizedBox(height: 112),
+                    ],
+                  );
+                },
+              ),
+            ),
             onRefresh: () => controlOnRefresh(),
           ),
         ),
       ],
-    );    
+    );
   }
 
   Future<void> controlOnRefresh() async {
-    setState(() {
-    });
+    setState(() {});
   }
 
-  controlDeleteUser(String _email, String _encoded_pw, String _key, String _uid) async {
+  controlDeleteUser(
+      String _email, String _encoded_pw, String _key, String _uid) async {
     PlatformStringCryptor cryptor;
     cryptor = PlatformStringCryptor();
     final salt = await cryptor.generateSalt();
@@ -496,46 +535,42 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
     var decoded_pw = await cryptor.decrypt(_encoded_pw, _key);
     FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     try {
-      await _firebaseAuth.signInWithEmailAndPassword(email: _email, password: decoded_pw);
+      await _firebaseAuth.signInWithEmailAndPassword(
+          email: _email, password: decoded_pw);
       User? user = _firebaseAuth.currentUser;
       user!.delete().whenComplete(() => deleteAccountSuccessfully(_uid));
       await _firebaseAuth.signOut();
     } on FirebaseAuthException catch (e) {
       onFailureDeleteAccount();
-    } catch(e) {
+    } catch (e) {
       onFailureDeleteAccount();
-    }  
+    }
     reSignIn();
   }
 
   deleteAccountSuccessfully(String _uid) async {
     await userReference.doc(_uid).delete();
-    showSnackBar(
-        context,
-        'Successfully removed the user!',
-        'success');
-    setState(() {
-    });           
+    showSnackBar(context, 'Successfully removed the user!', 'success');
+    setState(() {});
   }
 
   onFailureDeleteAccount() {
-    showSnackBar(
-        context,
-        'Error occured! Please try again.',
-        'error');
-    setState(() {
-    });             
+    showSnackBar(context, 'Error occured! Please try again.', 'error');
+    setState(() {});
   }
 
   reSignIn() async {
     PlatformStringCryptor cryptor;
     cryptor = PlatformStringCryptor();
     final salt = await cryptor.generateSalt();
-    var decoded_pw_default = await cryptor.decrypt(currentUser.encoded_pw, currentUser.key);
+    var decoded_pw_default =
+        await cryptor.decrypt(currentUser.encoded_pw, currentUser.key);
     //Resignin the storekeeper
-    firebaseAuth().signIn(currentUser.email, decoded_pw_default, context).then((val) async {
+    firebaseAuth()
+        .signIn(currentUser.email, decoded_pw_default, context)
+        .then((val) async {
       FirebaseAuth auth = FirebaseAuth.instance;
       User? user = auth.currentUser;
-    });    
+    });
   }
 }

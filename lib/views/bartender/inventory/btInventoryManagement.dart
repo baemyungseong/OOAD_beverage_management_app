@@ -173,7 +173,7 @@ class _btInventoryManagementScreenState
                           Container(
                               alignment: Alignment.topLeft,
                               child: Text(
-                                'Noob Chảo',
+                                currentUser.name,
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontFamily: 'SFProText',
@@ -184,7 +184,7 @@ class _btInventoryManagementScreenState
                           SizedBox(height: 1),
                           Container(
                               // alignment: Alignment.topLeft,
-                              child: Text('Accountant',
+                              child: Text(currentUser.role,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontFamily: 'SFProText',

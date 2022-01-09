@@ -108,6 +108,33 @@ class _btMainTaskManagementScreenState
                           ),
                         ),
                         SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  currentUser.name,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'SFProText',
+                                      color: black,
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.2),
+                                )),
+                            SizedBox(height: 1),
+                            Container(
+                                // alignment: Alignment.topLeft,
+                                child: Text(currentUser.role,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontFamily: 'SFProText',
+                                      color: grey8,
+                                      fontWeight: FontWeight.w400,
+                                      // height: 1.4
+                                    ))),
+                          ],
+                        ),
                         Spacer(),
                         AnimatedContainer(
                           duration: Duration(milliseconds: 300),

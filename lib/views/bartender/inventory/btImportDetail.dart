@@ -45,6 +45,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
       sender: '',
       description: '',
       receiver: '',
+      status: '',
       note: '',
       goodsDetail: [],
       total: '',
@@ -61,6 +62,25 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
       });
     });
   }
+
+  // Future deleteImport() async {
+  //   setState(() {
+  //     FirebaseFirestore.instance
+  //         .collection("importSubs")
+  //         .snapshots()
+  //         .listen((value) {
+  //       value.docs.forEach((element) {
+  //         if (importSubIdList.contains(element.data()['id'] as String)) {
+  //           FirebaseFirestore.instance
+  //               .collection("importSubs")
+  //               .doc(element.data()['id'] as String)
+  //               .delete();
+  //         }
+  //       });
+  //     });
+  //     FirebaseFirestore.instance.collection("imports").doc(idImport).delete();
+  //   });
+  // }
 
   List importSubIdList = [];
   List<ImportSub> importSubList = [];
@@ -793,62 +813,64 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                             //action navigate to dashboard screen
                                             onTap: () {
                                               setState(() {
-                                                checkoutDialog(context);
+                                                checkoutImportDialog(
+                                                    context, idImport);
                                                 isCheckout = true;
                                                 // Navigator.pop(context);
                                               });
                                             },
                                             child: AnimatedContainer(
-                                              alignment: Alignment.center,
-                                              duration:
-                                                  Duration(milliseconds: 300),
-                                              height: 48,
-                                              width: 200,
-                                              decoration: BoxDecoration(
-                                                color: (isCheckout)
-                                                    ? white
-                                                    : blackLight,
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(12)),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color:
-                                                        black.withOpacity(0.25),
-                                                    spreadRadius: 0,
-                                                    blurRadius: 4,
-                                                    offset: Offset(0,
-                                                        4), // changes position of shadow
-                                                  ),
-                                                  BoxShadow(
-                                                    color:
-                                                        black.withOpacity(0.1),
-                                                    spreadRadius: 0,
-                                                    blurRadius: 64,
-                                                    offset: Offset(15,
-                                                        15), // changes position of shadow
-                                                  ),
-                                                ],
-                                              ),
-                                              child: (isCheckout)
-                                                  ? Container(
-                                                      child: Icon(
-                                                          Iconsax.refresh,
-                                                          size: 24,
-                                                          color: blackLight),
-                                                    )
-                                                  : Container(
-                                                      child: Text(
-                                                      "Checkout",
-                                                      style: TextStyle(
-                                                          color: whiteLight,
-                                                          fontFamily:
-                                                              'SFProText',
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize:
-                                                              textButton20),
-                                                    )),
-                                            ),
+                                                alignment: Alignment.center,
+                                                duration:
+                                                    Duration(milliseconds: 300),
+                                                height: 48,
+                                                width: 200,
+                                                decoration: BoxDecoration(
+                                                  color: (isCheckout)
+                                                      ? white
+                                                      : blackLight,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(12)),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: black
+                                                          .withOpacity(0.25),
+                                                      spreadRadius: 0,
+                                                      blurRadius: 4,
+                                                      offset: Offset(0,
+                                                          4), // changes position of shadow
+                                                    ),
+                                                    BoxShadow(
+                                                      color: black
+                                                          .withOpacity(0.1),
+                                                      spreadRadius: 0,
+                                                      blurRadius: 64,
+                                                      offset: Offset(15,
+                                                          15), // changes position of shadow
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: (import.status ==
+                                                        'Checkout')
+                                                    ? Container(
+                                                        child: Icon(
+                                                            Iconsax.refresh,
+                                                            size: 24,
+                                                            color: blackLight),
+                                                      )
+                                                    : Container(
+                                                        child: Text(
+                                                        "Checkout",
+                                                        style: TextStyle(
+                                                            color: whiteLight,
+                                                            fontFamily:
+                                                                'SFProText',
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize:
+                                                                textButton20),
+                                                      ))),
                                           )),
                                       SizedBox(height: 24)
                                     ]),
@@ -877,7 +899,8 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                       Container(
                           child: GestureDetector(
                         onTap: () {
-                          // removeDialog(context);
+                          removeImportDialog(
+                              context, idImport, importSubIdList);
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(
@@ -935,7 +958,8 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => btImportEditingScreen(),
+                                  builder: (context) =>
+                                      btImportEditingScreen(idImport: idImport),
                                 ),
                               );
                               // .then((value) {});
