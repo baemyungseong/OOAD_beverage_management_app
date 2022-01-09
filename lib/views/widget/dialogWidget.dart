@@ -2795,7 +2795,8 @@ removeDrinkDialog(context, String _drinkID) {
         child: child,
       );
     },
-  );  
+  );
+}  
 
 searchMessageDialog(BuildContext context, List<appUser> appUser1) {
   String newMessageId = '';
