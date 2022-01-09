@@ -1,3 +1,4 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -51,7 +52,6 @@ class btDashboardManagementScreen extends StatefulWidget {
 class _btDashboardManagementScreenState
     extends State<btDashboardManagementScreen>
     with SingleTickerProviderStateMixin {
-  bool haveSearch = false;
   bool isHorizontal = false;
   TextEditingController searchController = TextEditingController();
 
@@ -133,17 +133,14 @@ class _btDashboardManagementScreenState
                               );
                               // .then((value) {});
                             },
-                            child: AnimatedContainer(
+                            child: Container(
                               alignment: Alignment.center,
-                              duration: Duration(milliseconds: 300),
                               height: 32,
                               width: 32,
+                              child: displayAvatar(currentUser.avatar, 32, 32),
                               decoration: BoxDecoration(
                                 color: blueWater,
                                 borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                    image: NetworkImage(currentUser.avatar),
-                                    fit: BoxFit.cover),
                                 shape: BoxShape.rectangle,
                                 boxShadow: [
                                   BoxShadow(
@@ -170,7 +167,7 @@ class _btDashboardManagementScreenState
                             Container(
                                 alignment: Alignment.topLeft,
                                 child: Text(
-                                  'Noob Chảo',
+                                  currentUser.name,
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'SFProText',
@@ -181,7 +178,7 @@ class _btDashboardManagementScreenState
                             SizedBox(height: 1),
                             Container(
                                 // alignment: Alignment.topLeft,
-                                child: Text('Accountant',
+                                child: Text(StringUtils.capitalize(currentUser.role),
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontFamily: 'SFProText',
@@ -290,16 +287,7 @@ class _btDashboardManagementScreenState
                           child: TextFormField(
                             controller: searchController,
                             autofocus: false,
-                            onEditingComplete: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    btDashboardManagementSearchingScreen(
-                                  searchResult: searchController.text,
-                                  haveFilter: haveFilter,
-                                ),
-                              ),
-                            ),
+                            onEditingComplete: () => controlSearchDrink(),
                             style: TextStyle(
                                 fontFamily: 'SFProText',
                                 fontSize: content14,
@@ -314,7 +302,7 @@ class _btDashboardManagementScreenState
                               ),
                               contentPadding:
                                   EdgeInsets.only(left: 20, right: 0),
-                              hintText: "What're you looking for?",
+                              hintText: "What are you looking for?",
                               hintStyle: TextStyle(
                                   fontFamily: 'SFProText',
                                   fontSize: content14,
@@ -622,6 +610,38 @@ class _btDashboardManagementScreenState
         ));
   }
 
+  controlSearchDrink() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });
+  }
+
+  getAllDrinksSorted() async {
+    await getAllDrinksInCategory();
+    List<Drink> sortedList = [];
+    for (int i = 0; i < drinksList.length; i++) {
+      if (double.parse(drinksList[i].unit_price) >= double.parse(_minpricecontroller.text)
+      && double.parse(drinksList[i].unit_price) <= double.parse(_maxpricecontroller.text)) {
+        sortedList.add(drinksList[i]);
+      }
+    }
+    drinksList.clear();
+    drinksList = List.from(sortedList);
+  }
+
+  getAllDrinksSeached() async {
+    await getAllDrinksInCategory();
+    List<Drink> searchList = [];
+    for (int i = 0; i < drinksList.length; i++) {
+      if (drinksList[i].name.toLowerCase().
+      contains(searchController.text.toLowerCase())) {
+        searchList.add(drinksList[i]);
+      }
+    }
+    drinksList.clear();
+    drinksList = List.from(searchList);
+  }
+
   getAllDrinksInCategory() async {
     String _selectedCategory = "";
     switch (_selectedIndex) {
@@ -686,7 +706,7 @@ class _btDashboardManagementScreenState
             child: Column(
           children: [
             FutureBuilder(
-              future: getAllDrinksInCategory(),
+              future: searchController.text.isEmpty ? (haveFilter == true ? getAllDrinksSorted() : getAllDrinksInCategory()) : (haveFilter == true ? getAllDrinksSorted() : getAllDrinksSeached()),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container(
@@ -846,7 +866,7 @@ class _btDashboardManagementScreenState
         slivers: <Widget>[
           SliverFillRemaining(
             child: FutureBuilder(
-              future: getAllDrinksInCategory(),
+              future: searchController.text.isEmpty ? (haveFilter == true ? getAllDrinksSorted() : getAllDrinksInCategory()) : (haveFilter == true ? getAllDrinksSorted() : getAllDrinksSeached()),
               builder: (context, _) {
                 return PageView.builder(
                 controller: pageController,
@@ -992,7 +1012,17 @@ controlSelectDrink(String _drinkID, String _drinkImageURL, String _drinkName, St
   }
 }
 
-
+  displayAvatar(String _url, double _height, double _width) => ClipRRect(
+    borderRadius: BorderRadius.circular(8.0),
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => 
+        Center(child: CircularProgressIndicator()),
+    ),
+  );
 
   //Bottom Sheet - start
 
@@ -1404,22 +1434,16 @@ controlSelectDrink(String _drinkID, String _drinkImageURL, String _drinkName, St
                       padding: const EdgeInsets.only(left: 28),
                       child: ElevatedButton(
                           onPressed: () {
-                            if (selectDate1.isBefore(selectDate2)) {
-                              if (_lowerValue <= _upperValue) {
-                                setState(() {
-                                  haveFilter = true;
-                                });
-                                Navigator.pop(context);
-                              } else {
-                                showSnackBar(
-                                    context,
-                                    'The max value must be greater than the min',
-                                    "error");
-                              }
+                            if (double.parse(_minpricecontroller.text) <= double.parse(_maxpricecontroller.text)) {
+                              setState(() {
+                                haveFilter = true;
+                              });
+                              Navigator.pop(context);
                             } else {
+                              Navigator.pop(context);
                               showSnackBar(
                                   context,
-                                  'The max date must be greater than the min',
+                                  'The max value must be greater than the min value.',
                                   "error");
                             }
                           },
@@ -1445,9 +1469,6 @@ controlSelectDrink(String _drinkID, String _drinkImageURL, String _drinkName, St
                       child: ElevatedButton(
                           onPressed: () {
                             SetState1(() {
-                              selected = 0;
-                              selectDate1 = DateTime.now();
-                              selectDate2 = DateTime.now();
                               _lowerValue = 0;
                               _upperValue = 1000;
                               _minpricecontroller.text = _lowerValue.toString();

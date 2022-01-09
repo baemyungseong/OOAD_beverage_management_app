@@ -465,6 +465,49 @@ class _btCustomizeDrinkDetailScreenState
                       Spacer(),
                       Container(
                           child: GestureDetector(
+                        onTap: () => removeDrinkDialog(context, widget.drinkID),
+                        child: AnimatedContainer(
+                          alignment: Alignment.center,
+                          duration: Duration(milliseconds: 300),
+                          height: 32,
+                          width: 32,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFFCB356B),
+                                  Color(0xFFBD3F32),
+                                ],
+                                stops: [
+                                  0.0,
+                                  1.0,
+                                ]),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: black.withOpacity(0.25),
+                                  spreadRadius: 0,
+                                  blurRadius: 64,
+                                  offset: Offset(8, 8)),
+                              BoxShadow(
+                                color: black.withOpacity(0.2),
+                                spreadRadius: 0,
+                                blurRadius: 4,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                              padding: EdgeInsets.zero,
+                              alignment: Alignment.center,
+                              child: Icon(Iconsax.close_circle,
+                                  size: 18, color: white)),
+                        ),
+                      )),
+                      SizedBox(width: 8),                      
+                      Container(
+                          child: GestureDetector(
                         onTap: () {
                           // removeDialog(context);
                           setState(() {

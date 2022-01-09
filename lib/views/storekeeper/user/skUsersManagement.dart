@@ -20,7 +20,6 @@ import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/storekeeper/user/skSearchingUser.dart';
 import 'package:ui_fresh_app/views/storekeeper/user/skCreateNewAccount.dart';
 
 //import others
@@ -527,8 +526,6 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
     setState(() {
     });             
   }
-
-
 
   reSignIn() async {
     PlatformStringCryptor cryptor;

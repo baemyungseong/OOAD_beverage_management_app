@@ -584,6 +584,7 @@ class _btCreateDrinkDetailScreenState
                               setState(() {
                                 selectedDrinkType = drinkTypes[index];
                                 isTapDrinkType = true;
+                                nameController.text = selectedDrinkType;
                               });
                             },
                             child: Container(
@@ -695,6 +696,7 @@ class _btCreateDrinkDetailScreenState
       drinkType = pathImageToName(drinkType);
       drinkTypes.add(drinkType);
       isTapDrinkType == false ? selectedDrinkType = drinkTypes[0] : selectedDrinkType;
+      nameController.text = selectedDrinkType;
     });
   }
 
