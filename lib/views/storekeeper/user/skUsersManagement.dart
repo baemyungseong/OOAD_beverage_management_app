@@ -17,9 +17,9 @@ import 'package:ui_fresh_app/models/appUser.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
+import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/storekeeper/user/skSearchingUser.dart';
 import 'package:ui_fresh_app/views/storekeeper/user/skCreateNewAccount.dart';
 
 //import others
@@ -34,7 +34,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
-import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 class skUserManagementScreen extends StatefulWidget {
   const skUserManagementScreen({Key? key}) : super(key: key);
@@ -348,7 +347,7 @@ class _skUserManagementScreenState extends State<skUserManagementScreen> {
                         shrinkWrap: true,
                         itemCount: accountsList.length,
                         separatorBuilder: (BuildContext context, int index) =>
-                            SizedBox(height: 24),
+                        SizedBox(height: 24),
                         itemBuilder: (context, index) {
                           return Dismissible(
                               onDismissed: (direction) => controlDeleteUser(

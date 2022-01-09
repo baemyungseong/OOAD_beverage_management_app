@@ -1,3 +1,5 @@
+import 'package:basic_utils/basic_utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -11,6 +13,9 @@ import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
+
+//import models
+import 'package:ui_fresh_app/models/drinkModel.dart';
 
 //import views
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
@@ -27,6 +32,15 @@ import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
+
 class btDashboardManagementScreen extends StatefulWidget {
   const btDashboardManagementScreen({Key? key}) : super(key: key);
 
@@ -38,7 +52,6 @@ class btDashboardManagementScreen extends StatefulWidget {
 class _btDashboardManagementScreenState
     extends State<btDashboardManagementScreen>
     with SingleTickerProviderStateMixin {
-  bool haveSearch = false;
   bool isHorizontal = false;
   TextEditingController searchController = TextEditingController();
 
@@ -50,6 +63,8 @@ class _btDashboardManagementScreenState
   double viewportFraction = 0.554;
   double? pageOffset = 0;
   double? scale;
+
+  List<Drink> drinksList = [];
 
   void initState() {
     super.initState();
@@ -65,19 +80,11 @@ class _btDashboardManagementScreenState
     _minpricecontroller.text = _lowerValue.toString();
     _maxpricecontroller.text = _upperValue.toString();
 
-    // User? user = FirebaseAuth.instance.currentUser;
-    // final userid = user?.uid.toString();
-    // uid = userid!;
-    // print('The current uid is $uid');
-    // getProjectsDataList();
-    // getProjectsIdList();
-
     pageController = new PageController(
         initialPage: 0, keepPage: true, viewportFraction: viewportFraction)
       ..addListener(() {
         setState(() {
           pageOffset = pageController.page;
-          print(pageOffset);
         });
       });
   }
@@ -126,17 +133,14 @@ class _btDashboardManagementScreenState
                               );
                               // .then((value) {});
                             },
-                            child: AnimatedContainer(
+                            child: Container(
                               alignment: Alignment.center,
-                              duration: Duration(milliseconds: 300),
                               height: 32,
                               width: 32,
+                              child: displayAvatar(currentUser.avatar, 32, 32),
                               decoration: BoxDecoration(
                                 color: blueWater,
                                 borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                    image: NetworkImage(currentUser.avatar),
-                                    fit: BoxFit.cover),
                                 shape: BoxShape.rectangle,
                                 boxShadow: [
                                   BoxShadow(
@@ -163,7 +167,7 @@ class _btDashboardManagementScreenState
                             Container(
                                 alignment: Alignment.topLeft,
                                 child: Text(
-                                  'Noob Chảo',
+                                  currentUser.name,
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'SFProText',
@@ -174,7 +178,7 @@ class _btDashboardManagementScreenState
                             SizedBox(height: 1),
                             Container(
                                 // alignment: Alignment.topLeft,
-                                child: Text('Accountant',
+                                child: Text(StringUtils.capitalize(currentUser.role),
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontFamily: 'SFProText',
@@ -283,16 +287,7 @@ class _btDashboardManagementScreenState
                           child: TextFormField(
                             controller: searchController,
                             autofocus: false,
-                            onEditingComplete: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    btDashboardManagementSearchingScreen(
-                                  searchResult: searchController.text,
-                                  haveFilter: haveFilter,
-                                ),
-                              ),
-                            ),
+                            onEditingComplete: () => controlSearchDrink(),
                             style: TextStyle(
                                 fontFamily: 'SFProText',
                                 fontSize: content14,
@@ -307,7 +302,7 @@ class _btDashboardManagementScreenState
                               ),
                               contentPadding:
                                   EdgeInsets.only(left: 20, right: 0),
-                              hintText: "What're you looking for?",
+                              hintText: "What are you looking for?",
                               hintStyle: TextStyle(
                                   fontFamily: 'SFProText',
                                   fontSize: content14,
@@ -351,8 +346,6 @@ class _btDashboardManagementScreenState
                                     onTap: () {
                                       setState(() {
                                         isHorizontal = true;
-                                        _tabController!.index = 0;
-                                        // showFilter(context);
                                       });
                                     },
                                     child: AnimatedContainer(
@@ -390,7 +383,6 @@ class _btDashboardManagementScreenState
                                     onTap: () {
                                       setState(() {
                                         isHorizontal = false;
-                                        _tabController!.index = 0;
                                         _currentPosition = 0.0;
                                         scale = viewportFraction;
                                       });
@@ -592,1182 +584,24 @@ class _btDashboardManagementScreenState
                             child: TabBarView(
                                 controller: _tabController,
                                 children: [
-                                  //Tea
-                                  Container(
-                                      padding:
-                                          EdgeInsets.only(left: 28, right: 28),
-                                      child: SingleChildScrollView(
-                                          child: Column(
-                                        children: [
-                                          GridView.builder(
-                                              padding: EdgeInsets.only(
-                                                  top: 32, bottom: 120),
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              shrinkWrap: true,
-                                              gridDelegate:
-                                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                                childAspectRatio: (150 / 244),
-                                                crossAxisCount: 2,
-                                                crossAxisSpacing: 19,
-                                                mainAxisSpacing: 24,
-                                              ),
-                                              itemCount: 6,
-                                              itemBuilder: (context, index) {
-                                                return GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              btCustomizeDrinkDetailScreen(),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Container(
-                                                      width: 150,
-                                                      height: 236,
-                                                      child: Stack(children: [
-                                                        Container(
-                                                          width: 150,
-                                                          height: 196,
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  top: 48),
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 8,
-                                                                  right: 8,
-                                                                  bottom: 16),
-                                                          decoration: BoxDecoration(
-                                                              color: blueLight,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          16)),
-                                                          child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .end,
-                                                              children: [
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      'Honey Tea',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 4),
-                                                                Container(
-                                                                    width: 134,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .centerLeft,
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    child: Text(
-                                                                      'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                      maxLines:
-                                                                          2,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              8,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              grey8,
-                                                                          fontWeight: FontWeight
-                                                                              .w400,
-                                                                          height:
-                                                                              1.4),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .left,
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 8),
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      "\$ " +
-                                                                          "05.00",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                              ]),
-                                                        ),
-                                                        Container(
-                                                          width: 150,
-                                                          alignment: Alignment
-                                                              .topCenter,
-                                                          child: Container(
-                                                            child: (index == 1 ||
-                                                                    index ==
-                                                                        2 ||
-                                                                    index == 5)
-                                                                ? Image.network(
-                                                                    'https://i.imgur.com/6GfgeBS.png',
-                                                                    scale: 10)
-                                                                : Image.network(
-                                                                    'https://i.imgur.com/vnQWQls.png',
-                                                                    scale: 10),
-                                                          ),
-                                                        )
-                                                      ]),
-                                                    ));
-                                              }),
-                                        ],
-                                      ))),
-                                  //Juice
-                                  Container(
-                                      padding:
-                                          EdgeInsets.only(left: 28, right: 28),
-                                      child: SingleChildScrollView(
-                                          child: Column(
-                                        children: [
-                                          GridView.builder(
-                                              padding: EdgeInsets.only(
-                                                  top: 32, bottom: 120),
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              shrinkWrap: true,
-                                              gridDelegate:
-                                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                                childAspectRatio: (150 / 244),
-                                                crossAxisCount: 2,
-                                                crossAxisSpacing: 19,
-                                                mainAxisSpacing: 24,
-                                              ),
-                                              itemCount: 6,
-                                              itemBuilder: (context, index) {
-                                                return GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              btCustomizeDrinkDetailScreen(),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Container(
-                                                      width: 150,
-                                                      height: 236,
-                                                      child: Stack(children: [
-                                                        Container(
-                                                          width: 150,
-                                                          height: 196,
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  top: 48),
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 8,
-                                                                  right: 8,
-                                                                  bottom: 16),
-                                                          decoration: BoxDecoration(
-                                                              color: blueLight,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          16)),
-                                                          child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .end,
-                                                              children: [
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      'Honey Tea',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 4),
-                                                                Container(
-                                                                    width: 134,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .centerLeft,
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    child: Text(
-                                                                      'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                      maxLines:
-                                                                          2,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              8,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              grey8,
-                                                                          fontWeight: FontWeight
-                                                                              .w400,
-                                                                          height:
-                                                                              1.4),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .left,
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 8),
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      "\$ " +
-                                                                          "05.00",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                              ]),
-                                                        ),
-                                                        Container(
-                                                          width: 150,
-                                                          alignment: Alignment
-                                                              .topCenter,
-                                                          child: Container(
-                                                            child: (index == 1 ||
-                                                                    index ==
-                                                                        2 ||
-                                                                    index == 5)
-                                                                ? Image.network(
-                                                                    'https://i.imgur.com/6GfgeBS.png',
-                                                                    scale: 10)
-                                                                : Image.network(
-                                                                    'https://i.imgur.com/vnQWQls.png',
-                                                                    scale: 10),
-                                                          ),
-                                                        )
-                                                      ]),
-                                                    ));
-                                              }),
-                                        ],
-                                      ))),
-                                  //Beer
-                                  Container(
-                                      padding:
-                                          EdgeInsets.only(left: 28, right: 28),
-                                      child: SingleChildScrollView(
-                                          child: Column(
-                                        children: [
-                                          GridView.builder(
-                                              padding: EdgeInsets.only(
-                                                  top: 32, bottom: 120),
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              shrinkWrap: true,
-                                              gridDelegate:
-                                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                                childAspectRatio: (150 / 244),
-                                                crossAxisCount: 2,
-                                                crossAxisSpacing: 19,
-                                                mainAxisSpacing: 24,
-                                              ),
-                                              itemCount: 6,
-                                              itemBuilder: (context, index) {
-                                                return GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              btCustomizeDrinkDetailScreen(),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Container(
-                                                      width: 150,
-                                                      height: 236,
-                                                      child: Stack(children: [
-                                                        Container(
-                                                          width: 150,
-                                                          height: 196,
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  top: 48),
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 8,
-                                                                  right: 8,
-                                                                  bottom: 16),
-                                                          decoration: BoxDecoration(
-                                                              color: blueLight,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          16)),
-                                                          child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .end,
-                                                              children: [
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      'Honey Tea',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 4),
-                                                                Container(
-                                                                    width: 134,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .centerLeft,
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    child: Text(
-                                                                      'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                      maxLines:
-                                                                          2,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              8,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              grey8,
-                                                                          fontWeight: FontWeight
-                                                                              .w400,
-                                                                          height:
-                                                                              1.4),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .left,
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 8),
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      "\$ " +
-                                                                          "05.00",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                              ]),
-                                                        ),
-                                                        Container(
-                                                          width: 150,
-                                                          alignment: Alignment
-                                                              .topCenter,
-                                                          child: Container(
-                                                            child: (index == 1 ||
-                                                                    index ==
-                                                                        2 ||
-                                                                    index == 5)
-                                                                ? Image.network(
-                                                                    'https://i.imgur.com/6GfgeBS.png',
-                                                                    scale: 10)
-                                                                : Image.network(
-                                                                    'https://i.imgur.com/vnQWQls.png',
-                                                                    scale: 10),
-                                                          ),
-                                                        )
-                                                      ]),
-                                                    ));
-                                              }),
-                                        ],
-                                      ))),
-                                  //Wine
-                                  Container(
-                                      padding:
-                                          EdgeInsets.only(left: 28, right: 28),
-                                      child: SingleChildScrollView(
-                                          child: Column(
-                                        children: [
-                                          GridView.builder(
-                                              padding: EdgeInsets.only(
-                                                  top: 32, bottom: 120),
-                                              physics:
-                                                  NeverScrollableScrollPhysics(),
-                                              shrinkWrap: true,
-                                              gridDelegate:
-                                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                                childAspectRatio: (150 / 244),
-                                                crossAxisCount: 2,
-                                                crossAxisSpacing: 19,
-                                                mainAxisSpacing: 24,
-                                              ),
-                                              itemCount: 6,
-                                              itemBuilder: (context, index) {
-                                                return GestureDetector(
-                                                    onTap: () {
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              btCustomizeDrinkDetailScreen(),
-                                                        ),
-                                                      );
-                                                    },
-                                                    child: Container(
-                                                      width: 150,
-                                                      height: 236,
-                                                      child: Stack(children: [
-                                                        Container(
-                                                          width: 150,
-                                                          height: 196,
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  top: 48),
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  left: 8,
-                                                                  right: 8,
-                                                                  bottom: 16),
-                                                          decoration: BoxDecoration(
-                                                              color: blueLight,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          16)),
-                                                          child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .end,
-                                                              children: [
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      'Honey Tea',
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 4),
-                                                                Container(
-                                                                    width: 134,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .centerLeft,
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .zero,
-                                                                    child: Text(
-                                                                      'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                      maxLines:
-                                                                          2,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              8,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              grey8,
-                                                                          fontWeight: FontWeight
-                                                                              .w400,
-                                                                          height:
-                                                                              1.4),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .left,
-                                                                    )),
-                                                                SizedBox(
-                                                                    height: 8),
-                                                                Container(
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .topLeft,
-                                                                    child: Text(
-                                                                      "\$ " +
-                                                                          "05.00",
-                                                                      style: TextStyle(
-                                                                          fontSize:
-                                                                              content16,
-                                                                          fontFamily:
-                                                                              'SFProText',
-                                                                          color:
-                                                                              blackLight,
-                                                                          fontWeight: FontWeight
-                                                                              .w600,
-                                                                          height:
-                                                                              1.4),
-                                                                    )),
-                                                              ]),
-                                                        ),
-                                                        Container(
-                                                          width: 150,
-                                                          alignment: Alignment
-                                                              .topCenter,
-                                                          child: Container(
-                                                            child: (index == 1 ||
-                                                                    index ==
-                                                                        2 ||
-                                                                    index == 5)
-                                                                ? Image.network(
-                                                                    'https://i.imgur.com/6GfgeBS.png',
-                                                                    scale: 10)
-                                                                : Image.network(
-                                                                    'https://i.imgur.com/vnQWQls.png',
-                                                                    scale: 10),
-                                                          ),
-                                                        )
-                                                      ]),
-                                                    ));
-                                              }),
-                                        ],
-                                      ))),
+                                  _selectedIndex == 0 ? viewDrinksPerTab() : Container(), 
+                                  _selectedIndex == 1 ? viewDrinksPerTab() : Container(), 
+                                  _selectedIndex == 2 ? viewDrinksPerTab() : Container(), 
+                                  _selectedIndex == 3 ? viewDrinksPerTab() : Container(), 
                                 ]))
                         : Container(
                             padding: EdgeInsets.only(top: 32),
                             width: double.maxFinite,
                             height: 512,
-                            child: TabBarView(
+                            child: 
+                            TabBarView(
                                 controller: _tabController,
                                 children: [
-                                  //Tea
-                                  Container(
-                                      // padding: EdgeInsets.only(left: 28, right: 28),
-                                      child: PageView.builder(
-                                          controller: pageController,
-                                          onPageChanged: (num) {
-                                            setState(() {
-                                              if (num + 1 == 3) {
-                                                _currentPosition = 2.0;
-                                              } else if (num == 0) {
-                                                _currentPosition = 0.0;
-                                              } else {
-                                                _currentPosition =
-                                                    num.toDouble();
-                                              }
-                                              print(_currentPosition);
-                                            });
-                                          },
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: 3,
-                                          itemBuilder: (context, index) {
-                                            double scale = max(
-                                                viewportFraction,
-                                                (1 -
-                                                        (pageOffset! - index)
-                                                            .abs()) +
-                                                    viewportFraction);
-                                            return Container(
-                                              width: 160,
-                                              height: 377,
-                                              child: Column(children: [
-                                                Container(
-                                                  width: 160,
-                                                  height: 196 + (scale * 50),
-                                                  decoration: BoxDecoration(
-                                                      color: blueLight,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16)),
-                                                  child: Center(
-                                                    child: Container(
-                                                      child: (index == 0 ||
-                                                              index == 2)
-                                                          ? Image.network(
-                                                              'https://i.imgur.com/6GfgeBS.png',
-                                                              scale: 5.982)
-                                                          : Image.network(
-                                                              'https://i.imgur.com/vnQWQls.png',
-                                                              scale: 5.982),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 16),
-                                                (_currentPosition == index)
-                                                    ? Column(
-                                                        children: [
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                (index == 0 ||
-                                                                        index ==
-                                                                            2)
-                                                                    ? 'Honey Tea'
-                                                                    : 'Grape Tea',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        content18,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                          SizedBox(height: 4),
-                                                          Container(
-                                                              width: 160,
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              child: Text(
-                                                                'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                maxLines: 2,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: TextStyle(
-                                                                    fontSize: 8,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        grey8,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    height:
-                                                                        1.4),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              )),
-                                                          SizedBox(height: 8),
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                "\$" + "05.00",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        title24,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                        ],
-                                                      )
-                                                    : Column()
-                                              ]),
-                                            );
-                                          })),
-
-                                  //Juice
-                                  Container(
-                                      // padding: EdgeInsets.only(left: 28, right: 28),
-                                      child: PageView.builder(
-                                          controller: pageController,
-                                          onPageChanged: (num) {
-                                            setState(() {
-                                              if (num + 1 == 3) {
-                                                _currentPosition = 2.0;
-                                              } else if (num == 0) {
-                                                _currentPosition = 0.0;
-                                              } else {
-                                                _currentPosition =
-                                                    num.toDouble();
-                                              }
-                                              print(_currentPosition);
-                                            });
-                                          },
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: 3,
-                                          itemBuilder: (context, index) {
-                                            double scale = max(
-                                                viewportFraction,
-                                                (1 -
-                                                        (pageOffset! - index)
-                                                            .abs()) +
-                                                    viewportFraction);
-                                            return Container(
-                                              width: 160,
-                                              height: 377,
-                                              child: Column(children: [
-                                                Container(
-                                                  width: 160,
-                                                  height: 196 + (scale * 50),
-                                                  decoration: BoxDecoration(
-                                                      color: blueLight,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16)),
-                                                  child: Center(
-                                                    child: Container(
-                                                      child: (index == 0 ||
-                                                              index == 2)
-                                                          ? Image.network(
-                                                              'https://i.imgur.com/6GfgeBS.png',
-                                                              scale: 5.982)
-                                                          : Image.network(
-                                                              'https://i.imgur.com/vnQWQls.png',
-                                                              scale: 5.982),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 16),
-                                                (_currentPosition == index)
-                                                    ? Column(
-                                                        children: [
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                (index == 0 ||
-                                                                        index ==
-                                                                            2)
-                                                                    ? 'Honey Tea'
-                                                                    : 'Grape Tea',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        content18,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                          SizedBox(height: 4),
-                                                          Container(
-                                                              width: 160,
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              child: Text(
-                                                                'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                maxLines: 2,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: TextStyle(
-                                                                    fontSize: 8,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        grey8,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    height:
-                                                                        1.4),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              )),
-                                                          SizedBox(height: 8),
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                "\$" + "05.00",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        title24,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                        ],
-                                                      )
-                                                    : Column()
-                                              ]),
-                                            );
-                                          })),
-
-                                  //Beer
-                                  Container(
-                                      // padding: EdgeInsets.only(left: 28, right: 28),
-                                      child: PageView.builder(
-                                          controller: pageController,
-                                          onPageChanged: (num) {
-                                            setState(() {
-                                              if (num + 1 == 3) {
-                                                _currentPosition = 2.0;
-                                              } else if (num == 0) {
-                                                _currentPosition = 0.0;
-                                              } else {
-                                                _currentPosition =
-                                                    num.toDouble();
-                                              }
-                                              print(_currentPosition);
-                                            });
-                                          },
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: 3,
-                                          itemBuilder: (context, index) {
-                                            double scale = max(
-                                                viewportFraction,
-                                                (1 -
-                                                        (pageOffset! - index)
-                                                            .abs()) +
-                                                    viewportFraction);
-                                            return Container(
-                                              width: 160,
-                                              height: 377,
-                                              child: Column(children: [
-                                                Container(
-                                                  width: 160,
-                                                  height: 196 + (scale * 50),
-                                                  decoration: BoxDecoration(
-                                                      color: blueLight,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16)),
-                                                  child: Center(
-                                                    child: Container(
-                                                      child: (index == 0 ||
-                                                              index == 2)
-                                                          ? Image.network(
-                                                              'https://i.imgur.com/6GfgeBS.png',
-                                                              scale: 5.982)
-                                                          : Image.network(
-                                                              'https://i.imgur.com/vnQWQls.png',
-                                                              scale: 5.982),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 16),
-                                                (_currentPosition == index)
-                                                    ? Column(
-                                                        children: [
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                (index == 0 ||
-                                                                        index ==
-                                                                            2)
-                                                                    ? 'Honey Tea'
-                                                                    : 'Grape Tea',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        content18,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                          SizedBox(height: 4),
-                                                          Container(
-                                                              width: 160,
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              child: Text(
-                                                                'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                maxLines: 2,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: TextStyle(
-                                                                    fontSize: 8,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        grey8,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    height:
-                                                                        1.4),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              )),
-                                                          SizedBox(height: 8),
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                "\$" + "05.00",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        title24,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                        ],
-                                                      )
-                                                    : Column()
-                                              ]),
-                                            );
-                                          })),
-
-                                  //Wine
-                                  Container(
-                                      // padding: EdgeInsets.only(left: 28, right: 28),
-                                      child: PageView.builder(
-                                          controller: pageController,
-                                          onPageChanged: (num) {
-                                            setState(() {
-                                              if (num + 1 == 3) {
-                                                _currentPosition = 2.0;
-                                              } else if (num == 0) {
-                                                _currentPosition = 0.0;
-                                              } else {
-                                                _currentPosition =
-                                                    num.toDouble();
-                                              }
-                                              print(_currentPosition);
-                                            });
-                                          },
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: 3,
-                                          itemBuilder: (context, index) {
-                                            double scale = max(
-                                                viewportFraction,
-                                                (1 -
-                                                        (pageOffset! - index)
-                                                            .abs()) +
-                                                    viewportFraction);
-                                            return Container(
-                                              width: 160,
-                                              height: 377,
-                                              child: Column(children: [
-                                                Container(
-                                                  width: 160,
-                                                  height: 196 + (scale * 50),
-                                                  decoration: BoxDecoration(
-                                                      color: blueLight,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              16)),
-                                                  child: Center(
-                                                    child: Container(
-                                                      child: (index == 0 ||
-                                                              index == 2)
-                                                          ? Image.network(
-                                                              'https://i.imgur.com/6GfgeBS.png',
-                                                              scale: 5.982)
-                                                          : Image.network(
-                                                              'https://i.imgur.com/vnQWQls.png',
-                                                              scale: 5.982),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(height: 16),
-                                                (_currentPosition == index)
-                                                    ? Column(
-                                                        children: [
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                (index == 0 ||
-                                                                        index ==
-                                                                            2)
-                                                                    ? 'Honey Tea'
-                                                                    : 'Grape Tea',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        content18,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                          SizedBox(height: 4),
-                                                          Container(
-                                                              width: 160,
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              child: Text(
-                                                                'Drinks from honey, bold taste create a feeling of sweetness',
-                                                                maxLines: 2,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: TextStyle(
-                                                                    fontSize: 8,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        grey8,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    height:
-                                                                        1.4),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              )),
-                                                          SizedBox(height: 8),
-                                                          Container(
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child: Text(
-                                                                "\$" + "05.00",
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        title24,
-                                                                    fontFamily:
-                                                                        'SFProText',
-                                                                    color:
-                                                                        blackLight,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w700,
-                                                                    height:
-                                                                        1.4),
-                                                              )),
-                                                        ],
-                                                      )
-                                                    : Column()
-                                              ]),
-                                            );
-                                          })),
-                                ]))
+                                  _selectedIndex == 0 ? viewDrinksPerTabHorizontal() : Container(),
+                                  _selectedIndex == 1 ? viewDrinksPerTabHorizontal() : Container(),
+                                  _selectedIndex == 2 ? viewDrinksPerTabHorizontal() : Container(),
+                                  _selectedIndex == 3 ? viewDrinksPerTabHorizontal() : Container(),
+                    ])),
                   ],
                 ),
               ),
@@ -1775,6 +609,420 @@ class _btDashboardManagementScreenState
           ),
         ));
   }
+
+  controlSearchDrink() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });
+  }
+
+  getAllDrinksSorted() async {
+    await getAllDrinksInCategory();
+    List<Drink> sortedList = [];
+    for (int i = 0; i < drinksList.length; i++) {
+      if (double.parse(drinksList[i].unit_price) >= double.parse(_minpricecontroller.text)
+      && double.parse(drinksList[i].unit_price) <= double.parse(_maxpricecontroller.text)) {
+        sortedList.add(drinksList[i]);
+      }
+    }
+    drinksList.clear();
+    drinksList = List.from(sortedList);
+  }
+
+  getAllDrinksSeached() async {
+    await getAllDrinksInCategory();
+    List<Drink> searchList = [];
+    for (int i = 0; i < drinksList.length; i++) {
+      if (drinksList[i].name.toLowerCase().
+      contains(searchController.text.toLowerCase())) {
+        searchList.add(drinksList[i]);
+      }
+    }
+    drinksList.clear();
+    drinksList = List.from(searchList);
+  }
+
+  getAllDrinksInCategory() async {
+    String _selectedCategory = "";
+    switch (_selectedIndex) {
+      case 0:
+        _selectedCategory = "Tea";
+        break;
+      case 1:
+        _selectedCategory = "Juice";
+        break;
+      case 2:
+        _selectedCategory = "Beer";
+        break;
+      case 3:
+        _selectedCategory = "Wine";
+        break;                    
+    }    
+    QuerySnapshot querySnapshot = await drinksReference.get();
+    drinksList.clear();
+    for (int i = 0; i < querySnapshot.docs.length; i++) {
+      var doc = querySnapshot.docs[i];
+      Drink drink = Drink();
+      drink = Drink.fromDocument(doc);
+      if (drink.category == _selectedCategory) {
+        drinksList.add(drink);
+      }
+    }
+    drinksList.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    drinksList = drinksList.reversed.toList();  
+  }
+
+  displayDrinkImage(String _url, double _height, double _width) => ClipRRect(
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      placeholder: (context, url) => 
+        Center(child: SizedBox(
+            child: CircularProgressIndicator(
+              color: blackLight,
+              strokeWidth: 3,
+            ),
+            height: 25.0,
+            width: 25.0,
+          ),
+        ),
+    ),
+  );
+
+  Future<void> controlRefresh() async {
+    setState(() {
+    });
+  }
+
+  viewDrinksPerTab() {
+    return Container(
+    padding:
+        EdgeInsets.only(left: 28, right: 28),
+    child: RefreshIndicator(
+      onRefresh: () => controlRefresh(),
+      child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+          children: [
+            FutureBuilder(
+              future: searchController.text.isEmpty ? (haveFilter == true ? getAllDrinksSorted() : getAllDrinksInCategory()) : (haveFilter == true ? getAllDrinksSorted() : getAllDrinksSeached()),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.only(top: 30),
+                    child: 
+                      SizedBox(
+                        child: CircularProgressIndicator(
+                          color: blackLight,
+                          strokeWidth: 3,
+                        ),
+                        height: 25.0,
+                        width: 25.0,
+                      ),
+                  );  
+                }
+                return GridView.builder(
+                padding: EdgeInsets.only(
+                    top: 32, bottom: 120),
+                physics:
+                    NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
+                  childAspectRatio: (150 / 244),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 19,
+                  mainAxisSpacing: 24,
+                ),
+                itemCount: drinksList.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      onTap: () => controlSelectDrink(drinksList[index].id, drinksList[index].image, drinksList[index].name, drinksList[index].description, drinksList[index].unit_price),
+                      child: Container(
+                        width: 150,
+                        height: 236,
+                        child: Stack(children: [
+                          Container(
+                            width: 150,
+                            height: 196,
+                            margin:
+                                EdgeInsets.only(
+                                    top: 48),
+                            padding:
+                                EdgeInsets.only(
+                                    left: 8,
+                                    right: 8,
+                                    bottom: 16),
+                            decoration: BoxDecoration(
+                                color: blueLight,
+                                borderRadius:
+                                    BorderRadius
+                                        .circular(
+                                            16)),
+                            child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment
+                                        .end,
+                                children: [
+                                  Container(
+                                      alignment:
+                                          Alignment
+                                              .topLeft,
+                                      child: Text(
+                                        drinksList[index].name,
+                                        style: TextStyle(
+                                            fontSize:
+                                                content16,
+                                            fontFamily:
+                                                'SFProText',
+                                            color:
+                                                blackLight,
+                                            fontWeight: FontWeight
+                                                .w600,
+                                            height:
+                                                1.4),
+                                      )),
+                                  SizedBox(
+                                      height: 4),
+                                  Container(
+                                      width: 134,
+                                      alignment:
+                                          Alignment
+                                              .centerLeft,
+                                      padding:
+                                          EdgeInsets
+                                              .zero,
+                                      child: Text(
+                                        drinksList[index].description,
+                                        maxLines:
+                                            2,
+                                        overflow:
+                                            TextOverflow
+                                                .ellipsis,
+                                        style: TextStyle(
+                                            fontSize:
+                                                8,
+                                            fontFamily:
+                                                'SFProText',
+                                            color:
+                                                grey8,
+                                            fontWeight: FontWeight
+                                                .w400,
+                                            height:
+                                                1.4),
+                                        textAlign:
+                                            TextAlign
+                                                .left,
+                                      )),
+                                  SizedBox(
+                                      height: 8),
+                                  Container(
+                                      alignment:
+                                          Alignment
+                                              .topLeft,
+                                      child: Text(
+                                        "\$ " + drinksList[index].unit_price + ".00",
+                                        style: TextStyle(
+                                            fontSize:
+                                                content16,
+                                            fontFamily:
+                                                'SFProText',
+                                            color:
+                                                blackLight,
+                                            fontWeight: FontWeight
+                                                .w600,
+                                            height:
+                                                1.4),
+                                      )),
+                                ]),
+                          ),
+                          Container(
+                            width: 150,
+                            height: 135,
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              child: displayDrinkImage(drinksList[index].image, 220, 220),
+                            ),
+                          )
+                        ]),
+                      ));
+                });
+              }
+            ),
+          ],
+        )),
+      ),
+    );  
+  }
+
+  viewDrinksPerTabHorizontal() {
+    return RefreshIndicator(
+      child: CustomScrollView(
+        slivers: <Widget>[
+          SliverFillRemaining(
+            child: FutureBuilder(
+              future: searchController.text.isEmpty ? (haveFilter == true ? getAllDrinksSorted() : getAllDrinksInCategory()) : (haveFilter == true ? getAllDrinksSorted() : getAllDrinksSeached()),
+              builder: (context, _) {
+                return PageView.builder(
+                controller: pageController,
+                onPageChanged: (num) {
+                    if (num + 1 == 3) {
+                      _currentPosition = 2.0;
+                    } else if (num == 0) {
+                      _currentPosition = 0.0;
+                    } else {
+                      _currentPosition =
+                          num.toDouble();
+                    }
+                },
+                scrollDirection: Axis.horizontal,
+                itemCount: drinksList.length,
+                itemBuilder: (context, index) {
+                  double scale = max(
+                      viewportFraction,
+                      (1 -
+                              (pageOffset! - index)
+                                  .abs()) +
+                          viewportFraction);
+                  return GestureDetector(
+                    onTap: () => controlSelectDrink(drinksList[index].id, drinksList[index].image, drinksList[index].name, drinksList[index].description, drinksList[index].unit_price),
+                    child: Column(children: [
+                      Container(
+                        width: 160,
+                        height: 196 + (scale * 50),
+                        decoration: BoxDecoration(
+                            color: blueLight,
+                            borderRadius:
+                                BorderRadius.circular(
+                                    16)),
+                        child: Center(
+                          child: Container(
+                            child: displayDrinkImage(drinksList[index].image, 200, 200),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      (_currentPosition == index)
+                          ? Column(
+                              children: [
+                                Container(
+                                    alignment:
+                                        Alignment
+                                            .center,
+                                    child: Text(
+                                          drinksList[index].name,
+                                      style: TextStyle(
+                                          fontSize:
+                                              content18,
+                                          fontFamily:
+                                              'SFProText',
+                                          color:
+                                              blackLight,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w600,
+                                          height:
+                                              1.4),
+                                    )),
+                                SizedBox(height: 4),
+                                Container(
+                                    width: 160,
+                                    alignment:
+                                        Alignment
+                                            .center,
+                                    padding:
+                                        EdgeInsets
+                                            .zero,
+                                    child: Text(
+                                      drinksList[index].description,
+                                      maxLines: 2,
+                                      overflow:
+                                          TextOverflow
+                                              .ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 8,
+                                          fontFamily:
+                                              'SFProText',
+                                          color:
+                                              grey8,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w400,
+                                          height:
+                                              1.4),
+                                      textAlign:
+                                          TextAlign
+                                              .center,
+                                    )),
+                                SizedBox(height: 8),
+                                Container(
+                                    alignment:
+                                        Alignment
+                                            .center,
+                                    child: Text(
+                                      "\$ " + drinksList[index].unit_price + ".00",
+                                      style: TextStyle(
+                                          fontSize:
+                                              title24,
+                                          fontFamily:
+                                              'SFProText',
+                                          color:
+                                              blackLight,
+                                          fontWeight:
+                                              FontWeight
+                                                  .w700,
+                                          height:
+                                              1.4),
+                                    )),
+                              ],
+                            )
+                          : Column()
+                    ]),
+                  );
+                });
+              }
+            ),
+          ),
+        ],        
+      ), 
+      onRefresh: () => controlRefresh(),
+    );
+  }
+
+controlSelectDrink(String _drinkID, String _drinkImageURL, String _drinkName, String _drinkDescription, String _drinkUnitPrice) async {
+  var doc = await drinksReference.doc(_drinkID).get();
+  if (doc.exists) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            btCustomizeDrinkDetailScreen(_drinkID, _drinkImageURL, _drinkName, _drinkDescription, _drinkUnitPrice),
+      ),
+    );
+  }
+  else {
+    setState(() {
+      showSnackBar(context, 'The drink has already been removed, please try another one!', 'error');      
+    });
+  }
+}
+
+  displayAvatar(String _url, double _height, double _width) => ClipRRect(
+    borderRadius: BorderRadius.circular(8.0),
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => 
+        Center(child: CircularProgressIndicator()),
+    ),
+  );
 
   //Bottom Sheet - start
 
@@ -2186,22 +1434,16 @@ class _btDashboardManagementScreenState
                       padding: const EdgeInsets.only(left: 28),
                       child: ElevatedButton(
                           onPressed: () {
-                            if (selectDate1.isBefore(selectDate2)) {
-                              if (_lowerValue <= _upperValue) {
-                                setState(() {
-                                  haveFilter = true;
-                                });
-                                Navigator.pop(context);
-                              } else {
-                                showSnackBar(
-                                    context,
-                                    'The max value must be greater than the min',
-                                    "error");
-                              }
+                            if (double.parse(_minpricecontroller.text) <= double.parse(_maxpricecontroller.text)) {
+                              setState(() {
+                                haveFilter = true;
+                              });
+                              Navigator.pop(context);
                             } else {
+                              Navigator.pop(context);
                               showSnackBar(
                                   context,
-                                  'The max date must be greater than the min',
+                                  'The max value must be greater than the min value.',
                                   "error");
                             }
                           },
@@ -2227,9 +1469,6 @@ class _btDashboardManagementScreenState
                       child: ElevatedButton(
                           onPressed: () {
                             SetState1(() {
-                              selected = 0;
-                              selectDate1 = DateTime.now();
-                              selectDate2 = DateTime.now();
                               _lowerValue = 0;
                               _upperValue = 1000;
                               _minpricecontroller.text = _lowerValue.toString();
@@ -2269,5 +1508,4 @@ class _btDashboardManagementScreenState
     );
   }
   // /Bottom Sheet - end
-
 }

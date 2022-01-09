@@ -12,6 +12,7 @@ import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 import 'package:ui_fresh_app/models/drinkModel.dart';
+import 'package:ui_fresh_app/models/goodModel.dart';
 import 'package:ui_fresh_app/models/importModel.dart';
 
 //import views
@@ -19,7 +20,6 @@ import 'package:ui_fresh_app/views/account/profileManagement.dart';
 import 'package:ui_fresh_app/views/bartender/inventory/btImportCreating.dart';
 import 'package:ui_fresh_app/views/bartender/inventory/btImportDetail.dart';
 import 'package:ui_fresh_app/views/bartender/mainTask/btDrinkDetail.dart';
-import 'package:ui_fresh_app/views/bartender/inventory/btDrinkEditing.dart';
 
 class btInventoryManagementScreen extends StatefulWidget {
   const btInventoryManagementScreen({Key? key}) : super(key: key);
@@ -64,13 +64,13 @@ class _btInventoryManagementScreenState
   // ];
 
   // List<String> listPrice = ['93', '64', '25', '33', '44', '55', '4', '9'];
-  List<Drink> goodList = [];
+  List<Good> goodList = [];
   Future getGoodList() async {
     FirebaseFirestore.instance.collection('goods').snapshots().listen((value) {
       setState(() {
         goodList.clear();
         value.docs.forEach((element) {
-          goodList.add(Drink.fromDocument(element.data()));
+          goodList.add(Good.fromDocument(element.data()));
         });
       });
     });

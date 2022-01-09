@@ -1,34 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class Drink {
   final String id;
   final String name;
   final String description;
   final String category;
-  final String quantity;
   final String image;
-  final String price;
+  final String unit_price;
+  final DateTime timestamp;
 
   Drink({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.category,
-    required this.quantity,
-    required this.image,
-    required this.price,
-  });
+    this.id = "",
+    this.name = "",
+    this.description = "",
+    this.category = "",
+    this.image = "",
+    this.unit_price = "",
+    DateTime? timestamp,
+  }) : this.timestamp = timestamp ?? DateTime.now();
 
-  factory Drink.fromDocument(Map<String, dynamic> doc) {
+  factory Drink.fromDocument(DocumentSnapshot doc) {
     return Drink(
       id: doc['id'],
       name: doc['name'],
       category: doc['category'],
       description: doc['description'],
-      quantity: doc['quantity'],
       image: doc["image"],
-      price: doc['price'],
+      unit_price: doc['unit price'],
+      timestamp: DateFormat("dd/MM/yyyy HH:mm:ss").parse(doc['timestamp']),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,8 +22,24 @@ import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
+
 class btCustomizeDrinkDetailScreen extends StatefulWidget {
-  btCustomizeDrinkDetailScreen({Key? key}) : super(key: key);
+  String drinkID;
+  String drinkImageURL;
+  String drinkName;
+  String drinkDescription;
+  String drinkUnitPrice;
+
+  btCustomizeDrinkDetailScreen(this.drinkID, this.drinkImageURL, this.drinkName, this.drinkDescription, this.drinkUnitPrice,
+  {Key? key}) : super(key: key);
 
   @override
   _btCustomizeDrinkDetailScreenState createState() =>
@@ -42,6 +59,13 @@ class _btCustomizeDrinkDetailScreenState
   int selectVolume = 1;
   int selectCondition = 3;
   int selectSugar = 5;
+
+  void initState() {
+    super.initState();
+    nameController.text = widget.drinkName;
+    descriptionController.text = widget.drinkDescription;
+    priceController.text = widget.drinkUnitPrice;
+  }
 
   Widget customRadioVolume(String category, int index) {
     return Container(
@@ -199,10 +223,6 @@ class _btCustomizeDrinkDetailScreenState
     );
   }
 
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
@@ -279,7 +299,7 @@ class _btCustomizeDrinkDetailScreenState
                                       fontSize: content14,
                                       fontWeight: FontWeight.w400,
                                       color: grey8),
-                                  hintText: "Honey Tea",
+                                  hintText: "Enter new drink's name",
                                   filled: true,
                                   fillColor: blueLight,
                                   border: OutlineInputBorder(
@@ -343,7 +363,7 @@ class _btCustomizeDrinkDetailScreenState
                                       fontSize: content14,
                                       fontWeight: FontWeight.w400,
                                       color: grey8),
-                                  hintText: "Drinks from honey, bold taste create a good...",
+                                  hintText: "Enter new drink's description",
                                   filled: true,
                                   fillColor: blueLight,
                                   border: OutlineInputBorder(
@@ -408,7 +428,7 @@ class _btCustomizeDrinkDetailScreenState
                                       fontSize: content14,
                                       fontWeight: FontWeight.w400,
                                       color: grey8),
-                                  hintText: "5.00",
+                                  hintText: "Enter new drink's unit price",
                                   filled: true,
                                   fillColor: blueLight,
                                   border: OutlineInputBorder(
@@ -424,112 +444,6 @@ class _btCustomizeDrinkDetailScreenState
                           ),
                         ),
                       ),
-                      SizedBox(height: 24),
-                      Container(
-                        child: Text(
-                          'Option',
-                          style: TextStyle(
-                            fontFamily: "SFProText",
-                            fontSize: 20.0,
-                            color: blackLight,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Container(
-                            child: Text(
-                              'Volume:',
-                              style: TextStyle(
-                                fontFamily: "SFProText",
-                                fontSize: 14.0,
-                                color: blackLight,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 24),
-                          Row(
-                            children: [
-                              customRadioVolume('500ml', 1),
-                              SizedBox(width: 16),
-                              customRadioVolume('1000ml', 2),
-                              SizedBox(width: 16),
-                              customRadioVolume('no', 3),
-                            ],
-                          ),
-                        ]
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Container(
-                            child: Text(
-                              'Condition:',
-                              style: TextStyle(
-                                fontFamily: "SFProText",
-                                fontSize: 14.0,
-                                color: blackLight,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 24),
-                          Row(
-                            children: [
-                              customRadioCondition('Cold', 1),
-                              SizedBox(width: 16),
-                              customRadioCondition('Hot', 2),
-                              SizedBox(width: 16),
-                              customRadioCondition('no', 3),
-                            ],
-                          ),
-                        ]
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            child: Text(
-                              'Sugar:',
-                              style: TextStyle(
-                                fontFamily: "SFProText",
-                                fontSize: 14.0,
-                                color: blackLight,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 24),
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  customRadioSugar('100%', 1),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('70%', 2),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('50%', 3),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  customRadioSugar('30%', 4),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('0%', 5),
-                                  SizedBox(width: 16),
-                                  customRadioSugar('no', 6),
-                                ],
-                              ),
-                            ],
-                          )
-                        ]
-                      ),
-                      SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -551,17 +465,57 @@ class _btCustomizeDrinkDetailScreenState
                       Spacer(),
                       Container(
                           child: GestureDetector(
+                        onTap: () => removeDrinkDialog(context, widget.drinkID),
+                        child: AnimatedContainer(
+                          alignment: Alignment.center,
+                          duration: Duration(milliseconds: 300),
+                          height: 32,
+                          width: 32,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFFCB356B),
+                                  Color(0xFFBD3F32),
+                                ],
+                                stops: [
+                                  0.0,
+                                  1.0,
+                                ]),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: black.withOpacity(0.25),
+                                  spreadRadius: 0,
+                                  blurRadius: 64,
+                                  offset: Offset(8, 8)),
+                              BoxShadow(
+                                color: black.withOpacity(0.2),
+                                spreadRadius: 0,
+                                blurRadius: 4,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                              padding: EdgeInsets.zero,
+                              alignment: Alignment.center,
+                              child: Icon(Iconsax.close_circle,
+                                  size: 18, color: white)),
+                        ),
+                      )),
+                      SizedBox(width: 8),                      
+                      Container(
+                          child: GestureDetector(
                         onTap: () {
                           // removeDialog(context);
                           setState(() {
-                            selectVolume = 1;
-                            selectCondition = 3;
-                            selectSugar = 5;
                             nameController.text = "";
                             descriptionController.text = "";
                             priceController.text = "";
                           });
-                          showSnackBar(context, 'The drink have been reseted!', "success");
+                          showSnackBar(context, "The drink's details have been reset!", "success");
                           // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(
@@ -611,16 +565,10 @@ class _btCustomizeDrinkDetailScreenState
                           padding: EdgeInsets.only(right: 28),
                           child: GestureDetector(
                             onTap: () {
-                              if (nameFormKey.currentState!.validate() &&
-                                  descriptionFormKey.currentState!.validate() &&
-                                  priceFormKey.currentState!.validate() &&
-                                  selectVolume != 0 &&
-                                  selectCondition != 0 &&
-                                  selectSugar != 0) {
-                                Navigator.pop(context);
-                                showSnackBar(context, 'The drink have been edited!', 'success');
+                              if (nameFormKey.currentState!.validate() && descriptionFormKey.currentState!.validate() && priceFormKey.currentState!.validate()) {
+                                controlUpdateDrink();
                               } else {
-                                showSnackBar(context, 'Please complete all information!', 'danger');
+                                showSnackBar(context, 'Please fill in all information or enter a valid unit price!', 'danger');
                               }
                               // removeDialog(context);
                               // Navigator.push(
@@ -667,7 +615,7 @@ class _btCustomizeDrinkDetailScreenState
                                   padding: EdgeInsets.zero,
                                   alignment: Alignment.center,
                                   child: Text(
-                                    "Save",
+                                    "Update",
                                     style: TextStyle(
                                       fontFamily: "SFProText",
                                       fontSize: 14.0,
@@ -685,54 +633,9 @@ class _btCustomizeDrinkDetailScreenState
                       Container(
                         alignment: Alignment.topCenter,
                         child: Container(
-                            child: Image.network(
-                                'https://i.imgur.com/6GfgeBS.png',
-                                scale: 4.926)),
+                            child: displayDrinkImage(widget.drinkImageURL, 300, 300),
+                        ),
                       ),
-                      Container(
-                        child: GestureDetector(
-                          onTap: () {
-                            print("pressed");
-                            // Navigator.pop(context);
-                            // removeDialog(context);
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => svDrinkCartScreen(),
-                            //   ),
-                            // );
-                            // // .then((value) {});
-                          },
-                          child: AnimatedContainer(
-                            margin: EdgeInsets.only(left: 260, top: 256),
-                            alignment: Alignment.center,
-                            duration: Duration(milliseconds: 300),
-                            height: 32,
-                            width: 32,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: blueWater,
-                              boxShadow: [
-                                BoxShadow(
-                                    color: black.withOpacity(0.25),
-                                    spreadRadius: 0,
-                                    blurRadius: 64,
-                                    offset: Offset(8, 8)),
-                                BoxShadow(
-                                  color: black.withOpacity(0.2),
-                                  spreadRadius: 0,
-                                  blurRadius: 4,
-                                  offset: Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Icon(Iconsax.edit, size: 18, color: white)
-                            ),
-                          ),
-                        )
-                      )
                     ],
                   ),
                   SizedBox(height: 16)
@@ -741,6 +644,41 @@ class _btCustomizeDrinkDetailScreenState
         )
       ])),
     );
+  }
+
+  displayDrinkImage(String _url, double _height, double _width) => ClipRRect(
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      placeholder: (context, url) => 
+        Center(child: SizedBox(
+            child: CircularProgressIndicator(
+              color: blackLight,
+              strokeWidth: 3,
+            ),
+            height: 25.0,
+            width: 25.0,
+          ),
+        ),
+    ),
+  );
+
+  controlUpdateDrink() async {
+    var doc = await drinksReference.doc(widget.drinkID).get();
+    if (doc.exists) {
+      drinksReference.doc(widget.drinkID).update({
+        "name": nameController.text,
+        "description": descriptionController.text,
+        "unit price": priceController.text,
+      });
+      Navigator.pop(context);
+      showSnackBar(context, "The drink's details have been updated!", 'success');
+    }
+    else {
+      Navigator.pop(context);
+      showSnackBar(context, "Failed to update the drink's details because it no longer exists.", 'error');
+    }
   }
 }
 
