@@ -813,18 +813,18 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
                                                   onDismissed: (direction) {
                                                     // Remove the item from the data source.
                                                     setState(() {
-                                                      total = total -
-                                                          double.parse(quantity[
-                                                                      index] +
-                                                                  ".0") *
-                                                              double.parse(
-                                                                  unit[index] +
-                                                                      ".0");
-                                                      name.removeAt(index);
-                                                      quantity.removeAt(index);
-                                                      unit.removeAt(index);
-                                                      importSubIdList
-                                                          .removeAt(index);
+                                                      // total = total -
+                                                      //     double.parse(quantity[
+                                                      //                 index] +
+                                                      //             ".0") *
+                                                      //         double.parse(
+                                                      //             unit[index] +
+                                                      //                 ".0");
+                                                      // name.removeAt(index);
+                                                      // quantity.removeAt(index);
+                                                      // unit.removeAt(index);
+                                                      // importSubIdList
+                                                      //     .removeAt(index);
                                                       // goodIdList
                                                       //     .removeAt(index);
                                                       // goodList.removeAt(index);

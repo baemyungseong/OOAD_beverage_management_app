@@ -6,6 +6,7 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
@@ -21,14 +22,13 @@ import 'package:blur/blur.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class forgotScreen extends StatefulWidget {
-  const forgotScreen({ Key? key }) : super(key: key);
+  const forgotScreen({Key? key}) : super(key: key);
 
   @override
   _forgotScreenState createState() => _forgotScreenState();
 }
 
 class _forgotScreenState extends State<forgotScreen> {
-
   TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> emailFormKey = GlobalKey<FormState>();
 
@@ -47,8 +47,7 @@ class _forgotScreenState extends State<forgotScreen> {
               padding: EdgeInsets.all(appPadding),
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage(background),
-                    fit: BoxFit.cover),
+                    image: AssetImage(background), fit: BoxFit.cover),
               ),
               child: Column(
                 children: [
@@ -72,13 +71,14 @@ class _forgotScreenState extends State<forgotScreen> {
                   SizedBox(height: 16),
                   Container(
                     child: Text(
-                      'Just enter the email address you’ve used to' + '\n' + 'register with us and we’ll send you a reset link!',
+                      'Just enter the email address you’ve used to' +
+                          '\n' +
+                          'register with us and we’ll send you a reset link!',
                       style: TextStyle(
                           fontFamily: 'SFProText',
                           fontSize: content14,
                           color: blackLight,
-                          fontWeight: FontWeight.w400
-                      ),
+                          fontWeight: FontWeight.w400),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -94,11 +94,10 @@ class _forgotScreenState extends State<forgotScreen> {
                       alignment: Alignment.topCenter,
                       child: TextFormField(
                           style: TextStyle(
-                            fontFamily: 'SFProText',
-                            fontSize: 16,
-                            color: blackLight,
-                            fontWeight: FontWeight.w400
-                          ),
+                              fontFamily: 'SFProText',
+                              fontSize: 16,
+                              color: blackLight,
+                              fontWeight: FontWeight.w400),
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           autofillHints: [AutofillHints.email],
@@ -112,7 +111,7 @@ class _forgotScreenState extends State<forgotScreen> {
                           // },
                           decoration: InputDecoration(
                             contentPadding:
-                              EdgeInsets.only(left: 20, right: 12),
+                                EdgeInsets.only(left: 20, right: 12),
                             hintStyle: TextStyle(
                                 fontFamily: 'SFProText',
                                 fontSize: content16,
@@ -130,8 +129,7 @@ class _forgotScreenState extends State<forgotScreen> {
                               fontSize: 0,
                               height: 0,
                             ),
-                          )
-                      ),
+                          )),
                     ),
                   ),
                   SizedBox(height: 16),
@@ -146,15 +144,13 @@ class _forgotScreenState extends State<forgotScreen> {
                           ),
                         );
                       },
-                      child: Text(
-                        'Instruction manual',
-                        style: TextStyle(
-                          fontFamily: 'SFProText',
-                          color: blueWater,
-                          fontSize: content14,
-                          fontWeight: FontWeight.w500,
-                        )
-                      ),
+                      child: Text('Instruction manual',
+                          style: TextStyle(
+                            fontFamily: 'SFProText',
+                            color: blueWater,
+                            fontSize: content14,
+                            fontWeight: FontWeight.w500,
+                          )),
                     ),
                   ),
                   SizedBox(height: 48),
@@ -163,8 +159,13 @@ class _forgotScreenState extends State<forgotScreen> {
                       child: GestureDetector(
                         //action navigate to dashboard screen
                         onTap: () {
-                          // if (_formemailKey.currentState!.validate()) {
-                            showSnackBar(context, 'Fresh sent you a reset link in your email!', 'success');
+                          if (emailFormKey.currentState!.validate()) {
+                            firebaseAuth()
+                                .resetPassword(emailController.text, context);
+                            showSnackBar(
+                                context,
+                                'Fresh sent you a reset link in your email!',
+                                'success');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -174,7 +175,7 @@ class _forgotScreenState extends State<forgotScreen> {
                             // ScaffoldMessenger.of(context).showSnackBar(
                             //   const SnackBar(content: Text('Processing Data')),
                             // );
-                          // }
+                          }
                         },
                         child: AnimatedContainer(
                           alignment: Alignment.center,
@@ -210,8 +211,7 @@ class _forgotScreenState extends State<forgotScreen> {
                                 fontSize: textButton20),
                           ),
                         ),
-                      )
-                  ),
+                      )),
                   SizedBox(height: 20),
                   Container(
                       alignment: Alignment.center,
@@ -232,14 +232,10 @@ class _forgotScreenState extends State<forgotScreen> {
                             decoration: BoxDecoration(
                               color: whiteLight.withOpacity(1),
                               border: Border(
-                                top: BorderSide(
-                                    width: 3, color: whiteLight),
-                                left: BorderSide(
-                                    width: 3, color: whiteLight),
-                                right: BorderSide(
-                                    width: 3, color: whiteLight),
-                                bottom: BorderSide(
-                                    width: 3, color: whiteLight),
+                                top: BorderSide(width: 3, color: whiteLight),
+                                left: BorderSide(width: 3, color: whiteLight),
+                                right: BorderSide(width: 3, color: whiteLight),
+                                bottom: BorderSide(width: 3, color: whiteLight),
                               ),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
@@ -264,14 +260,10 @@ class _forgotScreenState extends State<forgotScreen> {
                                   fontFamily: 'SFProtext',
                                   fontWeight: FontWeight.w600,
                                   fontSize: textButton20),
-                            )
-                        ),
-                      )
-                  ),
+                            )),
+                      )),
                 ],
               ),
-            )
-        )
-    );
+            )));
   }
 }

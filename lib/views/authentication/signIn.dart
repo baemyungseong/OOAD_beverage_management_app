@@ -325,6 +325,8 @@ class _signInScreenState extends State<signInScreen> {
                           padding: EdgeInsets.only(top: 16),
                           child: GestureDetector(
                             onTap: () {
+                              firebaseAuth()
+                                  .resetPassword(emailController.text, context);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -394,19 +396,22 @@ class _signInScreenState extends State<signInScreen> {
   //Control sign-in
   controlSignIn() async {
     if (emailFormKey.currentState!.validate() &&
-        passwordFormKey.currentState!.validate()){
+        passwordFormKey.currentState!.validate()) {
       PlatformStringCryptor cryptor;
       cryptor = PlatformStringCryptor();
       final salt = await cryptor.generateSalt();
 
-      //Firebase auth 
-      firebaseAuth().signIn(emailController.text, passwordController.text, context).then((val) async {
+      //Firebase auth
+      firebaseAuth()
+          .signIn(emailController.text, passwordController.text, context)
+          .then((val) async {
         final FirebaseAuth auth = FirebaseAuth.instance;
         final User? user = auth.currentUser;
         final uid = user?.uid;
 
         if (val != null) {
-          var key = await cryptor.generateKeyFromPassword(passwordController.text, salt);
+          var key = await cryptor.generateKeyFromPassword(
+              passwordController.text, salt);
           var encrypted = await cryptor.encrypt(passwordController.text, key);
 
           //Update new decoded_pw and new key
@@ -415,31 +420,35 @@ class _signInScreenState extends State<signInScreen> {
             "key": key,
           });
 
-          DocumentSnapshot documentSnapshot = await userReference.doc(uid).get();
+          DocumentSnapshot documentSnapshot =
+              await userReference.doc(uid).get();
           currentUser = appUser.fromDocument(documentSnapshot);
 
           //Switch account due to specific role
-          if(currentUser.role == "storekeeper")
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (context) => storekeeperNavigationBar()),
-                  (Route<dynamic> route) => route is storekeeperNavigationBar
-          );
-          else if(currentUser.role == "serve")
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (context) => serveNavigationBar()),
-                  (Route<dynamic> route) => route is serveNavigationBar
-          );
-          else if(currentUser.role == "bartender")
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (context) => bartenderNavigationBar()),
-                  (Route<dynamic> route) => route is bartenderNavigationBar
-          );
-          else if(currentUser.role == "accountant")
-          Navigator.pushAndRemoveUntil(context,
-              MaterialPageRoute(builder: (context) => accountantNavigationBar()),
-                  (Route<dynamic> route) => route is accountantNavigationBar
-          );   
-        }   
+          if (currentUser.role == "storekeeper")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => storekeeperNavigationBar()),
+                (Route<dynamic> route) => route is storekeeperNavigationBar);
+          else if (currentUser.role == "serve")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => serveNavigationBar()),
+                (Route<dynamic> route) => route is serveNavigationBar);
+          else if (currentUser.role == "bartender")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => bartenderNavigationBar()),
+                (Route<dynamic> route) => route is bartenderNavigationBar);
+          else if (currentUser.role == "accountant")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => accountantNavigationBar()),
+                (Route<dynamic> route) => route is accountantNavigationBar);
+        }
       });
     }
   }
