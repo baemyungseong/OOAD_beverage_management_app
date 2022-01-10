@@ -6,7 +6,6 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
-import 'package:ui_fresh_app/views/serve/mainTask/svSearchMainTask.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -16,6 +15,9 @@ import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 import 'package:ui_fresh_app/views/serve/mainTask/svDrinkDetail.dart';
 
+//import models
+import 'package:ui_fresh_app/models/orderModel.dart';
+
 //import others
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +25,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
+
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 
 class svMainTaskManagementScreen extends StatefulWidget {
   const svMainTaskManagementScreen({Key? key}) : super(key: key);
@@ -35,6 +46,8 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
 
   bool haveSearch = false;
   TextEditingController searchController = TextEditingController();
+
+  List<Order> orders = [];
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +92,10 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                             duration: Duration(milliseconds: 300),
                             height: 32,
                             width: 32,
+                            child: displayAvatar(currentUser.avatar),
                             decoration: BoxDecoration(
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                  image: NetworkImage(
-                                      'https://scontent.fsgn5-5.fna.fbcdn.net/v/t1.6435-9/76888832_686654728409257_8144869486420295680_n.jpg?_nc_cat=100&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=fREdzxOPFXEAX8anDQU&tn=GQDoBzXNSN_e_0U-&_nc_ht=scontent.fsgn5-5.fna&oh=9a1d0ebec85c5fd35b8c38b2bb7efbdd&oe=61D2CAC3'),
-                                  fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
                                 BoxShadow(
@@ -117,15 +127,7 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                           child: TextFormField(
                             controller: searchController,
                             autofocus: true,
-                            onEditingComplete: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => svMainTaskSearchingScreen(
-                                  searchResult: searchController.text,
-                                  haveFilter: haveFilter,
-                                ),
-                              ),
-                            ),
+                            onEditingComplete: () => controlSearchOrders(),
                             style: TextStyle(
                               fontFamily: 'SFProText',
                               fontSize: content14,
@@ -261,131 +263,153 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                       Container(
                         height: 670-45,
                         width: 319,
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              ListView.separated(
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.zero,
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: 16,
-                                separatorBuilder: (BuildContext context, int index) =>
-                                    SizedBox(height: 24),
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => svDrinkDetailScreen(),
+                        child: RefreshIndicator(
+                          onRefresh: () => controlRefresh(),
+                          child: SingleChildScrollView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            child: FutureBuilder(
+                              future: searchController.text.isEmpty || searchController.text.toLowerCase().contains("order") ? (haveFilter == true ? getAllOrdersSorted() : getAllOrders()) : (haveFilter == true ? getAllOrdersSorted() : getAllOrdersSearched()),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(
+                                    child: 
+                                      SizedBox(
+                                        child: CircularProgressIndicator(
+                                          color: blackLight,
+                                          strokeWidth: 3,
                                         ),
-                                      );
-                                      // .then((value) {});
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 300),
-                                      child: Row(
-                                        children: [
-                                          Image.asset('assets/images/accountant/drinkavatar.png'),
-                                          SizedBox(width: 16),
-                                          Container(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                        height: 25.0,
+                                        width: 25.0,
+                                      ),
+                                  );
+                                }
+                                return Column(
+                              children: [
+                                    ListView.separated(
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: EdgeInsets.zero,
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: orders.length,
+                                      separatorBuilder: (BuildContext context, int index) =>
+                                          SizedBox(height: 24),
+                                      itemBuilder: (context, index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => svDrinkDetailScreen(),
+                                              ),
+                                            );
+                                            // .then((value) {});
+                                          },
+                                          child: AnimatedContainer(
+                                            duration: Duration(milliseconds: 300),
+                                            child: Row(
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      child: Text(
-                                                        'Drink',                          
-                                                        maxLines: 1,
-                                                        softWrap: false,
-                                                        overflow: TextOverflow.fade,
-                                                        style: TextStyle(
-                                                            fontSize: content16,
-                                                            fontWeight: FontWeight.w600,
-                                                            fontFamily: 'SFProText',
-                                                            color: blackLight,
-                                                            height: 1.0),
-                                                      ),
-                                                    ),
-                                                    Column(
-                                                      children: [
-                                                        SizedBox(height: 1),
-                                                        Container(
-                                                          width: 64,
-                                                          child: Text(
-                                                            ' #' + '2022',
-                                                            maxLines: 1,
-                                                            softWrap: false,
-                                                            overflow: TextOverflow.fade,
-                                                            style: TextStyle(
-                                                              fontSize: content14,
-                                                              fontWeight: FontWeight.w500,
-                                                              fontFamily: 'SFProText',
-                                                              foreground: Paint()
-                                                                ..shader = greenGradient,
+                                                Image.asset('assets/images/accountant/drinkavatar.png'),
+                                                SizedBox(width: 16),
+                                                Container(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            child: Text(
+                                                              "Order ",                          
+                                                              maxLines: 1,
+                                                              softWrap: false,
+                                                              overflow: TextOverflow.fade,
+                                                              style: TextStyle(
+                                                                  fontSize: content16,
+                                                                  fontWeight: FontWeight.w600,
+                                                                  fontFamily: 'SFProText',
+                                                                  color: blackLight,
+                                                                  height: 1.0),
                                                             ),
                                                           ),
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                SizedBox(height: 4),
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 145,
-                                                      child: Text(
-                                                        '02.00 pm, 08 Oct 2021',
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.fade,
-                                                        softWrap: false,
-                                                        style: TextStyle(
-                                                            fontSize: content12,
-                                                            fontWeight: FontWeight.w400,
-                                                            fontFamily: 'SFProText',
-                                                            color: grey8,
-                                                            height: 1.4),
+                                                          Column(
+                                                            children: [
+                                                              SizedBox(height: 1),
+                                                              Container(
+                                                                width: 64,
+                                                                child: Text(
+                                                                  orders[index].code,
+                                                                  maxLines: 1,
+                                                                  softWrap: false,
+                                                                  overflow: TextOverflow.fade,
+                                                                  style: TextStyle(
+                                                                    fontSize: content14,
+                                                                    fontWeight: FontWeight.w500,
+                                                                    fontFamily: 'SFProText',
+                                                                    foreground: Paint()
+                                                                      ..shader = greenGradient,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          )
+                                                        ],
                                                       ),
-                                                    )
-                                                  ],
+                                                      SizedBox(height: 4),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            width: 145,
+                                                            child: Text(
+                                                              DateFormat("hh:mm a, MMM dd yyyy").format(orders[index].timestamp),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.fade,
+                                                              softWrap: false,
+                                                              style: TextStyle(
+                                                                  fontSize: content12,
+                                                                  fontWeight: FontWeight.w400,
+                                                                  fontFamily: 'SFProText',
+                                                                  color: grey8,
+                                                                  height: 1.4),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
+                                                Spacer(),
+                                                Container(
+                                                  width: 102,
+                                                  child: Text(
+                                                    "+ \$ " + orders[index].totalMoney + ".0",
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.fade,
+                                                    softWrap: false,
+                                                    textAlign: TextAlign.right,
+                                                    style: TextStyle(
+                                                      fontSize: content16,
+                                                      fontWeight: FontWeight.w600,
+                                                      fontFamily: 'SFProText',
+                                                      foreground: Paint()
+                                                        ..shader = greenGradient,
+                                                    ),
+                                                  ),
+                                                )
                                               ],
                                             ),
                                           ),
-                                          Spacer(),
-                                          Container(
-                                            width: 102,
-                                            child: Text(
-                                              '+ ' + '\$36.00',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                              softWrap: false,
-                                              textAlign: TextAlign.right,
-                                              style: TextStyle(
-                                                fontSize: content16,
-                                                fontWeight: FontWeight.w600,
-                                                fontFamily: 'SFProText',
-                                                foreground: Paint()
-                                                  ..shader = greenGradient,
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 112)
-                            ]
-                          )
-                        )
+                                    SizedBox(height: 112)
+                                  ]
+                                );
+                              }
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   )
@@ -574,7 +598,7 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                               selectDate2 = dt;
                               SetState1(() {
                                 selectDate2 != selectDate2;
-                              });
+                              });                            
                             }
                             print(selectDate2);
                           },
@@ -815,22 +839,24 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                       padding: const EdgeInsets.only(left: 28),
                       child: ElevatedButton(
                           onPressed: () {
-                            if (selectDate1.isBefore(selectDate2)) {
-                              if (_lowerValue <= _upperValue) {
+                            if (selectDate1.compareTo(selectDate2) <= 0) {
+                              if (double.parse(_minpricecontroller.text) <= double.parse(_maxpricecontroller.text)) {
                                 setState(() {
-                                  haveFilter = true;
+                                  haveFilter = true;                                  
                                 });
                                 Navigator.pop(context);
                               } else {
+                                Navigator.pop(context);
                                 showSnackBar(
                                     context,
-                                    'The max value must be greater than the min',
+                                    'The max value must be greater than the min value',
                                     "error");
                               }
                             } else {
+                              Navigator.pop(context);
                               showSnackBar(
                                   context,
-                                  'The max date must be greater than the min',
+                                  'The end date must be equal or after the start date',
                                   "error");
                             }
                           },
@@ -867,9 +893,6 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                             setState(() {
                               haveFilter = false;
                             });
-                            SetState1(() {
-                              haveFilter = false;
-                            });
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(112, 52),
@@ -899,4 +922,59 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
   }
   // /Bottom Sheet - end
   
+  Future<void> controlRefresh() async {
+    setState(() {
+    });
+  }
+
+  getAllOrders() async {
+    QuerySnapshot querySnapshot = await ordersReference.get();
+    orders.clear();
+    for (int i = 0; i < querySnapshot.docs.length; i++) {
+      var doc = querySnapshot.docs[i];
+      Order order = Order();
+      order = Order.fromDocument(doc);
+      if (order.serveId == currentUser.id && order.isCheckedOutByServe == "false") {
+        orders.add(order);
+      }
+    }
+    orders.sort((a, b) => a.timestamp.compareTo(b.timestamp));    
+  }
+
+  controlSearchOrders() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });  
+  }
+
+  getAllOrdersSearched() async {
+    await getAllOrders();
+    List<Order> searchList = [];
+    for (int i = 0; i < orders.length; i++) {
+      if (orders[i].code.contains(searchController.text)) {
+        searchList.add(orders[i]);
+      }
+    }
+    orders.clear();
+    orders = List.from(searchList);    
+  }
+
+  getAllOrdersSorted() async {
+    await getAllOrders();
+    List<Order> sortedList = [];
+    for (int i = 0; i < orders.length; i++) {
+      if (double.parse(orders[i].totalMoney) >= double.parse(_minpricecontroller.text)
+      && double.parse(orders[i].totalMoney) <= double.parse(_maxpricecontroller.text)
+      && dayMonthYearOnly(orders[i].timestamp).compareTo(dayMonthYearOnly(selectDate1)) >= 0
+      && dayMonthYearOnly(orders[i].timestamp).compareTo(dayMonthYearOnly(selectDate2)) <= 0) {
+        sortedList.add(orders[i]);
+      }
+    }
+    orders.clear();
+    orders = List.from(sortedList);
+  }
+
+  DateTime dayMonthYearOnly(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day);
+  }  
 }

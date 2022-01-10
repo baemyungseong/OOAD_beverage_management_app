@@ -135,7 +135,7 @@ class _svDashboardManagementScreenState
                               alignment: Alignment.center,
                               height: 32,
                               width: 32,
-                              child: displayAvatar(currentUser.avatar, 32, 32),
+                              child: displayAvatar(currentUser.avatar),
                               decoration: BoxDecoration(
                                 color: blueWater,
                                 borderRadius: BorderRadius.circular(8),
@@ -1009,19 +1009,6 @@ controlSelectDrink(String _drinkID, String _drinkImageURL, String _drinkName, St
     });
   }
 }
-
-  displayAvatar(String _url, double _height, double _width) => ClipRRect(
-    borderRadius: BorderRadius.circular(8.0),
-    child: CachedNetworkImage(
-      imageUrl: _url,
-      height: _height,
-      width: _width,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => 
-        Center(child: CircularProgressIndicator()),
-    ),
-  );
-
   //Bottom Sheet - start
 
   TextEditingController _minpricecontroller = TextEditingController();

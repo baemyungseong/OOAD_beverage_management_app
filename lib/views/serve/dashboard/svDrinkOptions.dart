@@ -849,7 +849,14 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                           Spacer(),
                           GestureDetector(
                             //action navigate to signin screen
-                            onTap: () => controlAddDrinkToCart(),
+                            onTap: () {
+                              if (volume != "" && condition != "" && sugar != "") {
+                                controlAddDrinkToCart();
+                              }
+                              else {
+                                showSnackBar(context, "Please choose all options for this drink!", "warning");
+                              }
+                            },
                             child: AnimatedContainer(
                               alignment: Alignment.center,
                               duration: Duration(milliseconds: 300),
@@ -876,7 +883,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                                 ],
                               ),
                               child: Text(
-                                "Add to cart",
+                                "Add to Cart",
                                 style: TextStyle(
                                     color: white,
                                     fontFamily: 'SFProText',
@@ -884,7 +891,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                                     fontSize: textButton16),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       )
                     ]

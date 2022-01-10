@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 //import constants
 import 'package:ui_fresh_app/constants/colors.dart';
@@ -12,6 +14,7 @@ import 'package:ui_fresh_app/constants/others.dart';
 
 //import models
 import 'package:ui_fresh_app/models/cartItemModel.dart';
+import 'package:ui_fresh_app/models/orderDetailModel.dart';
 
 //import others
 import 'package:meta/meta.dart';
@@ -40,8 +43,10 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
 
   List<CartItem> cartItems = [];
 
-  int quantity = 1;
+  List<OrderDetail> orderDetails = [];
 
+  int totalMoney = 0;
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,16 +104,19 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
                               future: getDrinksInCart(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return Center(
-                                    child: SizedBox(
-                                      child: CircularProgressIndicator(
-                                        color: blackLight,
-                                        strokeWidth: 3,
+                                  return Container(
+                                    padding: EdgeInsets.only(top: 30),
+                                    child: Center(
+                                      child: SizedBox(
+                                        child: CircularProgressIndicator(
+                                          color: blackLight,
+                                          strokeWidth: 3,
+                                        ),
+                                        height: 25.0,
+                                        width: 25.0,
                                       ),
-                                      height: 25.0,
-                                      width: 25.0,
                                     ),
-                                  );                                  
+                                  );                         
                                 }
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -123,8 +131,8 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
                                       separatorBuilder: (BuildContext context, int index) => SizedBox(height: 32),
                                       itemBuilder: (context, index) {
                                         return Dismissible(
-                                          // key: ValueKey(index), 
-                                          key: UniqueKey(), 
+                                          key: UniqueKey(),
+                                          direction: DismissDirection.endToStart, 
                                           background: Container(
                                             padding: EdgeInsets.only(right: 24),
                                             alignment: Alignment.centerRight,
@@ -144,22 +152,19 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
                                             ),
                                             child: Icon(Iconsax.minus, size: 56, color: white)
                                           ),
-                                          onDismissed: (direction) async {
+                                          onDismissed: (direction) {
                                             setState(() {
-                                              // lista.removeAt(index);
+                                              controlRemoveDrink(cartItems[index].id);
                                             });
-                                            showSnackBar(context, 'The drink has been removed from the cart!', 'success');
                                           },
-                                          child: GestureDetector(
-                                            onTap: () {
-                                            },
+                                          child: Container(
                                             child: AnimatedContainer(
                                               duration: Duration(milliseconds: 300),
                                               alignment: Alignment.center,
                                               padding: EdgeInsets.only(left: 20, top: 8, right: 3, bottom: 8),
                                               height: 150,
                                               width: 370,
-                                              color: white,
+                                              color: Colors.transparent,
                                               child: Row(
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
@@ -239,8 +244,11 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
                                                                     padding: EdgeInsets.zero,
                                                                     onPressed: () {
                                                                       setState(() {
-                                                                        if(quantity > 1) {
-                                                                          quantity--;
+                                                                        if(int.parse(cartItems[index].quantity) > 1) {
+                                                                          controlDecreaseQuantity(cartItems[index].id, cartItems[index].quantity);
+                                                                        }
+                                                                        else {
+                                                                          showSnackBar(context, "Quantity must not be zero ", "error");
                                                                         }
                                                                       });
                                                                     },
@@ -272,8 +280,11 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
                                                                     padding: EdgeInsets.zero,
                                                                     onPressed: () {
                                                                       setState(() {
-                                                                        if(quantity < 99) {
-                                                                          quantity++;
+                                                                        if(int.parse(cartItems[index].quantity) < 99) {
+                                                                          controlIncreaseQuantity(cartItems[index].id, cartItems[index].quantity);
+                                                                        }
+                                                                        else {
+                                                                          showSnackBar(context, "Quantity must be below 100", "error");
                                                                         }
                                                                       });
                                                                     },
@@ -312,6 +323,46 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
                                       }
                                     ),
                                     SizedBox(height: 32),
+                                    cartItems.isEmpty ? Container() : Container(
+                                      padding: EdgeInsets.only(right: 20, bottom: 30),
+                                      child: GestureDetector(
+                                        onTap: () => controlAddNewOrder(),
+                                        child: AnimatedContainer(
+                                          alignment: Alignment.center,
+                                          duration: Duration(milliseconds: 300),
+                                          height: 48,
+                                          width: 180,
+                                          decoration: BoxDecoration(
+                                            color: blackLight,
+                                            borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                bottomRight: Radius.circular(20)),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: black.withOpacity(0.1),
+                                                spreadRadius: 0,
+                                                blurRadius: 64,
+                                                offset: Offset(15, 15), // changes position of shadow
+                                              ),
+                                              BoxShadow(
+                                                color: black.withOpacity(0.25),
+                                                spreadRadius: 0,
+                                                blurRadius: 4,
+                                                offset: Offset(0, 4), // changes position of shadow
+                                              ),
+                                            ],
+                                          ),
+                                          child: Text(
+                                            "Confirm Order",
+                                            style: TextStyle(
+                                                color: white,
+                                                fontFamily: 'SFProText',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: textButton16),
+                                          ),
+                                        ),
+                                      ), 
+                                    ),                                   
                                   ]
                                 );
                               },
@@ -329,6 +380,26 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
     );
   }
 
+  controlIncreaseQuantity(String _id, String _quantity) {
+    String _quantityIncreased = (int.parse(_quantity) + 1).toString();
+    cartsReference.doc(currentUser.id).collection("myCart").doc(_id).update({
+      "quantity": _quantityIncreased,
+    });
+  }
+
+  controlDecreaseQuantity(String _id, String _quantity) {
+    String _quantityDecreased = (int.parse(_quantity) - 1).toString();
+    cartsReference.doc(currentUser.id).collection("myCart").doc(_id).update({
+      "quantity": _quantityDecreased,
+    });
+  }
+
+  controlRemoveDrink(String _id) {
+    cartsReference.doc(currentUser.id).collection("myCart").doc(_id).delete().whenComplete((){
+      showSnackBar(context, "Drink removed from your cart successfully!", "success");
+    });
+  }
+
   getDrinksInCart() async {
     cartItems.clear();
     QuerySnapshot querySnapshot = await cartsReference.doc(currentUser.id).collection("myCart").get();
@@ -342,20 +413,73 @@ class _svDrinkCartScreenState extends State<svDrinkCartScreen> {
   }
 
   displayDrinkImage(String _url, double _height, double _width) => ClipRRect(
-  child: CachedNetworkImage(
-    imageUrl: _url,
-    height: _height,
-    width: _width,
-    placeholder: (context, url) => 
-      Center(child: SizedBox(
-          child: CircularProgressIndicator(
-            color: blackLight,
-            strokeWidth: 3,
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      placeholder: (context, url) => 
+        Center(child: SizedBox(
+            child: CircularProgressIndicator(
+              color: blackLight,
+              strokeWidth: 3,
+            ),
+            height: 25.0,
+            width: 25.0,
           ),
-          height: 25.0,
-          width: 25.0,
         ),
-      ),
-  ),
-);
+    ),
+  );
+
+  addItemsToOrderDetails() {
+    orderDetails.clear();
+    for (int i = 0; i < cartItems.length; i++) {
+      OrderDetail orderDetail = OrderDetail();
+      orderDetail.name = cartItems[i].name + " x " + cartItems[i].quantity;
+      orderDetail.options = cartItems[i].options;
+      orderDetail.quantity = cartItems[i].quantity;
+      orderDetail.price = (int.parse(cartItems[i].unit_price) * int.parse(cartItems[i].quantity)).toString();
+      orderDetails.add(orderDetail);
+    }
+    for (int i = 0; i < orderDetails.length; i++) {
+      totalMoney = totalMoney + int.parse(orderDetails[i].price);
+    }
+  }
+
+  controlAddNewOrder() async {
+    addItemsToOrderDetails();
+    List orderDetailsList = [];
+    for (int i = 0; i < orderDetails.length; i++)
+      orderDetailsList.add({
+        "name": orderDetails.toList()[i].name,
+        "options": orderDetails.toList()[i].options,
+        "quantity": orderDetails.toList()[i].quantity,
+        "price": orderDetails.toList()[i].price,        
+    });
+    var rand = new Random();
+    var orderCode = rand.nextInt(9000) + 1000;
+    List<String> myUserId = [currentUser.id];
+    ordersReference.add({
+      "id": "",
+      "serveId": currentUser.id,
+      "code": "#" + orderCode.toString(),
+      "staffs": FieldValue.arrayUnion(myUserId),
+      "details": FieldValue.arrayUnion(orderDetailsList),
+      "total money": totalMoney.toString(),
+      "isCheckedOutByServe": "false",
+      "isCheckedOutByBartender": "false",
+      "isCheckedOutByAccountant": "false", 
+      "isConfirmedPurchased": "false",           
+      "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+    }).then(
+      (DocumentReference docRef) => docRef.update({"id": docRef.id})
+    ).whenComplete(() async {
+      await cartsReference.doc(currentUser.id).collection("myCart").get().then((snapshot) {
+        for (DocumentSnapshot ds in snapshot.docs){
+          ds.reference.delete();
+        }        
+      });
+    });
+    Navigator.pop(context);
+    showSnackBar(context, "Added to orders list successfully!", "success");    
+  }
 }
