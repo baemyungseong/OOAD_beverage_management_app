@@ -51,6 +51,7 @@ class _signInScreenState extends State<signInScreen> {
 
   List<String> _listImage = [atAdsLogin1, atAdsLogin2, atAdsLogin3];
   double _currentPosition = 1.0;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -325,8 +326,6 @@ class _signInScreenState extends State<signInScreen> {
                           padding: EdgeInsets.only(top: 16),
                           child: GestureDetector(
                             onTap: () {
-                              firebaseAuth()
-                                  .resetPassword(emailController.text, context);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -345,48 +344,113 @@ class _signInScreenState extends State<signInScreen> {
                   ),
                 ),
                 Container(
-                    padding: EdgeInsets.all(appPadding),
-                    alignment: Alignment.center,
-                    child: GestureDetector(
-                      //action navigate to dashboard screen
-                      onTap: () {
+                  padding: EdgeInsets.all(appPadding),
+                  alignment: Alignment.center,
+                  // height: 48,
+                  // width: 200,
+                  // decoration: BoxDecoration(
+                  //   // color: blackLight,
+                  //   // borderRadius: BorderRadius.all(Radius.circular(16)),
+                  //   boxShadow: [
+                  //     BoxShadow(
+                  //       color: black.withOpacity(0.25),
+                  //       spreadRadius: 0,
+                  //       blurRadius: 4,
+                  //       offset: Offset(0, 4), // changes position of shadow
+                  //     ),
+                  //     BoxShadow(
+                  //       color: black.withOpacity(0.1),
+                  //       spreadRadius: 0,
+                  //       blurRadius: 64,
+                  //       offset: Offset(15, 15), // changes position of shadow
+                  //     ),
+                  //   ],
+                  // ),
+                  // height: 48,
+                  // width: 200,
+                  child: ElevatedButton(
+                    //action navigate to dashboard screen
+                    onPressed: () async {
+                      if (isLoading) return;
+                      setState(() {
+                        isLoading = true;
                         controlSignIn();
-                      },
-                      child: AnimatedContainer(
-                        alignment: Alignment.center,
-                        duration: Duration(milliseconds: 300),
-                        height: 48,
-                        width: 200,
-                        decoration: BoxDecoration(
-                          color: blackLight,
-                          borderRadius: BorderRadius.all(Radius.circular(16)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: black.withOpacity(0.25),
-                              spreadRadius: 0,
-                              blurRadius: 4,
-                              offset:
-                                  Offset(0, 4), // changes position of shadow
+                      });
+                      await Future.delayed(Duration(seconds: 3));
+                      if (this.mounted) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        primary: blackLight,
+                        onPrimary: Colors.white,
+                        shadowColor: black.withOpacity(0.25),
+                        elevation: 15,
+                        animationDuration: Duration(milliseconds: 300),
+                        // maximumSize: Size.fromWidth(200),
+                        minimumSize: Size(200, 48),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(16.0)),
+                        // BorderRadius.all(Radius.circular(16)),
+                        textStyle: TextStyle(
+                            color: whiteLight,
+                            fontFamily: 'SFProText',
+                            fontWeight: FontWeight.w600,
+                            fontSize: textButton20)),
+                    // child: AnimatedContainer(
+                    //   alignment: Alignment.center,
+                    //   duration: Duration(milliseconds: 300),
+                    //   height: 48,
+                    //   width: 200,
+                    //   decoration: BoxDecoration(
+                    //     color: blackLight,
+                    //     borderRadius: BorderRadius.all(Radius.circular(16)),
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: black.withOpacity(0.25),
+                    //         spreadRadius: 0,
+                    //         blurRadius: 4,
+                    //         offset:
+                    //             Offset(0, 4), // changes position of shadow
+                    //       ),
+                    //       BoxShadow(
+                    //         color: black.withOpacity(0.1),
+                    //         spreadRadius: 0,
+                    //         blurRadius: 64,
+                    //         offset:
+                    //             Offset(15, 15), // changes position of shadow
+                    //       ),
+                    //     ],
+                    //   ),
+                    child: isLoading
+                        ? Container(
+                            height: 48,
+                            width: 200,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                        color: white)),
+                                const SizedBox(width: 16),
+                                Text("Please wait..."),
+                              ],
                             ),
-                            BoxShadow(
-                              color: black.withOpacity(0.1),
-                              spreadRadius: 0,
-                              blurRadius: 64,
-                              offset:
-                                  Offset(15, 15), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          "Sign in",
-                          style: TextStyle(
-                              color: whiteLight,
-                              fontFamily: 'SFProText',
-                              fontWeight: FontWeight.w600,
-                              fontSize: textButton20),
-                        ),
-                      ),
-                    )),
+                          )
+                        : Text(
+                            "Sign in",
+                            // style: TextStyle(
+                            //     color: whiteLight,
+                            //     fontFamily: 'SFProText',
+                            //     fontWeight: FontWeight.w600,
+                            //     fontSize: textButton20),
+                          ),
+                  ),
+                ),
               ],
             )),
       ),
@@ -395,61 +459,132 @@ class _signInScreenState extends State<signInScreen> {
 
   //Control sign-in
   controlSignIn() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
     if (emailFormKey.currentState!.validate() &&
         passwordFormKey.currentState!.validate()) {
       PlatformStringCryptor cryptor;
       cryptor = PlatformStringCryptor();
       final salt = await cryptor.generateSalt();
-
       //Firebase auth
-      firebaseAuth()
-          .signIn(emailController.text, passwordController.text, context)
-          .then((val) async {
-        final FirebaseAuth auth = FirebaseAuth.instance;
-        final User? user = auth.currentUser;
-        final uid = user?.uid;
+      try {
+        await auth
+            .signInWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text)
+            .then((val) async {
+          final User? user = auth.currentUser;
+          final uid = user?.uid;
+          if (val != null) {
+            isLoading = true;
+            var key = await cryptor.generateKeyFromPassword(
+                passwordController.text, salt);
+            var encrypted = await cryptor.encrypt(passwordController.text, key);
 
-        if (val != null) {
-          var key = await cryptor.generateKeyFromPassword(
-              passwordController.text, salt);
-          var encrypted = await cryptor.encrypt(passwordController.text, key);
+            //Update new decoded_pw and new key
+            userReference.doc(uid).update({
+              "encoded_pw": encrypted,
+              "key": key,
+            });
+            DocumentSnapshot documentSnapshot =
+                await userReference.doc(uid).get();
+            currentUser = appUser.fromDocument(documentSnapshot);
 
-          //Update new decoded_pw and new key
-          userReference.doc(uid).update({
-            "encoded_pw": encrypted,
-            "key": key,
-          });
+            //Switch account due to specific role
+            if (currentUser.role == "storekeeper")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => storekeeperNavigationBar()),
+                  (Route<dynamic> route) => route is storekeeperNavigationBar);
+            else if (currentUser.role == "serve")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => serveNavigationBar()),
+                  (Route<dynamic> route) => route is serveNavigationBar);
+            else if (currentUser.role == "bartender")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => bartenderNavigationBar()),
+                  (Route<dynamic> route) => route is bartenderNavigationBar);
+            else if (currentUser.role == "accountant")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => accountantNavigationBar()),
+                  (Route<dynamic> route) => route is accountantNavigationBar);
+          }
+        });
+      } on FirebaseAuthException catch (e) {
+        print(e.code);
+        switch (e.code) {
+          case "user-not-found":
+            showSnackBar(
+                context, "Your email is not found, please check!", 'error');
+            break;
+          case "wrong-password":
+            showSnackBar(
+                context, "Your password is wrong, please check!", 'error');
+            break;
+          case "invalid-email":
+            showSnackBar(
+                context, "Your email is invalid, please check!", 'error');
+            break;
+          case "user-disabled":
+            showSnackBar(
+                context, "The user account has been disabled!", 'error');
+            break;
+          case "too-many-requests":
+            showSnackBar(
+                context, "There was too many attempts to sign in!", 'error');
+            break;
+          case "operation-not-allowed":
+            showSnackBar(context, "The user account are not enabled!", 'error');
+            break;
+          // // Preventing user from entering email already provided by other login method
+          // case "account-exists-with-different-credential":
+          //   showErrorSnackBar(context, "This account exists with a different sign in provider!");
+          //   break;
 
-          DocumentSnapshot documentSnapshot =
-              await userReference.doc(uid).get();
-          currentUser = appUser.fromDocument(documentSnapshot);
-
-          //Switch account due to specific role
-          if (currentUser.role == "storekeeper")
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => storekeeperNavigationBar()),
-                (Route<dynamic> route) => route is storekeeperNavigationBar);
-          else if (currentUser.role == "serve")
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => serveNavigationBar()),
-                (Route<dynamic> route) => route is serveNavigationBar);
-          else if (currentUser.role == "bartender")
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => bartenderNavigationBar()),
-                (Route<dynamic> route) => route is bartenderNavigationBar);
-          else if (currentUser.role == "accountant")
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => accountantNavigationBar()),
-                (Route<dynamic> route) => route is accountantNavigationBar);
+          default:
+            showSnackBar(context, "An undefined Error happened.", 'error');
         }
-      });
+      } on PlatformException catch (e) {
+        print(e.message);
+        switch (e.message) {
+          case "user-not-found":
+            showSnackBar(
+                context, "Your email is not found, please check!", 'error');
+            break;
+          case "wrong-password":
+            showSnackBar(
+                context, "Your password is wrong, please check!", 'error');
+            break;
+          case "invalid-email":
+            showSnackBar(
+                context, "Your email is invalid, please check!", 'error');
+            break;
+          case "user-disabled":
+            showSnackBar(
+                context, "The user account has been disabled!", 'error');
+            break;
+          case "too-many-requests":
+            showSnackBar(
+                context, "There was too many attempts to sign in!", 'error');
+            break;
+          case "operation-not-allowed":
+            showSnackBar(context, "The user account are not enabled!", 'error');
+            break;
+          // // Preventing user from entering email already provided by other login method
+          // case "account-exists-with-different-credential":
+          //   showErrorSnackBar(context, "This account exists with a different sign in provider!");
+          //   break;
+
+          default:
+            showSnackBar(context, "An undefined Error happened.", 'error');
+        }
+      } catch (e) {
+        print(e.toString());
+      }
     }
   }
 
