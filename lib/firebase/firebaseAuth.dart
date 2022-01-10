@@ -38,13 +38,27 @@ class firebaseAuth {
     FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
     // return _firebaseAuth.signInWithEmailAndPassword(
     //     email: email, password: password);
+    PlatformStringCryptor cryptor;
+    cryptor = PlatformStringCryptor();
+    final salt = await cryptor.generateSalt();
+
     try {
       await _firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password)
           .then((value) async {
-        print("successfully login!");
-        final User? user = _firebaseAuth.currentUser;
+        var key = await cryptor.generateKeyFromPassword(password, salt);
+        var encrypted = await cryptor.encrypt(password, key);
+        final FirebaseAuth auth = FirebaseAuth.instance;
+        final User? user = auth.currentUser;
         final uid = user?.uid;
+        //Update new decoded_pw and new key
+        userReference.doc(uid).update({
+          "encoded_pw": encrypted,
+          "key": key,
+        });
+        print("successfully login!");
+        // final User? user = _firebaseAuth.currentUser;
+        // final uid = user?.uid;
         DocumentSnapshot documentSnapshot = await userReference.doc(uid).get();
         currentUser = appUser.fromDocument(documentSnapshot);
         print("Your current id is $uid");
