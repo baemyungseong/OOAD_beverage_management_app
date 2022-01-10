@@ -97,84 +97,119 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
       "goodsDetail": importSubIdList,
       'total': total.toStringAsFixed(0).toString(),
     }).then((value) {
-      var check = false;
+      if (mounted) {
+        setState(() {});
+      }
+      // setState(() {
+      // var check = false;
       n = 0;
-      setState(() {
-        FirebaseFirestore.instance.collection("imports").doc(value.id).update({
-          'id': newIdImport = value.id,
-        });
-        // .whenComplete(() {
-        name.forEach((element1) {
-          FirebaseFirestore.instance.collection('goods').get().then((value1) {
-            value1.docs.forEach((element2) {
-              if (element1 == element2.data()['name'] as String) {
-                check = true;
-                oldIdGood = '';
-                oldIdGood = element2.data()['id'] as String;
-                sum = (double.parse(quantity[n] + ".0") +
-                    double.parse((element2.data()["quantity"]) as String));
-                print("name");
-                print(element2.data()['name'] as String);
-                print("Ket qua");
-                print(check);
-                print("oldIdGood");
-                print(oldIdGood);
-                print(element2.data()['id'] as String);
-                print("Sum");
-                print(sum);
-                FirebaseFirestore.instance
-                    .collection('goods')
-                    .doc(oldIdGood)
-                    .update({
-                  'quantity': sum.toStringAsFixed(0).toString(),
-                }).whenComplete(() {
-                  importSubIdList.forEach((element3) {
-                    FirebaseFirestore.instance
-                        .collection('importSubs')
-                        .doc(element3)
-                        .update({
-                      'idImport': newIdImport,
-                      'idGood': oldIdGood,
-                    });
+      FirebaseFirestore.instance.collection("imports").doc(value.id).update({
+        'id': newIdImport = value.id,
+      });
+      // .whenComplete(() {
+      name.forEach((element1) {
+        FirebaseFirestore.instance.collection('goods').get().then((value1) {
+          var check = false;
+          value1.docs.forEach((element2) {
+            if (element1 == element2.data()['name'] as String) {
+              check = true;
+              oldIdGood = '';
+              oldIdGood = element2.data()['id'] as String;
+              sum = (double.parse(quantity[n] + ".0") +
+                  double.parse((element2.data()["quantity"]) as String));
+              print("name");
+              print(element2.data()['name'] as String);
+              print("Ket qua");
+              print(check);
+              print("oldIdGood");
+              print(oldIdGood);
+              print(element2.data()['id'] as String);
+              print("Sum");
+              print(sum);
+              FirebaseFirestore.instance
+                  .collection('goods')
+                  .doc(oldIdGood)
+                  .update({
+                'quantity': sum.toStringAsFixed(0).toString(),
+              }).whenComplete(() {
+                importSubIdList.forEach((element3) {
+                  FirebaseFirestore.instance
+                      .collection('importSubs')
+                      .doc(element3)
+                      .update({
+                    'idImport': newIdImport,
+                    'idGood': oldIdGood,
                   });
                 });
-              }
-            });
+              });
+            }
           });
-          // .then((value) {
-          // if (check == false) {
-          //   FirebaseFirestore.instance.collection('goods').add({
-          //     'name': element1,
-          //     'image': 'https://i.imgur.com/RIkxRfd.png',
-          //     'quantity': quantity[n],
-          //   }).then((value5) {
-          //     FirebaseFirestore.instance
-          //         .collection('goods')
-          //         .doc(value5.id)
-          //         .update({
-          //       'id': newIdGood = value5.id,
-          //     }).whenComplete(() {
-          //       importSubIdList.forEach((element) {
-          //         FirebaseFirestore.instance
-          //             .collection('importSubs')
-          //             .doc(element)
-          //             .update({
-          //           'idImport': newIdImport,
-          //           'idGood': newIdGood,
-          //         });
-          //       });
-          //     });
-          //   });
-          // }
-          // });
-          // setState(() {
-          //   n = n + 1;
-          //   print(n);
+          print("check trong if:");
+          print(check);
+          if (check == false) {
+            FirebaseFirestore.instance.collection('goods').add({
+              'name': element1,
+              'image': 'https://i.imgur.com/RIkxRfd.png',
+              'quantity': quantity[n],
+            }).then((value5) {
+              FirebaseFirestore.instance
+                  .collection('goods')
+                  .doc(value5.id)
+                  .update({
+                'id': newIdGood = value5.id,
+              }).whenComplete(() {
+                importSubIdList.forEach((element) {
+                  FirebaseFirestore.instance
+                      .collection('importSubs')
+                      .doc(element)
+                      .update({
+                    'idImport': newIdImport,
+                    'idGood': newIdGood,
+                  });
+                });
+              });
+            });
+          }
+          n = n + 1;
+          print("n = n + 1");
+          print(n);
           // });
         });
 
+        // .then((value) {
+        // if (check == false) {
+        //   FirebaseFirestore.instance.collection('goods').add({
+        //     'name': element1,
+        //     'image': 'https://i.imgur.com/RIkxRfd.png',
+        //     'quantity': quantity[n],
+        //   }).then((value5) {
+        //     FirebaseFirestore.instance
+        //         .collection('goods')
+        //         .doc(value5.id)
+        //         .update({
+        //       'id': newIdGood = value5.id,
+        //     }).whenComplete(() {
+        //       importSubIdList.forEach((element) {
+        //         FirebaseFirestore.instance
+        //             .collection('importSubs')
+        //             .doc(element)
+        //             .update({
+        //           'idImport': newIdImport,
+        //           'idGood': newIdGood,
+        //         });
+        //       });
+        //     });
+        //   });
+        // }
+        // });
+        // setState(() {
+        //   n = n + 1;
+        //   print(n);
         // });
       });
+
+      // });
+      // });
     });
   }
 
@@ -778,18 +813,18 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
                                                   onDismissed: (direction) {
                                                     // Remove the item from the data source.
                                                     setState(() {
-                                                      total = total -
-                                                          double.parse(quantity[
-                                                                      index] +
-                                                                  ".0") *
-                                                              double.parse(
-                                                                  unit[index] +
-                                                                      ".0");
-                                                      name.removeAt(index);
-                                                      quantity.removeAt(index);
-                                                      unit.removeAt(index);
-                                                      importSubIdList
-                                                          .removeAt(index);
+                                                      // total = total -
+                                                      //     double.parse(quantity[
+                                                      //                 index] +
+                                                      //             ".0") *
+                                                      //         double.parse(
+                                                      //             unit[index] +
+                                                      //                 ".0");
+                                                      // name.removeAt(index);
+                                                      // quantity.removeAt(index);
+                                                      // unit.removeAt(index);
+                                                      // importSubIdList
+                                                      //     .removeAt(index);
                                                       // goodIdList
                                                       //     .removeAt(index);
                                                       // goodList.removeAt(index);

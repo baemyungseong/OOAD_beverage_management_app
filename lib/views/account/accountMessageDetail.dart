@@ -54,7 +54,7 @@ class _messageDetailScreenState extends State<messageDetailScreen> {
   Future getUserDetail() async {
     FirebaseFirestore.instance
         .collection("users")
-        .where("id", isEqualTo: uid2)
+        .where("id", isEqualTo: uid)
         .snapshots()
         .listen((value) {
       setState(() {

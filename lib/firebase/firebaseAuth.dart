@@ -1,12 +1,20 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:ui_fresh_app/views/authentication/checkinEmail.dart';
+import 'package:ui_fresh_app/views/navigationBar/atNavigationBar.dart';
+import 'package:ui_fresh_app/views/navigationBar/btNavigationBar.dart';
+import 'package:ui_fresh_app/views/navigationBar/skNavigationBar.dart';
+import 'package:ui_fresh_app/views/navigationBar/svNavigationBar.dart';
 
+import 'package:ui_fresh_app/models/appUser.dart';
 //import widgets
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 import 'package:flutter_string_encryption/flutter_string_encryption.dart';
+import 'package:path/path.dart';
 
 class firebaseAuth {
   //Sign-up
@@ -28,14 +36,109 @@ class firebaseAuth {
   //Sign-in
   signIn(String email, String password, context) async {
     FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-    return _firebaseAuth.signInWithEmailAndPassword(
-        email: email, password: password);
+    // return _firebaseAuth.signInWithEmailAndPassword(
+    //     email: email, password: password);
+    try {
+      await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password)
+          .then((value) async {
+        print("successfully login!");
+        final User? user = _firebaseAuth.currentUser;
+        final uid = user?.uid;
+        DocumentSnapshot documentSnapshot = await userReference.doc(uid).get();
+        currentUser = appUser.fromDocument(documentSnapshot);
+        print("Your current id is $uid");
+        if (uid != null) {
+          if (currentUser.role == "storekeeper")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => storekeeperNavigationBar()),
+                (Route<dynamic> route) => route is storekeeperNavigationBar);
+          else if (currentUser.role == "serve")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => serveNavigationBar()),
+                (Route<dynamic> route) => route is serveNavigationBar);
+          else if (currentUser.role == "bartender")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => bartenderNavigationBar()),
+                (Route<dynamic> route) => route is bartenderNavigationBar);
+          else if (currentUser.role == "accountant")
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => accountantNavigationBar()),
+                (Route<dynamic> route) => route is accountantNavigationBar);
+        }
+      });
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      switch (e.code) {
+        case "user-not-found":
+          showSnackBar(
+              context, "Your email is not found, please check!", 'error');
+          break;
+        case "wrong-password":
+          showSnackBar(
+              context, "Your password is wrong, please check!", 'error');
+          break;
+        case "invalid-email":
+          showSnackBar(
+              context, "Your email is invalid, please check!", 'error');
+          break;
+        case "user-disabled":
+          showSnackBar(context, "The user account has been disabled!", 'error');
+          break;
+        case "too-many-requests":
+          showSnackBar(
+              context, "There was too many attempts to sign in!", 'error');
+          break;
+        case "operation-not-allowed":
+          showSnackBar(context, "The user account are not enabled!", 'error');
+          break;
+        // // Preventing user from entering email already provided by other login method
+        // case "account-exists-with-different-credential":
+        //   showErrorSnackBar(context, "This account exists with a different sign in provider!");
+        //   break;
+
+        default:
+          showSnackBar(context, "An undefined Error happened.", 'error');
+      }
+    }
   }
 
   //Reset password
-  resetPassword(String email) {
+  resetPassword(String email, context) async {
     FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-    _firebaseAuth.sendPasswordResetEmail(email: email);
+    // _firebaseAuth.sendPasswordResetEmail(email: email);
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email).then((value) => {
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => checkinEmailScreen(),
+            //   ),
+            // )
+          });
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      switch (e.code) {
+        case "invalid-email":
+          showSnackBar(
+              context, "Your email is invalid, please check!", 'error');
+          break;
+        case "user-not-found":
+          showSnackBar(
+              context, "Your email is not found, please check!", 'error');
+          break;
+
+        default:
+          showSnackBar(context, "An undefined Error happened.", 'error');
+      }
+    }
   }
 
   //Sign-out
@@ -57,7 +160,7 @@ class firebaseAuth {
           ),
         );
         user.updatePassword(newPassword).then((_) {
-        controlUpdateEncPw(newPassword);
+          controlUpdateEncPw(newPassword);
           showSnackBar(context, 'Successfully changed password!', 'success');
           Navigator.pop(context);
         }).catchError((error) {
