@@ -422,9 +422,13 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  messageDetailScreen(required,
-                                                      uid: uid,
-                                                      uid2: userList[index].id,
+                                                  messageDetailScreen(
+                                                      required,
+                                                      uid:
+                                                          messagesList[index]
+                                                              .userId1,
+                                                      uid2: messagesList[index]
+                                                          .userId2,
                                                       messagesId:
                                                           messagesList[index]
                                                               .messageId),
@@ -434,9 +438,13 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  messageDetailScreen(required,
-                                                      uid: userList[index].id,
-                                                      uid2: uid,
+                                                  messageDetailScreen(
+                                                      required,
+                                                      uid:
+                                                          messagesList[index]
+                                                              .userId2,
+                                                      uid2: messagesList[index]
+                                                          .userId1,
                                                       messagesId:
                                                           messagesList[index]
                                                               .messageId),
