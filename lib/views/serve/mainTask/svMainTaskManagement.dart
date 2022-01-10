@@ -295,15 +295,7 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                                           SizedBox(height: 24),
                                       itemBuilder: (context, index) {
                                         return GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => svDrinkDetailScreen(),
-                                              ),
-                                            );
-                                            // .then((value) {});
-                                          },
+                                          onTap: () => controlViewOrder(orders[index].id, orders[index].code, orders[index].timestamp, orders[index].totalMoney),
                                           child: AnimatedContainer(
                                             duration: Duration(milliseconds: 300),
                                             child: Row(
@@ -383,7 +375,7 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
                                                 Container(
                                                   width: 102,
                                                   child: Text(
-                                                    "+ \$ " + orders[index].totalMoney + ".0",
+                                                    "+ \$ " + orders[index].totalMoney + ".00",
                                                     maxLines: 1,
                                                     overflow: TextOverflow.fade,
                                                     softWrap: false,
@@ -976,5 +968,22 @@ class _svMainTaskManagementScreenState extends State<svMainTaskManagementScreen>
 
   DateTime dayMonthYearOnly(DateTime dt) {
     return DateTime(dt.year, dt.month, dt.day);
+  }
+
+  controlViewOrder(String _id, String _code, DateTime _timestamp, String _totalMoney) async {
+    var doc = await ordersReference.doc(_id).get();
+    if (doc.exists) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => svDrinkDetailScreen(_id, _code, _timestamp, _totalMoney),
+        ),
+      );      
+    }
+    else {
+      setState(() {
+        showSnackBar(context, "This order no longer exists!", "error");
+      });
+    }
   }  
 }

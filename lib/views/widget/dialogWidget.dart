@@ -1871,7 +1871,7 @@ checkoutImportDialog(BuildContext context, String idImport) {
   );
 }
 
-checkoutDialog(BuildContext context) {
+checkoutDialog(BuildContext context, String _id, List<appUser> _staffs) {
   return showGeneralDialog(
     barrierLabel: "Label",
     barrierDismissible: true,
@@ -1934,7 +1934,7 @@ checkoutDialog(BuildContext context) {
                   ),
                   Container(
                     child: Text(
-                      'Do you want to check out \nthis Drink?',
+                      'Do you want to check out \nthis Order?',
                       style: TextStyle(
                         fontFamily: "SFProText",
                         fontSize: 20,
@@ -1955,11 +1955,7 @@ checkoutDialog(BuildContext context) {
                     width: 24,
                   ),
                   GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                      showSnackBar(
-                          context, 'The order has been passed!', "success");
-                    },
+                    onTap: () => controlCheckOutOrder(context, _id, _staffs),
                     child: Container(
                       width: 122,
                       height: 40,
@@ -3124,6 +3120,243 @@ searchMessageDialog(BuildContext context, List<appUser> appUser1) {
       });
 }
 
+controlCheckOutOrder(context, String _orderID, List<appUser> _staffsList) async {
+  String roleToCheckOut = "";
+  switch (currentUser.role) {
+    case "serve":
+      roleToCheckOut = "isCheckedOutByServe";
+      break;
+    case "bartender":
+      roleToCheckOut = "isCheckedOutByBartender";
+      break;
+    case "accountant":
+      roleToCheckOut = "isCheckedOutByAccountant";
+      break;                 
+  }
+  String isCheckedOut = "";
+  var doc = await ordersReference.doc(_orderID).get();
+  await ordersReference.doc(_orderID).get().then((value) {
+    isCheckedOut = value.data()![roleToCheckOut].toString();
+  });
+  if (doc.exists) {
+    if (isCheckedOut == "false") {
+      ordersReference.doc(_orderID).update({
+        roleToCheckOut: "true",
+        "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+      });
+      if (currentUser.role != "serve") {
+        _staffsList.add(currentUser);
+        List staffsList = [];
+        for (int i = 0; i < _staffsList.length; i++) {
+          staffsList.add(_staffsList[i].id);     
+        }
+        ordersReference.doc(_orderID).update({
+          "staffs": FieldValue.arrayUnion(staffsList),
+        }); 
+      }
+      Navigator.pop(context);
+      Navigator.pop(context);
+      showSnackBar(context, "This order has been checked out successfully!", "success");      
+    }
+    else {
+      Navigator.pop(context);
+      showSnackBar(context, "This order has been checked out by someone else!", "error");
+    }
+  }
+  else {
+    Navigator.pop(context);
+    showSnackBar(context, "This order no longer exists!", "error");    
+  }
+}
+
+dialogRemoveOrder(context, String _orderID) {
+  return showGeneralDialog(
+    barrierLabel: "Label",
+    barrierDismissible: true,
+    barrierColor: Colors.black.withOpacity(0.5),
+    transitionDuration: Duration(milliseconds: 400),
+    context: context,
+    pageBuilder: (context, anim1, anim2) {
+      return Align(
+        alignment: Alignment.center,
+        child: Container(
+          height: 194,
+          width: 299,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFFCB356B),
+                            Color(0xFFBD3F32),
+                          ],
+                          stops: [
+                            0.0,
+                            1.0,
+                          ]),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Iconsax.close_circle,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    child: Text(
+                      'Do you want to remove \nthis Order?',
+                      style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20,
+                        color: blackLight,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () async {
+                      var doc = await ordersReference.doc(_orderID).get();
+                      if (doc.exists) {
+                        ordersReference.doc(_orderID).delete();
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        showSnackBar(context, "The order has been removed!", 'success');
+                      }
+                      else {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        showSnackBar(context, "Failed to remove the order because it no longer exists.", 'error');
+                      }
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFFCB356B),
+                              Color(0xFFBD3F32),
+                            ],
+                            stops: [
+                              0.0,
+                              1.0,
+                            ]),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: black.withOpacity(0.25),
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Remove',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: white,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, anim1, anim2, child) {
+      return SlideTransition(
+        position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim1),
+        child: child,
+      );
+    },
+  );
+}  
+
 displayAvatar(String _url) => ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: CachedNetworkImage(
@@ -3132,6 +3365,16 @@ displayAvatar(String _url) => ClipRRect(
         width: 56,
         fit: BoxFit.cover,
         placeholder: (context, url) =>
-            Center(child: CircularProgressIndicator()),
+          Center(
+          child: 
+            SizedBox(
+              child: CircularProgressIndicator(
+                color: blackLight,
+                strokeWidth: 3,
+              ),
+              height: 25.0,
+              width: 25.0,
+            ),
+        ),
       ),
     );

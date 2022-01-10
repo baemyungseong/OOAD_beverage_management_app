@@ -576,7 +576,7 @@ class _svInvoiceDetailScreenState
                                         //action navigate to dashboard screen
                                         onTap: () {
                                           setState(() {
-                                            checkoutDialog(context);
+                                            //checkoutDialog(context);
                                             isCheckout = true;
                                             // Navigator.pop(context);
                                           });
