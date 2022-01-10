@@ -46,8 +46,8 @@ class skNewAccountCreatingScreen extends StatefulWidget {
       _skNewAccountCreatingScreenState();
 }
 
-class _skNewAccountCreatingScreenState
-    extends State<skNewAccountCreatingScreen> with InputValidationMixin {
+class _skNewAccountCreatingScreenState extends State<skNewAccountCreatingScreen>
+    with InputValidationMixin {
   TextEditingController troubleNameController = TextEditingController();
 
   bool isCheckout = false;
@@ -78,6 +78,7 @@ class _skNewAccountCreatingScreenState
   GlobalKey<FormState> newFormKey = GlobalKey<FormState>();
   TextEditingController confirmController = TextEditingController();
   GlobalKey<FormState> confirmFormKey = GlobalKey<FormState>();
+  bool isLoading = false;
 
   Widget customRadio(String role, int index) {
     return Container(
@@ -194,7 +195,8 @@ class _skNewAccountCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -202,9 +204,11 @@ class _skNewAccountCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: emailController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 // //validator
                                                 // validator: (password) {
                                                 //   if (isPasswordValid(password.toString())) {
@@ -215,18 +219,22 @@ class _skNewAccountCreatingScreenState
                                                 // },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
                                                   hintText: "Enter the email",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -258,7 +266,8 @@ class _skNewAccountCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -266,9 +275,11 @@ class _skNewAccountCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: usernameController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 // //validator
                                                 // validator: (password) {
                                                 //   if (isPasswordValid(password.toString())) {
@@ -279,18 +290,23 @@ class _skNewAccountCreatingScreenState
                                                 // },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Enter the user name",
+                                                  hintText:
+                                                      "Enter the user name",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -322,7 +338,8 @@ class _skNewAccountCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -330,9 +347,11 @@ class _skNewAccountCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: phoneController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 // //validator
                                                 // validator: (password) {
                                                 //   if (isPasswordValid(password.toString())) {
@@ -343,18 +362,23 @@ class _skNewAccountCreatingScreenState
                                                 // },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Enter the phone number",
+                                                  hintText:
+                                                      "Enter the phone number",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -383,8 +407,9 @@ class _skNewAccountCreatingScreenState
                                         child: GestureDetector(
                                           onTap: () async {
                                             String category = "dob";
-                                            DateTime? dt = await datePickerDialog(
-                                                context, selectDate, category);
+                                            DateTime? dt =
+                                                await datePickerDialog(context,
+                                                    selectDate, category);
                                             if (dt != null) {
                                               selectDate = dt;
                                               setState(() {
@@ -395,20 +420,24 @@ class _skNewAccountCreatingScreenState
                                           },
                                           child: AnimatedContainer(
                                               alignment: Alignment.center,
-                                              duration: Duration(milliseconds: 300),
+                                              duration:
+                                                  Duration(milliseconds: 300),
                                               height: 48,
                                               width: 180,
                                               decoration: BoxDecoration(
                                                 color: blueLight,
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
                                                 children: [
                                                   SizedBox(width: 12),
                                                   Container(
                                                       padding: EdgeInsets.zero,
-                                                      alignment: Alignment.center,
+                                                      alignment:
+                                                          Alignment.center,
                                                       child: Icon(
                                                         Iconsax.calendar_1,
                                                         size: 16,
@@ -420,7 +449,8 @@ class _skNewAccountCreatingScreenState
                                                     style: TextStyle(
                                                       color: grey8,
                                                       fontFamily: 'SFProText',
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -443,19 +473,22 @@ class _skNewAccountCreatingScreenState
                                       SizedBox(height: 16),
                                       Container(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             SizedBox(height: 12),
                                             Column(
                                               children: [
                                                 Row(
                                                   children: [
-                                                    customRadio('Accountant', 1),
+                                                    customRadio(
+                                                        'Accountant', 1),
                                                   ],
                                                 ),
                                                 SizedBox(height: 16),
                                                 Row(
-                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
                                                   children: [
                                                     customRadio('Serve', 2),
                                                     SizedBox(
@@ -490,7 +523,8 @@ class _skNewAccountCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -498,9 +532,11 @@ class _skNewAccountCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: newController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 // //validator
                                                 // validator: (password) {
                                                 //   if (isPasswordValid(password.toString())) {
@@ -511,18 +547,23 @@ class _skNewAccountCreatingScreenState
                                                 // },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Enter the password",
+                                                  hintText:
+                                                      "Enter the password",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -554,7 +595,8 @@ class _skNewAccountCreatingScreenState
                                             width: 319,
                                             height: 48,
                                             decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                                 color: blueLight),
                                             alignment: Alignment.topCenter,
                                             child: TextFormField(
@@ -562,9 +604,11 @@ class _skNewAccountCreatingScreenState
                                                     fontFamily: 'SFProText',
                                                     fontSize: content14,
                                                     color: blackLight,
-                                                    fontWeight: FontWeight.w400),
+                                                    fontWeight:
+                                                        FontWeight.w400),
                                                 controller: confirmController,
-                                                keyboardType: TextInputType.text,
+                                                keyboardType:
+                                                    TextInputType.text,
                                                 // //validator
                                                 // validator: (password) {
                                                 //   if (isPasswordValid(password.toString())) {
@@ -575,18 +619,23 @@ class _skNewAccountCreatingScreenState
                                                 // },
                                                 decoration: InputDecoration(
                                                   contentPadding:
-                                                      EdgeInsets.only(left: 20, right: 12),
+                                                      EdgeInsets.only(
+                                                          left: 20, right: 12),
                                                   hintStyle: TextStyle(
                                                       fontFamily: 'SFProText',
                                                       fontSize: content14,
-                                                      fontWeight: FontWeight.w400,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                       color: grey8),
-                                                  hintText: "Confirm the password",
+                                                  hintText:
+                                                      "Confirm the password",
                                                   filled: true,
                                                   fillColor: blueLight,
                                                   border: OutlineInputBorder(
                                                     borderSide: BorderSide.none,
-                                                    borderRadius: BorderRadius.circular(8.0),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0),
                                                   ),
                                                   errorStyle: TextStyle(
                                                     color: Colors.transparent,
@@ -599,29 +648,43 @@ class _skNewAccountCreatingScreenState
                                       ),
                                       SizedBox(height: 40),
                                       Container(
-                                        alignment: Alignment.center,
-                                        child: GestureDetector(
-                                          //action navigate to dashboard screen
-                                          onTap: () {
-                                            if (newController.text != "" &&
-                                                confirmController.text != "") {
-                                              if (newFormKey.currentState!.validate() &&
-                                                  confirmFormKey.currentState!.validate()) {
-                                                if (newController.text ==
+                                          alignment: Alignment.center,
+                                          child: ElevatedButton(
+                                            //action navigate to dashboard screen
+                                            onPressed: () async {
+                                              if (newController.text != "" &&
+                                                  confirmController.text !=
+                                                      "") {
+                                                if (newFormKey.currentState!
+                                                        .validate() &&
+                                                    confirmFormKey.currentState!
+                                                        .validate()) {
+                                                  if (newController.text ==
                                                       confirmController.text) {
-                                                    controlCreateAccount();
-                                                    Timer(Duration(seconds: 4), () {
-                                                      showSnackBar(
+                                                    setState(() {
+                                                      isLoading = true;
+                                                      controlCreateAccount();
+                                                    });
+                                                    await Future.delayed(
+                                                        Duration(seconds: 4));
+                                                    if (this.mounted) {
+                                                      setState(() {
+                                                        isLoading = false;
+                                                        showSnackBar(
+                                                            context,
+                                                            'Successfully created the account!',
+                                                            'success');
+                                                        Navigator.push(
                                                           context,
-                                                          'Successfully created the account!',
-                                                          'success');
-                                                      Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) => skCreateAccountSuccessfullyScreen(),
-                                                        ),
-                                                      );                                                            
-                                                    });    
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                skCreateAccountSuccessfullyScreen(),
+                                                          ),
+                                                        );
+                                                      });
+                                                    }
+                                                    ;
+                                                    // });
                                                     // .then((value) {});
                                                   } else {
                                                     showSnackBar(
@@ -629,62 +692,107 @@ class _skNewAccountCreatingScreenState
                                                         "New password isn't confirmed correctly",
                                                         'error');
                                                   }
+                                                } else {
+                                                  showSnackBar(
+                                                      context,
+                                                      'Your password must be more than 6',
+                                                      'error');
+                                                }
                                               } else {
-                                                showSnackBar(context,
-                                                    'Your password must be more than 6', 'error');
+                                                showSnackBar(
+                                                    context,
+                                                    'Your password can not be blank!',
+                                                    'error');
                                               }
-                                            } else {
-                                              showSnackBar(context, 'Your password can not be blank!',
-                                                  'error');
-                                            }
-                                          },
-                                          child: AnimatedContainer(
-                                            alignment: Alignment.center,
-                                            duration: Duration(milliseconds: 300),
-                                            height: 48,
-                                            width: 200,
-                                            decoration: BoxDecoration(
-                                              color: (isCheckout) ? white : blackLight,
-                                              borderRadius:
-                                                  BorderRadius.all(Radius.circular(12)),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: black.withOpacity(0.25),
-                                                  spreadRadius: 0,
-                                                  blurRadius: 4,
-                                                  offset: Offset(
-                                                      0, 4), // changes position of shadow
-                                                ),
-                                                BoxShadow(
-                                                  color: black.withOpacity(0.1),
-                                                  spreadRadius: 0,
-                                                  blurRadius: 64,
-                                                  offset: Offset(
-                                                      15, 15), // changes position of shadow
-                                                ),
-                                              ],
-                                            ),
-                                            child: (isCheckout) 
-                                            ? Container(
-                                              child: Icon(Iconsax.refresh, size: 24, color: blackLight),
-                                            )
-                                            : Container(
-                                              child: Text(
-                                                "Create Account",
-                                                style: TextStyle(
-                                                  color: whiteLight,
-                                                  fontFamily: 'SFProText',
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: textButton20
-                                                ),
-                                              )
-                                            ),
-                                          ),
-                                        )
-                                      ),
+                                            },
+                                            // child: AnimatedContainer(
+                                            //   alignment: Alignment.center,
+                                            //   duration:
+                                            //       Duration(milliseconds: 300),
+                                            //   height: 48,
+                                            //   width: 200,
+                                            //   decoration: BoxDecoration(
+                                            //     color: (isCheckout)
+                                            //         ? white
+                                            //         : blackLight,
+                                            //     borderRadius: BorderRadius.all(
+                                            //         Radius.circular(12)),
+                                            //     boxShadow: [
+                                            //       BoxShadow(
+                                            //         color:
+                                            //             black.withOpacity(0.25),
+                                            //         spreadRadius: 0,
+                                            //         blurRadius: 4,
+                                            //         offset: Offset(0,
+                                            //             4), // changes position of shadow
+                                            //       ),
+                                            //       BoxShadow(
+                                            //         color:
+                                            //             black.withOpacity(0.1),
+                                            //         spreadRadius: 0,
+                                            //         blurRadius: 64,
+                                            //         offset: Offset(15,
+                                            //             15), // changes position of shadow
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            style: ElevatedButton.styleFrom(
+                                                primary: blackLight,
+                                                onPrimary: Colors.white,
+                                                shadowColor:
+                                                    black.withOpacity(0.25),
+                                                elevation: 15,
+                                                animationDuration:
+                                                    Duration(milliseconds: 300),
+                                                // maximumSize: Size.fromWidth(200),
+                                                minimumSize: Size(200, 48),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        new BorderRadius
+                                                            .circular(16.0)),
+                                                // BorderRadius.all(Radius.circular(16)),
+                                                textStyle: TextStyle(
+                                                    color: whiteLight,
+                                                    fontFamily: 'SFProText',
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: textButton20)),
+                                            child: (isLoading)
+                                                ? Container(
+                                                    height: 48,
+                                                    width: 200,
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        SizedBox(
+                                                            width: 24,
+                                                            height: 24,
+                                                            child:
+                                                                CircularProgressIndicator(
+                                                                    color:
+                                                                        white)),
+                                                        const SizedBox(
+                                                            width: 16),
+                                                        Text("Please wait..."),
+                                                      ],
+                                                    ))
+                                                : Container(
+                                                    child: Text(
+                                                    "Create Account",
+                                                    // style: TextStyle(
+                                                    //     color: whiteLight,
+                                                    //     fontFamily:
+                                                    //         'SFProText',
+                                                    //     fontWeight:
+                                                    //         FontWeight.w600,
+                                                    //     fontSize:
+                                                    //         textButton20),
+                                                  )),
+                                            // ),
+                                          )),
                                       SizedBox(height: 24)
-                                    ]
-                                ),
+                                    ]),
                               )
                             ],
                           ),
@@ -714,10 +822,10 @@ class _skNewAccountCreatingScreenState
       ),
     );
   }
-  
+
   controlCreateAccount() async {
     var randomAvatar = avatars[Random().nextInt(avatars.length)];
-      switch (selected) {
+    switch (selected) {
       case 1:
         selectedRole = "accountant";
         break;
@@ -726,18 +834,21 @@ class _skNewAccountCreatingScreenState
         break;
       case 3:
         selectedRole = "bartender";
-        break;               
+        break;
     }
 
     PlatformStringCryptor cryptor;
     cryptor = PlatformStringCryptor();
     final salt = await cryptor.generateSalt();
 
-    firebaseAuth().signUp(emailController.text, confirmController.text, context).then((val) async {
+    firebaseAuth()
+        .signUp(emailController.text, confirmController.text, context)
+        .then((val) async {
       final FirebaseAuth auth = FirebaseAuth.instance;
       final User? user = auth.currentUser;
       final uid = user?.uid;
-      var key = await cryptor.generateKeyFromPassword(confirmController.text, salt);
+      var key =
+          await cryptor.generateKeyFromPassword(confirmController.text, salt);
       var encrypted = await cryptor.encrypt(confirmController.text, key);
       if (val != null) {
         userReference.doc(uid).set({

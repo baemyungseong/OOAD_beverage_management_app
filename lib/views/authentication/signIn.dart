@@ -459,63 +459,132 @@ class _signInScreenState extends State<signInScreen> {
 
   //Control sign-in
   controlSignIn() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
     if (emailFormKey.currentState!.validate() &&
         passwordFormKey.currentState!.validate()) {
-      // PlatformStringCryptor cryptor;
-      // cryptor = PlatformStringCryptor();
-      // final salt = await cryptor.generateSalt();
-
+      PlatformStringCryptor cryptor;
+      cryptor = PlatformStringCryptor();
+      final salt = await cryptor.generateSalt();
       //Firebase auth
-      firebaseAuth()
-          .signIn(emailController.text, passwordController.text, context)
-          .then((val) async {
-        // final FirebaseAuth auth = FirebaseAuth.instance;
-        // final User? user = auth.currentUser;
-        // final uid = user?.uid;
-        // if (val != null) {
-        //   isLoading = true;
-        //   var key = await cryptor.generateKeyFromPassword(
-        //       passwordController.text, salt);
-        //   var encrypted = await cryptor.encrypt(passwordController.text, key);
+      try {
+        await auth
+            .signInWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text)
+            .then((val) async {
+          final User? user = auth.currentUser;
+          final uid = user?.uid;
+          if (val != null) {
+            isLoading = true;
+            var key = await cryptor.generateKeyFromPassword(
+                passwordController.text, salt);
+            var encrypted = await cryptor.encrypt(passwordController.text, key);
 
-        //   //Update new decoded_pw and new key
-        //   userReference.doc(uid).update({
-        //     "encoded_pw": encrypted,
-        //     "key": key,
-        //   });
+            //Update new decoded_pw and new key
+            userReference.doc(uid).update({
+              "encoded_pw": encrypted,
+              "key": key,
+            });
+            DocumentSnapshot documentSnapshot =
+                await userReference.doc(uid).get();
+            currentUser = appUser.fromDocument(documentSnapshot);
 
-        //   DocumentSnapshot documentSnapshot =
-        //       await userReference.doc(uid).get();
-        //   currentUser = appUser.fromDocument(documentSnapshot);
+            //Switch account due to specific role
+            if (currentUser.role == "storekeeper")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => storekeeperNavigationBar()),
+                  (Route<dynamic> route) => route is storekeeperNavigationBar);
+            else if (currentUser.role == "serve")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => serveNavigationBar()),
+                  (Route<dynamic> route) => route is serveNavigationBar);
+            else if (currentUser.role == "bartender")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => bartenderNavigationBar()),
+                  (Route<dynamic> route) => route is bartenderNavigationBar);
+            else if (currentUser.role == "accountant")
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => accountantNavigationBar()),
+                  (Route<dynamic> route) => route is accountantNavigationBar);
+          }
+        });
+      } on FirebaseAuthException catch (e) {
+        print(e.code);
+        switch (e.code) {
+          case "user-not-found":
+            showSnackBar(
+                context, "Your email is not found, please check!", 'error');
+            break;
+          case "wrong-password":
+            showSnackBar(
+                context, "Your password is wrong, please check!", 'error');
+            break;
+          case "invalid-email":
+            showSnackBar(
+                context, "Your email is invalid, please check!", 'error');
+            break;
+          case "user-disabled":
+            showSnackBar(
+                context, "The user account has been disabled!", 'error');
+            break;
+          case "too-many-requests":
+            showSnackBar(
+                context, "There was too many attempts to sign in!", 'error');
+            break;
+          case "operation-not-allowed":
+            showSnackBar(context, "The user account are not enabled!", 'error');
+            break;
+          // // Preventing user from entering email already provided by other login method
+          // case "account-exists-with-different-credential":
+          //   showErrorSnackBar(context, "This account exists with a different sign in provider!");
+          //   break;
 
-        //   //Switch account due to specific role
-        //   if (currentUser.role == "storekeeper")
-        //     Navigator.pushAndRemoveUntil(
-        //         context,
-        //         MaterialPageRoute(
-        //             builder: (context) => storekeeperNavigationBar()),
-        //         (Route<dynamic> route) => route is storekeeperNavigationBar);
-        //   else if (currentUser.role == "serve")
-        //     Navigator.pushAndRemoveUntil(
-        //         context,
-        //         MaterialPageRoute(builder: (context) => serveNavigationBar()),
-        //         (Route<dynamic> route) => route is serveNavigationBar);
-        //   else if (currentUser.role == "bartender")
-        //     Navigator.pushAndRemoveUntil(
-        //         context,
-        //         MaterialPageRoute(
-        //             builder: (context) => bartenderNavigationBar()),
-        //         (Route<dynamic> route) => route is bartenderNavigationBar);
-        //   else if (currentUser.role == "accountant")
-        //     Navigator.pushAndRemoveUntil(
-        //         context,
-        //         MaterialPageRoute(
-        //             builder: (context) => accountantNavigationBar()),
-        //         (Route<dynamic> route) => route is accountantNavigationBar);
-        // } else {
-        //   isLoading = false;
-        // }
-      });
+          default:
+            showSnackBar(context, "An undefined Error happened.", 'error');
+        }
+      } on PlatformException catch (e) {
+        print(e.message);
+        switch (e.message) {
+          case "user-not-found":
+            showSnackBar(
+                context, "Your email is not found, please check!", 'error');
+            break;
+          case "wrong-password":
+            showSnackBar(
+                context, "Your password is wrong, please check!", 'error');
+            break;
+          case "invalid-email":
+            showSnackBar(
+                context, "Your email is invalid, please check!", 'error');
+            break;
+          case "user-disabled":
+            showSnackBar(
+                context, "The user account has been disabled!", 'error');
+            break;
+          case "too-many-requests":
+            showSnackBar(
+                context, "There was too many attempts to sign in!", 'error');
+            break;
+          case "operation-not-allowed":
+            showSnackBar(context, "The user account are not enabled!", 'error');
+            break;
+          // // Preventing user from entering email already provided by other login method
+          // case "account-exists-with-different-credential":
+          //   showErrorSnackBar(context, "This account exists with a different sign in provider!");
+          //   break;
+
+          default:
+            showSnackBar(context, "An undefined Error happened.", 'error');
+        }
+      } catch (e) {
+        print(e.toString());
+      }
     }
   }
 
