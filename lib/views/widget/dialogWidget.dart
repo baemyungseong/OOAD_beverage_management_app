@@ -1134,15 +1134,20 @@ watchUserDialog(BuildContext context, String _name, String _email,
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _name,
-                        style: TextStyle(
-                            fontSize: content18,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'SFProText',
-                            color: blackLight,
-                            decoration: TextDecoration.none,
-                            height: 1.4),
+                      Container(
+                        width: 150,
+                        child: Text(
+                          _name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: content18,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'SFProText',
+                              color: blackLight,
+                              decoration: TextDecoration.none,
+                              height: 1.4),
+                        ),
                       ),
                       SizedBox(
                         height: 8,
@@ -1155,15 +1160,20 @@ watchUserDialog(BuildContext context, String _name, String _email,
                       SizedBox(
                         height: 8,
                       ),
-                      Text(
+                      Container(
+                        width: 150,
+                        child: Text(
                         _email,
-                        style: TextStyle(
-                            fontSize: content10,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'SFProText',
-                            color: grey8,
-                            decoration: TextDecoration.none,
-                            height: 1.4),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: content10,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'SFProText',
+                              color: grey8,
+                              decoration: TextDecoration.none,
+                              height: 1.4),
+                        ),
                       ),
                       SizedBox(
                         height: 4,
@@ -2721,14 +2731,11 @@ searchDialog(
                                                   Duration(milliseconds: 300),
                                               height: 32,
                                               width: 32,
+                                              child:  displayUserMsgAvatar('https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
                                               decoration: BoxDecoration(
                                                 color: blueWater,
                                                 borderRadius:
                                                     BorderRadius.circular(8),
-                                                image: DecorationImage(
-                                                    image: NetworkImage(
-                                                        'https://scontent.fsgn5-10.fna.fbcdn.net/v/t1.6435-9/161084499_1011185239289536_7749468629913909457_n.jpg?_nc_cat=110&ccb=1-5&_nc_sid=8bfeb9&_nc_ohc=1Z9ynzc2dg4AX_mL5HN&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT92ecLxLZxUsrqM0zA8jcY7hzLCnJ0x_pE78H7gd730uQ&oe=61EC35B8'),
-                                                    fit: BoxFit.cover),
                                                 shape: BoxShape.rectangle,
                                               ),
                                             ),
@@ -3230,15 +3237,12 @@ searchMessageDialog(BuildContext context, List<appUser> appUser1) {
                                                   Duration(milliseconds: 300),
                                               height: 32,
                                               width: 32,
+                                              child: displayAvatar(userListSearch[index]
+                                                            .avatar),
                                               decoration: BoxDecoration(
                                                 color: blueWater,
                                                 borderRadius:
                                                     BorderRadius.circular(8),
-                                                image: DecorationImage(
-                                                    image: NetworkImage(
-                                                        userListSearch[index]
-                                                            .avatar),
-                                                    fit: BoxFit.cover),
                                                 shape: BoxShape.rectangle,
                                               ),
                                             ),
@@ -3744,9 +3748,9 @@ dialogRemoveInvoice(context, String _orderID) {
 displayAvatar(String _url) => ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: CachedNetworkImage(
+        width: 64,
+        height: 64,
         imageUrl: _url,
-        height: 56,
-        width: 56,
         fit: BoxFit.cover,
         placeholder: (context, url) =>
           Center(
@@ -3762,3 +3766,23 @@ displayAvatar(String _url) => ClipRRect(
         ),
       ),
     );
+
+ displayUserMsgAvatar(String _url) => ClipRRect(
+      borderRadius: BorderRadius.circular(32.0),
+      child: CachedNetworkImage(
+        imageUrl: _url,
+        fit: BoxFit.cover,
+        placeholder: (context, url) =>
+          Center(
+          child: 
+            SizedBox(
+              child: CircularProgressIndicator(
+                color: blackLight,
+                strokeWidth: 3,
+              ),
+              height: 25.0,
+              width: 25.0,
+            ),
+        ),
+      ),
+    );   

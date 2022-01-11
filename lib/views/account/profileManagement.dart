@@ -111,15 +111,19 @@ class _profileManagementScreenState extends State<profileManagementScreen>
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text(
-                                      currentUser.name,
-                                      style: TextStyle(
-                                        color: blackLight,
-                                        fontFamily: 'SFProText',
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: title20
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                                      Container(
+                                        width: 180,
+                                        child: Text(
+                                        currentUser.name,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          color: blackLight,
+                                          fontFamily: 'SFProText',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: title20
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                       SizedBox(height: 4),
                                       SizedBox(
@@ -133,7 +137,8 @@ class _profileManagementScreenState extends State<profileManagementScreen>
                                         ),
                                       ),
                                       SizedBox(height: 8),
-                                      Flexible(
+                                      Container(
+                                        width: 180,
                                         child: 
                                         Text(
                                           currentUser.email,

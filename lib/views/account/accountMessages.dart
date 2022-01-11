@@ -1,3 +1,4 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -197,12 +198,10 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                             duration: Duration(milliseconds: 300),
                             height: 32,
                             width: 32,
+                            child: displayAvatar(currentUser.avatar),
                             decoration: BoxDecoration(
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(image: NetworkImage(
-                                  // '${projects[index]!["background"]}'),
-                                  currentUser.avatar), fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
                                 BoxShadow(
@@ -240,7 +239,7 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                           SizedBox(height: 1),
                           Container(
                               // alignment: Alignment.topLeft,
-                              child: Text(currentUser.role,
+                              child: Text(StringUtils.capitalize(currentUser.role),
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontFamily: 'SFProText',
@@ -376,12 +375,8 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                         alignment: Alignment.bottomCenter,
                                         width: 48,
                                         height: 48,
+                                        child: displayUserMsgAvatar(userList[index].avatar),
                                         decoration: new BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(
-                                                  // '${projects[index]!["background"]}'),
-                                                  userList[index].avatar),
-                                              fit: BoxFit.cover),
                                           shape: BoxShape.circle,
                                         ),
                                       ),
@@ -460,18 +455,15 @@ class _accountMessagesScreenState extends State<accountMessagesScreen> {
                                         alignment: Alignment.center,
                                         width: 60,
                                         height: 60,
-                                        decoration: new BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(
-                                                  // '${projects[index]!["background"]}'),
-                                                  (currentUser.id ==
+                                        child:  displayUserMsgAvatar(
+                                                      (currentUser.id ==
                                                           messagesList[index]
                                                               .userId1)
                                                       ? messagesList[index]
                                                           .background2
                                                       : messagesList[index]
                                                           .background1),
-                                              fit: BoxFit.cover),
+                                        decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
                                         ),
                                       ),

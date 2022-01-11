@@ -437,12 +437,12 @@ class _signInScreenState extends State<signInScreen> {
                                     child: CircularProgressIndicator(
                                         color: white)),
                                 const SizedBox(width: 16),
-                                Text("Please wait..."),
+                                Text("Please Wait..."),
                               ],
                             ),
                           )
                         : Text(
-                            "Sign in",
+                            "Sign In",
                             // style: TextStyle(
                             //     color: whiteLight,
                             //     fontFamily: 'SFProText',

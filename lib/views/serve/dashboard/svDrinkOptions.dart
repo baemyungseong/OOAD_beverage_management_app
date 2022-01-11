@@ -248,18 +248,21 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                           Container(
                             // width: 319,
                             padding: EdgeInsets.zero,
-                            child: Text(
-                              widget.drinkName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: blackLight,
-                                fontSize: title32,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'SFProText',
+                            child: Container(
+                              width: 240,
+                              child: Text(
+                                widget.drinkName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: blackLight,
+                                  fontSize: title32,
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: 'SFProText',
+                                ),
+                                textAlign: TextAlign.left,
                               ),
-                              textAlign: TextAlign.left,
-                            ),
+                            ), 
                           ),
                           Spacer(),
                           Row(
