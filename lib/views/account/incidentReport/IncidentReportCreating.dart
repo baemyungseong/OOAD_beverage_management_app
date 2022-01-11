@@ -85,19 +85,45 @@ class _IncidentReportCreatingScreenState
           .update({
         'id': newIdIncidentReport = value.id,
       });
-    }).whenComplete(() => FirebaseFirestore.instance
-        .collection("troubles")
-        .get()
-        .then((value) => value.docs.forEach((element) {
-              if (incidentReportList.contains(element.data()['id'] as String)) {
-                FirebaseFirestore.instance
-                    .collection("troubles")
-                    .doc(element.id)
-                    .update({
-                  'idIncidentReport': newIdIncidentReport,
-                });
-              }
-            })));
+    }).whenComplete(() {
+      FirebaseFirestore.instance
+          .collection("troubles")
+          .get()
+          .then((value) => value.docs.forEach((element) {
+                if (incidentReportList
+                    .contains(element.data()['id'] as String)) {
+                  FirebaseFirestore.instance
+                      .collection("troubles")
+                      .doc(element.id)
+                      .update({
+                    'idIncidentReport': newIdIncidentReport,
+                  });
+                }
+              }));
+      (statusIncident == "Done")
+          ? (total < 0)
+              ? (FirebaseFirestore.instance.collection("reex").add({
+                  'itemId': newIdIncidentReport,
+                  'type': "outcome",
+                  'money': (total * (-1.0)).toStringAsFixed(0).toString(),
+                  'timestamp':
+                      "${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}",
+                }).then((value) => FirebaseFirestore.instance
+                  .collection("reex")
+                  .doc(value.id)
+                  .update({'id': value.id})))
+              : (FirebaseFirestore.instance.collection("reex").add({
+                  'itemId': newIdIncidentReport,
+                  'type': "income",
+                  'money': (total).toStringAsFixed(0).toString(),
+                  'timestamp':
+                      "${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}",
+                }).then((value) => FirebaseFirestore.instance
+                  .collection("reex")
+                  .doc(value.id)
+                  .update({'id': value.id})))
+          : print("Processing");
+    });
   }
 
   String idIncidentReport = '';
@@ -1291,6 +1317,20 @@ class _IncidentReportCreatingScreenState
                       IconButton(
                         padding: EdgeInsets.only(left: 28),
                         onPressed: () {
+                          FirebaseFirestore.instance
+                              .collection('troubles')
+                              .snapshots()
+                              .listen((value) {
+                            value.docs.forEach((element) {
+                              if (incidentReportList
+                                  .contains(element.data()['id'] as String)) {
+                                FirebaseFirestore.instance
+                                    .collection('troubles')
+                                    .doc(element.data()['id'] as String)
+                                    .delete();
+                              }
+                            });
+                          });
                           Navigator.pop(context);
                         },
                         icon: Icon(Iconsax.arrow_square_left,

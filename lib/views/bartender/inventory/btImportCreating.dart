@@ -22,6 +22,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 class btImportCreatingScreen extends StatefulWidget {
   btImportCreatingScreen({Key? key}) : super(key: key);
@@ -55,6 +56,8 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
   String idGood = '';
   List quantity = [];
   List name = [];
+
+  int randomNumber = Random().nextInt(9999) + 1000;
   List unit = [];
   void initState() {
     super.initState();
@@ -94,6 +97,7 @@ class _btImportCreatingScreenState extends State<btImportCreatingScreen>
           ", at " +
           "${DateFormat('hh:mm a').format(selectDate)}",
       'status': '',
+      'code': randomNumber.toString(),
       "goodsDetail": importSubIdList,
       'total': total.toStringAsFixed(0).toString(),
     }).then((value) {

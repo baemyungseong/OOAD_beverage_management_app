@@ -377,7 +377,7 @@ class _messageDetailScreenState extends State<messageDetailScreen> {
                                                           constraints:
                                                               BoxConstraints(
                                                                   maxWidth:
-                                                                      264),
+                                                                      254),
                                                           padding:
                                                               EdgeInsets.only(
                                                                   top: 16,

@@ -80,7 +80,7 @@ class _btInventoryManagementScreenState
   Future getImportList() async {
     FirebaseFirestore.instance
         .collection('imports')
-        .orderBy('time', descending: true)
+        .orderBy('time', descending: false)
         .snapshots()
         .listen((value) {
       setState(() {
@@ -460,7 +460,7 @@ class _btInventoryManagementScreenState
                                   child: Row(
                                     children: [
                                       Image.asset(
-                                          'assets/images/accountant/oderavatar.png'),
+                                          'assets/images/accountant/orderavatar.png'),
                                       SizedBox(width: 16),
                                       Container(
                                         child: Column(
@@ -494,7 +494,9 @@ class _btInventoryManagementScreenState
                                                     Container(
                                                       width: 64,
                                                       child: Text(
-                                                        ' #' + '2092',
+                                                        ' #' +
+                                                            importList[index]
+                                                                .code,
                                                         maxLines: 1,
                                                         softWrap: false,
                                                         overflow:

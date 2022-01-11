@@ -11,6 +11,7 @@ class Import {
   final String total;
   final String time;
   final String status;
+  final String code;
 
   Import({
     required this.id,
@@ -22,6 +23,7 @@ class Import {
     required this.total,
     required this.time,
     required this.status,
+    required this.code,
   });
 
   factory Import.fromDocument(Map<String, dynamic> doc) {
@@ -34,6 +36,7 @@ class Import {
         goodsDetail: doc["goodsDetail"],
         total: doc['total'],
         status: doc['status'],
+        code: doc['code'],
         time: doc['time']);
   }
 }

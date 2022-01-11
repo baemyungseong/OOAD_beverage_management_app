@@ -45,6 +45,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
       sender: '',
       description: '',
       receiver: '',
+      code: '',
       status: '',
       note: '',
       goodsDetail: [],
@@ -147,7 +148,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       SizedBox(height: 8),
                                       Container(
                                         child: Text(
-                                          "Order #1049",
+                                          "Order #" + import.code,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: 24.0,
@@ -811,14 +812,19 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                           alignment: Alignment.center,
                                           child: GestureDetector(
                                             //action navigate to dashboard screen
-                                            onTap: () {
-                                              setState(() {
-                                                checkoutImportDialog(
-                                                    context, idImport);
-                                                isCheckout = true;
-                                                // Navigator.pop(context);
-                                              });
-                                            },
+                                            onTap: (import.status == 'Checkout')
+                                                ? null
+                                                : () {
+                                                    setState(() {
+                                                      checkoutImportDialog(
+                                                          context,
+                                                          idImport,
+                                                          import.total,
+                                                          import.code);
+                                                      isCheckout = true;
+                                                      // Navigator.pop(context);
+                                                    });
+                                                  },
                                             child: AnimatedContainer(
                                                 alignment: Alignment.center,
                                                 duration:
@@ -826,7 +832,8 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                                 height: 48,
                                                 width: 200,
                                                 decoration: BoxDecoration(
-                                                  color: (isCheckout)
+                                                  color: (import.status ==
+                                                          'Checkout')
                                                       ? white
                                                       : blackLight,
                                                   borderRadius:
@@ -883,86 +890,34 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                   ),
                 ),
               ),
-              Container(
-                  padding: EdgeInsets.only(top: 62),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        padding: EdgeInsets.only(left: 28),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Iconsax.arrow_square_left,
-                            size: 32, color: blackLight),
-                      ),
-                      Spacer(),
-                      Container(
-                          child: GestureDetector(
-                        onTap: () {
-                          removeImportDialog(
-                              context, idImport, importSubIdList);
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => svDrinkCartScreen(),
-                          //   ),
-                          // );
-                          // // .then((value) {});
-                          showSnackBar(context, 'The order has been removed!',
-                              "success");
-                        },
-                        child: AnimatedContainer(
-                          alignment: Alignment.center,
-                          duration: Duration(milliseconds: 300),
-                          height: 32,
-                          width: 32,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFFCB356B),
-                                  Color(0xFFBD3F32),
-                                ],
-                                stops: [
-                                  0.0,
-                                  1.0,
-                                ]),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: black.withOpacity(0.25),
-                                  spreadRadius: 0,
-                                  blurRadius: 64,
-                                  offset: Offset(8, 8)),
-                              BoxShadow(
-                                color: black.withOpacity(0.2),
-                                spreadRadius: 0,
-                                blurRadius: 4,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
+              (import.status != 'Checkout')
+                  ? Container(
+                      padding: EdgeInsets.only(top: 62),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            padding: EdgeInsets.only(left: 28),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: Icon(Iconsax.arrow_square_left,
+                                size: 32, color: blackLight),
                           ),
-                          child: Container(
-                              padding: EdgeInsets.zero,
-                              alignment: Alignment.center,
-                              child: Icon(Iconsax.close_circle,
-                                  size: 18, color: white)),
-                        ),
-                      )),
-                      SizedBox(width: 8),
-                      Container(
-                          padding: EdgeInsets.only(right: 28),
-                          child: GestureDetector(
+                          Spacer(),
+                          Container(
+                              child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      btImportEditingScreen(idImport: idImport),
-                                ),
-                              );
-                              // .then((value) {});
+                              removeImportDialog(
+                                  context, idImport, importSubIdList);
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => svDrinkCartScreen(),
+                              //   ),
+                              // );
+                              // // .then((value) {});
+                              showSnackBar(context,
+                                  'The order has been removed!', "success");
                             },
                             child: AnimatedContainer(
                               alignment: Alignment.center,
@@ -975,8 +930,8 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
                                     colors: [
-                                      blueWater,
-                                      Color(0xFF979DFA),
+                                      Color(0xFFCB356B),
+                                      Color(0xFFBD3F32),
                                     ],
                                     stops: [
                                       0.0,
@@ -999,12 +954,77 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                               child: Container(
                                   padding: EdgeInsets.zero,
                                   alignment: Alignment.center,
-                                  child: Icon(Iconsax.edit_2,
+                                  child: Icon(Iconsax.close_circle,
                                       size: 18, color: white)),
                             ),
                           )),
-                    ],
-                  ))
+                          SizedBox(width: 8),
+                          Container(
+                              padding: EdgeInsets.only(right: 28),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          btImportEditingScreen(
+                                              idImport: idImport),
+                                    ),
+                                  );
+                                  // .then((value) {});
+                                },
+                                child: AnimatedContainer(
+                                  alignment: Alignment.center,
+                                  duration: Duration(milliseconds: 300),
+                                  height: 32,
+                                  width: 32,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    gradient: LinearGradient(
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                        colors: [
+                                          blueWater,
+                                          Color(0xFF979DFA),
+                                        ],
+                                        stops: [
+                                          0.0,
+                                          1.0,
+                                        ]),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: black.withOpacity(0.25),
+                                          spreadRadius: 0,
+                                          blurRadius: 64,
+                                          offset: Offset(8, 8)),
+                                      BoxShadow(
+                                        color: black.withOpacity(0.2),
+                                        spreadRadius: 0,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Container(
+                                      padding: EdgeInsets.zero,
+                                      alignment: Alignment.center,
+                                      child: Icon(Iconsax.edit_2,
+                                          size: 18, color: white)),
+                                ),
+                              )),
+                        ],
+                      ))
+                  : Container(
+                      padding: EdgeInsets.only(top: 62),
+                      child: IconButton(
+                        padding: EdgeInsets.only(left: 28),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Iconsax.arrow_square_left,
+                            size: 32, color: blackLight),
+                      ),
+                    ),
             ],
           ),
         ],
