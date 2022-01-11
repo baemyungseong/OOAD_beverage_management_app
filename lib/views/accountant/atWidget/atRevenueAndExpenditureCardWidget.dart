@@ -1,3 +1,4 @@
+import 'package:countup/countup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -83,18 +84,20 @@ class atRevenueAndExpenditureCardWidget extends StatelessWidget {
               SizedBox(height: 8),
               Container(
                 width: 276,
-                child: Text(
-                  '\$ ' + revenue.toStringAsFixed(2),
-                  maxLines: 1,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
+                child:
+                Countup(
+                  begin: 0,
+                  end: revenue,
+                  prefix: "\$ ",
+                  suffix: ".00",
+                  duration: Duration(milliseconds: 1000),
                   style: TextStyle(
                     fontSize: title32,
                     fontWeight: FontWeight.w600,
                     fontFamily: 'SFProText',
-                    color: blackLight
+                    color: blackLight,
                   ),
-                ),
+                ),                   
               ),
               SizedBox(height: 11),
               Row(
@@ -102,7 +105,7 @@ class atRevenueAndExpenditureCardWidget extends StatelessWidget {
                 children: [
                   Container(
                     child: Text(
-                      time.toString(),
+                      time,
                       style: TextStyle(
                         fontSize: content12,
                         fontWeight: FontWeight.w500,
