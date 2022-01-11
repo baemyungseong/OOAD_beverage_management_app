@@ -148,7 +148,9 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                   SizedBox(height: 1),
                                   Container(
                                       // alignment: Alignment.topLeft,
-                                      child: Text(StringUtils.capitalize(currentUser.role),
+                                      child: Text(
+                                          StringUtils.capitalize(
+                                              currentUser.role),
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontFamily: 'SFProText',
@@ -170,7 +172,8 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                   child: TextFormField(
                                     controller: searchController,
                                     autofocus: true,
-                                    onEditingComplete: () => controlSearchTrans(),
+                                    onEditingComplete: () =>
+                                        controlSearchTrans(),
                                     style: TextStyle(
                                         fontFamily: 'SFProText',
                                         fontSize: content14,
@@ -296,12 +299,21 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                     ),
                     SizedBox(height: 32),
                     FutureBuilder(
-                      future: searchController.text.isEmpty || searchController.text.toLowerCase().contains("order") ? (haveFilter == true ? getAllTransSorted() : getAllTrans()) : (haveFilter == true ? getAllTransSorted() : getAllTransSearched()),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return Center(
-                            child: 
-                              SizedBox(
+                        future: searchController.text.isEmpty ||
+                                searchController.text
+                                    .toLowerCase()
+                                    .contains("order")
+                            ? (haveFilter == true
+                                ? getAllTransSorted()
+                                : getAllTrans())
+                            : (haveFilter == true
+                                ? getAllTransSorted()
+                                : getAllTransSearched()),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child: SizedBox(
                                 child: CircularProgressIndicator(
                                   color: blackLight,
                                   strokeWidth: 3,
@@ -309,204 +321,263 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                 height: 25.0,
                                 width: 25.0,
                               ),
-                          );                            
-                        }
-                        return Column(
-                          children: [
-                            atIncomeAndOutcomeWidget(income, outcome),
-                            SizedBox(height: 32),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'All Transactions',
-                                  style: TextStyle(
-                                    fontSize: content16,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'SFProText',
-                                    color: blackLight,
+                            );
+                          }
+                          return Column(
+                            children: [
+                              atIncomeAndOutcomeWidget(income, outcome),
+                              SizedBox(height: 32),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'All Transactions',
+                                    style: TextStyle(
+                                      fontSize: content16,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: 'SFProText',
+                                      color: blackLight,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 18),
-                            Column(
-                              children: [
-                                Container(
+                                ],
+                              ),
+                              SizedBox(height: 18),
+                              Column(
+                                children: [
+                                  Container(
                                     height: 463,
                                     width: 319,
                                     child: RefreshIndicator(
                                       onRefresh: () => controlRefresh(),
                                       child: SingleChildScrollView(
-                                        physics: AlwaysScrollableScrollPhysics(),
+                                          physics:
+                                              AlwaysScrollableScrollPhysics(),
                                           child: Column(children: [
-                                        ListView.separated(
-                                          physics: const NeverScrollableScrollPhysics(),
-                                          padding: EdgeInsets.zero,
-                                          scrollDirection: Axis.vertical,
-                                          shrinkWrap: true,
-                                          itemCount: trans.length,
-                                          separatorBuilder:
-                                              (BuildContext context, int index) =>
-                                                  SizedBox(height: 24),
-                                          itemBuilder: (context, index) {
-                                            return GestureDetector(
-                                              onTap: () {
+                                            ListView.separated(
+                                              physics:
+                                                  const NeverScrollableScrollPhysics(),
+                                              padding: EdgeInsets.zero,
+                                              scrollDirection: Axis.vertical,
+                                              shrinkWrap: true,
+                                              itemCount: trans.length,
+                                              separatorBuilder:
+                                                  (BuildContext context,
+                                                          int index) =>
+                                                      SizedBox(height: 24),
+                                              itemBuilder: (context, index) {
+                                                return GestureDetector(
+                                                  onTap: () {
                                                     trans[index].type == "order"
-                                                    ? Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              atIncomeTransactionDetailScreen(trans[index].itemId, trans[index].code, trans[index].timestamp, trans[index].money),
-                                                        ),
-                                                      )
+                                                        ? Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => atIncomeTransactionDetailScreen(
+                                                                  trans[index]
+                                                                      .itemId,
+                                                                  trans[index]
+                                                                      .code,
+                                                                  trans[index]
+                                                                      .timestamp,
+                                                                  trans[index]
+                                                                      .money),
+                                                            ),
+                                                          )
+                                                        // .then((value) {});
+                                                        : Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => atOutcomeTransactionDetailScreen(
+                                                                  trans[index]
+                                                                      .itemId,
+                                                                  trans[index]
+                                                                      .code,
+                                                                  trans[index]
+                                                                      .timestamp,
+                                                                  trans[index]
+                                                                      .money),
+                                                            ),
+                                                          );
                                                     // .then((value) {});
-                                                    : Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              atOutcomeTransactionDetailScreen(),
+                                                  },
+                                                  child: AnimatedContainer(
+                                                    duration: Duration(
+                                                        milliseconds: 300),
+                                                    child: Row(
+                                                      children: [
+                                                        Image.asset(
+                                                          trans[index].type ==
+                                                                  "order"
+                                                              ? 'assets/images/accountant/drinkavatar.png'
+                                                              : 'assets/images/accountant/orderavatar.png',
                                                         ),
-                                                      );
-                                                // .then((value) {});
-                                              },
-                                              child: AnimatedContainer(
-                                                duration: Duration(milliseconds: 300),
-                                                child: Row(
-                                                  children: [
-                                                    Image.asset(
-                                                          trans[index].type == "order"
-                                                          ? 'assets/images/accountant/drinkavatar.png'
-                                                          : 'assets/images/accountant/orderavatar.png',
-                                                    ),
-                                                    SizedBox(width: 16),
-                                                    Container(
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment.start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment.center,
-                                                        children: [
-                                                          Row(
+                                                        SizedBox(width: 16),
+                                                        Container(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             mainAxisAlignment:
-                                                                MainAxisAlignment.start,
+                                                                MainAxisAlignment
+                                                                    .center,
                                                             children: [
-                                                              Container(
-                                                                child: Text(
-                                                                      trans[index].type == "order"
-                                                                      ? 'Order '
-                                                                      : 'Import ',
-                                                                  maxLines: 1,
-                                                                  softWrap: false,
-                                                                  overflow:
-                                                                      TextOverflow.fade,
-                                                                  style: TextStyle(
-                                                                      fontSize: content16,
-                                                                      fontWeight:
-                                                                          FontWeight.w600,
-                                                                      fontFamily:
-                                                                          'SFProText',
-                                                                      color: blackLight,
-                                                                      height: 1.0),
-                                                                ),
-                                                              ),
-                                                              Column(
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
                                                                 children: [
-                                                                  SizedBox(height: 1),
                                                                   Container(
-                                                                    width: 64,
                                                                     child: Text(
-                                                                      trans[index].code,
-                                                                      maxLines: 1,
-                                                                      softWrap: false,
+                                                                      trans[index].type ==
+                                                                              "order"
+                                                                          ? 'Order '
+                                                                          : 'Import ',
+                                                                      maxLines:
+                                                                          1,
+                                                                      softWrap:
+                                                                          false,
                                                                       overflow:
                                                                           TextOverflow
                                                                               .fade,
                                                                       style: TextStyle(
-                                                                        fontSize:
-                                                                            content14,
-                                                                        fontWeight:
-                                                                            FontWeight
-                                                                                .w500,
-                                                                        fontFamily:
-                                                                            'SFProText',
-                                                                        foreground: Paint()
-                                                                          ..shader = trans[index].type == "order"
-                                                                              ? greenGradient
-                                                                              : redGradient,
-                                                                      ),
+                                                                          fontSize:
+                                                                              content16,
+                                                                          fontWeight: FontWeight
+                                                                              .w600,
+                                                                          fontFamily:
+                                                                              'SFProText',
+                                                                          color:
+                                                                              blackLight,
+                                                                          height:
+                                                                              1.0),
+                                                                    ),
+                                                                  ),
+                                                                  Column(
+                                                                    children: [
+                                                                      SizedBox(
+                                                                          height:
+                                                                              1),
+                                                                      Container(
+                                                                        width:
+                                                                            64,
+                                                                        child:
+                                                                            Text(
+                                                                          trans[index]
+                                                                              .code,
+                                                                          maxLines:
+                                                                              1,
+                                                                          softWrap:
+                                                                              false,
+                                                                          overflow:
+                                                                              TextOverflow.fade,
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                content14,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                            fontFamily:
+                                                                                'SFProText',
+                                                                            foreground: Paint()
+                                                                              ..shader = trans[index].type == "order" ? greenGradient : redGradient,
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                                ],
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 4),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Container(
+                                                                    width: 145,
+                                                                    child: Text(
+                                                                      DateFormat(
+                                                                              "hh:mm a, MMM dd yyyy")
+                                                                          .format(
+                                                                              trans[index].timestamp),
+                                                                      maxLines:
+                                                                          1,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .fade,
+                                                                      softWrap:
+                                                                          false,
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              content12,
+                                                                          fontWeight: FontWeight
+                                                                              .w400,
+                                                                          fontFamily:
+                                                                              'SFProText',
+                                                                          color:
+                                                                              grey8,
+                                                                          height:
+                                                                              1.4),
                                                                     ),
                                                                   )
                                                                 ],
-                                                              )
+                                                              ),
                                                             ],
                                                           ),
-                                                          SizedBox(height: 4),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment.start,
-                                                            children: [
-                                                              Container(
-                                                                width: 145,
-                                                                child: Text(
-                                                                  DateFormat("hh:mm a, MMM dd yyyy").format(trans[index].timestamp),
-                                                                  maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow.fade,
-                                                                  softWrap: false,
-                                                                  style: TextStyle(
-                                                                      fontSize: content12,
-                                                                      fontWeight:
-                                                                          FontWeight.w400,
-                                                                      fontFamily:
-                                                                          'SFProText',
-                                                                      color: grey8,
-                                                                      height: 1.4),
-                                                                ),
-                                                              )
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Spacer(),
-                                                    Container(
-                                                      width: 102,
-                                                      child: Text(
-                                                            trans[index].type == "order"
-                                                            ? "+ \$ " + trans[index].money + ".00"
-                                                            : "- \$ " + trans[index].money + ".00",
-                                                        maxLines: 1,
-                                                        overflow: TextOverflow.fade,
-                                                        softWrap: false,
-                                                        textAlign: TextAlign.right,
-                                                        style: TextStyle(
-                                                          fontSize: content16,
-                                                          fontWeight: FontWeight.w600,
-                                                          fontFamily: 'SFProText',
-                                                          foreground: Paint()
-                                                            ..shader = trans[index].type == "order"
-                                                                ? greenGradient
-                                                                : redGradient,
                                                         ),
-                                                      ),
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                        SizedBox(height: 112)
-                                      ])),
+                                                        Spacer(),
+                                                        Container(
+                                                          width: 102,
+                                                          child: Text(
+                                                            trans[index].type ==
+                                                                    "order"
+                                                                ? "+ \$ " +
+                                                                    trans[index]
+                                                                        .money +
+                                                                    ".00"
+                                                                : "- \$ " +
+                                                                    trans[index]
+                                                                        .money +
+                                                                    ".00",
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .fade,
+                                                            softWrap: false,
+                                                            textAlign:
+                                                                TextAlign.right,
+                                                            style: TextStyle(
+                                                              fontSize:
+                                                                  content16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              fontFamily:
+                                                                  'SFProText',
+                                                              foreground: Paint()
+                                                                ..shader = trans[index]
+                                                                            .type ==
+                                                                        "order"
+                                                                    ? greenGradient
+                                                                    : redGradient,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                            SizedBox(height: 112)
+                                          ])),
                                     ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        );
-                      }
-                    ),            
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
+                        }),
                   ],
                 ),
               ),
@@ -1017,9 +1088,10 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                           onPressed: () {
                             if (selected != 0) {
                               if (selectDate1.compareTo(selectDate2) <= 0) {
-                                if (double.parse(_minpricecontroller.text) <= double.parse(_maxpricecontroller.text)) {
+                                if (double.parse(_minpricecontroller.text) <=
+                                    double.parse(_maxpricecontroller.text)) {
                                   setState(() {
-                                    haveFilter = true;                                  
+                                    haveFilter = true;
                                   });
                                   Navigator.pop(context);
                                 } else {
@@ -1036,13 +1108,10 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                     'The end date must be equal or after the start date',
                                     "error");
                               }
-                            }
-                            else {
-                                Navigator.pop(context);
-                                showSnackBar(
-                                    context,
-                                    'Category must be chosen!',
-                                    "error");                              
+                            } else {
+                              Navigator.pop(context);
+                              showSnackBar(
+                                  context, 'Category must be chosen!', "error");
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -1111,8 +1180,7 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
   // /Bottom Sheet - end
 
   Future<void> controlRefresh() async {
-    setState(() {
-    });
+    setState(() {});
   }
 
   getAllTrans() async {
@@ -1130,18 +1198,16 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
     for (int i = 0; i < trans.length; i++) {
       if (trans[i].type == "order") {
         income = (int.parse(income) + int.parse(trans[i].money)).toString();
+      } else {
+        outcome = (int.parse(outcome) + int.parse(trans[i].money)).toString();
       }
-      else {
-        outcome = (int.parse(outcome) + int.parse(trans[i].money)).toString();        
-      }
-    }     
+    }
   }
 
-   controlSearchTrans() {
+  controlSearchTrans() {
     FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-    });  
-  } 
+    setState(() {});
+  }
 
   getAllTransSearched() async {
     await getAllTrans();
@@ -1152,7 +1218,7 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
       }
     }
     trans.clear();
-    trans = List.from(searchList);    
+    trans = List.from(searchList);
   }
 
   getAllTransSorted() async {
@@ -1160,20 +1226,31 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
     List<Trans> sortedList = [];
     for (int i = 0; i < trans.length; i++) {
       if (trans[i].type == "order" && selected == 1) {
-        if (double.parse(trans[i].money) >= double.parse(_minpricecontroller.text)
-        && double.parse(trans[i].money) <= double.parse(_maxpricecontroller.text)
-        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate1)) >= 0
-        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate2)) <= 0) {
+        if (double.parse(trans[i].money) >=
+                double.parse(_minpricecontroller.text) &&
+            double.parse(trans[i].money) <=
+                double.parse(_maxpricecontroller.text) &&
+            dayMonthYearOnly(trans[i].timestamp)
+                    .compareTo(dayMonthYearOnly(selectDate1)) >=
+                0 &&
+            dayMonthYearOnly(trans[i].timestamp)
+                    .compareTo(dayMonthYearOnly(selectDate2)) <=
+                0) {
           sortedList.add(trans[i]);
         }
-      }
-      else if (trans[i].type != "order" && selected == 2) {
-        if (double.parse(trans[i].money) >= double.parse(_minpricecontroller.text)
-        && double.parse(trans[i].money) <= double.parse(_maxpricecontroller.text)
-        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate1)) >= 0
-        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate2)) <= 0) {
+      } else if (trans[i].type != "order" && selected == 2) {
+        if (double.parse(trans[i].money) >=
+                double.parse(_minpricecontroller.text) &&
+            double.parse(trans[i].money) <=
+                double.parse(_maxpricecontroller.text) &&
+            dayMonthYearOnly(trans[i].timestamp)
+                    .compareTo(dayMonthYearOnly(selectDate1)) >=
+                0 &&
+            dayMonthYearOnly(trans[i].timestamp)
+                    .compareTo(dayMonthYearOnly(selectDate2)) <=
+                0) {
           sortedList.add(trans[i]);
-        }        
+        }
       }
     }
     trans.clear();
@@ -1182,5 +1259,5 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
 
   DateTime dayMonthYearOnly(DateTime dt) {
     return DateTime(dt.year, dt.month, dt.day);
-  }  
+  }
 }

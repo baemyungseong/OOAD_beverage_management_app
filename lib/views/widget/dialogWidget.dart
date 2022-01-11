@@ -1686,7 +1686,8 @@ removeImportDialog(BuildContext context, String idImport, List importSub) {
   );
 }
 
-checkoutImportDialog(BuildContext context, String idImport) {
+checkoutImportDialog(
+    BuildContext context, String idImport, String total, String code) {
   return showGeneralDialog(
     barrierLabel: "Label",
     barrierDismissible: true,
@@ -1777,6 +1778,29 @@ checkoutImportDialog(BuildContext context, String idImport) {
                           .update({
                         "status": 'Checkout',
                       });
+                      FirebaseFirestore.instance
+                          .collection("transactions")
+                          .add({
+                        'itemId': idImport,
+                        'code': "#" + code,
+                        'type': "import",
+                        'money': total,
+                        'timestamp':
+                            "${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}",
+                      }).then((value) => FirebaseFirestore.instance
+                              .collection("transactions")
+                              .doc(value.id)
+                              .update({'id': value.id}));
+                      FirebaseFirestore.instance.collection("reex").add({
+                        'itemId': idImport,
+                        'type': "outcome",
+                        'money': total,
+                        'timestamp':
+                            "${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}",
+                      }).then((value) => FirebaseFirestore.instance
+                          .collection("reex")
+                          .doc(value.id)
+                          .update({'id': value.id}));
                       Navigator.pop(context);
                       showSnackBar(
                           context, 'The order has been passed!', "success");
@@ -2046,7 +2070,8 @@ checkoutDialog(BuildContext context, String _id, List<appUser> _staffs) {
   );
 }
 
-confirmPurchasedDialog(BuildContext context, String _id, String _code, String _money) {
+confirmPurchasedDialog(
+    BuildContext context, String _id, String _code, String _money) {
   return showGeneralDialog(
     barrierLabel: "Label",
     barrierDismissible: true,
@@ -2130,7 +2155,8 @@ confirmPurchasedDialog(BuildContext context, String _id, String _code, String _m
                     width: 24,
                   ),
                   GestureDetector(
-                    onTap: () => controlConfirmPurchased(context, _id, _code, _money),
+                    onTap: () =>
+                        controlConfirmPurchased(context, _id, _code, _money),
                     child: Container(
                       width: 122,
                       height: 40,
@@ -2871,12 +2897,15 @@ removeDrinkDialog(context, String _drinkID) {
                         drinksReference.doc(_drinkID).delete();
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        showSnackBar(context, "The drink has been removed!", 'success');
-                      }
-                      else {
+                        showSnackBar(
+                            context, "The drink has been removed!", 'success');
+                      } else {
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        showSnackBar(context, "Failed to remove the drink because it no longer exists.", 'error');
+                        showSnackBar(
+                            context,
+                            "Failed to remove the drink because it no longer exists.",
+                            'error');
                       }
                     },
                     child: Container(
@@ -2967,7 +2996,7 @@ removeDrinkDialog(context, String _drinkID) {
       );
     },
   );
-}  
+}
 
 searchMessageDialog(BuildContext context, List<appUser> appUser1) {
   String newMessageId = '';
@@ -3295,7 +3324,8 @@ searchMessageDialog(BuildContext context, List<appUser> appUser1) {
       });
 }
 
-controlCheckOutOrder(context, String _orderID, List<appUser> _staffsList) async {
+controlCheckOutOrder(
+    context, String _orderID, List<appUser> _staffsList) async {
   String roleToCheckOut = "";
   switch (currentUser.role) {
     case "serve":
@@ -3306,7 +3336,7 @@ controlCheckOutOrder(context, String _orderID, List<appUser> _staffsList) async 
       break;
     case "accountant":
       roleToCheckOut = "isCheckedOutByAccountant";
-      break;                 
+      break;
   }
   String isCheckedOut = "";
   var doc = await ordersReference.doc(_orderID).get();
@@ -3323,31 +3353,32 @@ controlCheckOutOrder(context, String _orderID, List<appUser> _staffsList) async 
         _staffsList.add(currentUser);
         List staffsList = [];
         for (int i = 0; i < _staffsList.length; i++) {
-          staffsList.add(_staffsList[i].id);     
+          staffsList.add(_staffsList[i].id);
         }
         ordersReference.doc(_orderID).update({
           "staffs": FieldValue.arrayUnion(staffsList),
-        }); 
+        });
       }
       Navigator.pop(context);
       Navigator.pop(context);
-      showSnackBar(context, "This order has been checked out successfully!", "success");      
-    }
-    else {
+      showSnackBar(
+          context, "This order has been checked out successfully!", "success");
+    } else {
       Navigator.pop(context);
-      showSnackBar(context, "This order has been checked out by someone else!", "error");
+      showSnackBar(
+          context, "This order has been checked out by someone else!", "error");
     }
-  }
-  else {
+  } else {
     Navigator.pop(context);
-    showSnackBar(context, "This order no longer exists!", "error");    
+    showSnackBar(context, "This order no longer exists!", "error");
   }
 }
 
-controlConfirmPurchased(context, String _orderID, String _code, String _money) async {
+controlConfirmPurchased(
+    context, String _orderID, String _code, String _money) async {
   ordersReference.doc(_orderID).update({
     "isConfirmedPurchased": "true",
-"timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),    
+    "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
   });
   transReference.add({
     "id": "",
@@ -3356,21 +3387,18 @@ controlConfirmPurchased(context, String _orderID, String _code, String _money) a
     "type": "order",
     "money": _money,
     "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
-  }).then(
-      (DocumentReference docRef) => docRef.update({"id": docRef.id})
-  );
+  }).then((DocumentReference docRef) => docRef.update({"id": docRef.id}));
   reexReference.add({
     "id": "",
     "itemId": _orderID,
     "type": "income",
     "money": _money,
-    "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),    
-  }).then(
-      (DocumentReference docRef) => docRef.update({"id": docRef.id})
-  );
+    "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+  }).then((DocumentReference docRef) => docRef.update({"id": docRef.id}));
   Navigator.pop(context);
   Navigator.pop(context);
-  showSnackBar(context, "The invoice has been confirmed purchased successfully!", "success");
+  showSnackBar(context,
+      "The invoice has been confirmed purchased successfully!", "success");
 }
 
 dialogRemoveOrder(context, String _orderID) {
@@ -3463,12 +3491,15 @@ dialogRemoveOrder(context, String _orderID) {
                         ordersReference.doc(_orderID).delete();
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        showSnackBar(context, "The order has been removed!", 'success');
-                      }
-                      else {
+                        showSnackBar(
+                            context, "The order has been removed!", 'success');
+                      } else {
                         Navigator.pop(context);
                         Navigator.pop(context);
-                        showSnackBar(context, "Failed to remove the order because it no longer exists.", 'error');
+                        showSnackBar(
+                            context,
+                            "Failed to remove the order because it no longer exists.",
+                            'error');
                       }
                     },
                     child: Container(
@@ -3646,10 +3677,11 @@ dialogRemoveInvoice(context, String _orderID) {
                   ),
                   GestureDetector(
                     onTap: () {
-                        ordersReference.doc(_orderID).delete();
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                        showSnackBar(context, "The invoice has been removed!", 'success');
+                      ordersReference.doc(_orderID).delete();
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      showSnackBar(
+                          context, "The invoice has been removed!", 'success');
                     },
                     child: Container(
                       width: 122,
@@ -3739,7 +3771,7 @@ dialogRemoveInvoice(context, String _orderID) {
       );
     },
   );
-}  
+}
 
 displayAvatar(String _url) => ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
@@ -3748,17 +3780,15 @@ displayAvatar(String _url) => ClipRRect(
         height: 56,
         width: 56,
         fit: BoxFit.cover,
-        placeholder: (context, url) =>
-          Center(
-          child: 
-            SizedBox(
-              child: CircularProgressIndicator(
-                color: blackLight,
-                strokeWidth: 3,
-              ),
-              height: 25.0,
-              width: 25.0,
+        placeholder: (context, url) => Center(
+          child: SizedBox(
+            child: CircularProgressIndicator(
+              color: blackLight,
+              strokeWidth: 3,
             ),
+            height: 25.0,
+            width: 25.0,
+          ),
         ),
       ),
     );
