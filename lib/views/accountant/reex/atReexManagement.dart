@@ -16,10 +16,12 @@ import 'package:ui_fresh_app/views/accountant/atWidget/atRecentTransactionWidget
 import 'package:ui_fresh_app/views/accountant/atWidget/atRevenueAndExpenditureCardWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/accountant/reex/atSearchingReex.dart';
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 import 'package:ui_fresh_app/views/accountant/reex/atIncomeTransactionDetail.dart';
 import 'package:ui_fresh_app/views/accountant/reex/atOutcomeTransactionDetail.dart';
+
+//import models
+import 'package:ui_fresh_app/models/transactionModel.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -28,6 +30,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
+
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
 
 class atReexManagementScreen extends StatefulWidget {
   const atReexManagementScreen({Key? key}) : super(key: key);
@@ -39,6 +50,16 @@ class atReexManagementScreen extends StatefulWidget {
 class _atReexManagementScreenState extends State<atReexManagementScreen> {
   bool haveSearch = false;
   TextEditingController searchController = TextEditingController();
+
+  List<Trans> trans = [];
+  String income = "0";
+  String outcome = "0";
+
+  void initState() {
+    super.initState();
+    _minpricecontroller.text = _lowerValue.toString();
+    _maxpricecontroller.text = _upperValue.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +105,10 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                               duration: Duration(milliseconds: 300),
                               height: 32,
                               width: 32,
+                              child: displayAvatar(currentUser.avatar),
                               decoration: BoxDecoration(
                                 color: blueWater,
                                 borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                    image: NetworkImage(currentUser.avatar),
-                                    fit: BoxFit.cover),
                                 shape: BoxShape.rectangle,
                                 boxShadow: [
                                   BoxShadow(
@@ -150,16 +169,7 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                   child: TextFormField(
                                     controller: searchController,
                                     autofocus: true,
-                                    onEditingComplete: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            atReexManagementSearchScreen(
-                                          searchResult: searchController.text,
-                                          haveFilter: haveFilter,
-                                        ),
-                                      ),
-                                    ),
+                                    onEditingComplete: () => controlSearchTrans(),
                                     style: TextStyle(
                                         fontFamily: 'SFProText',
                                         fontSize: content14,
@@ -274,7 +284,7 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.zero,
                       child: Text(
-                        'Revenue and expenditure' + '\n' + 'management',
+                        'Revenue and Expenditure',
                         style: TextStyle(
                           color: blackLight,
                           fontSize: title24,
@@ -284,241 +294,218 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                       ),
                     ),
                     SizedBox(height: 32),
-                    atIncomeAndOutcomeWidget(),
-                    SizedBox(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(
-                          'All Transaction',
-                          style: TextStyle(
-                            fontSize: content16,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: 'SFProText',
-                            color: blackLight,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 18),
-                    // atRecentTransactionListWidget(),
-                    Column(
-                      children: [
-                        Container(
-                            height: 463,
-                            width: 319,
-                            child: SingleChildScrollView(
-                                child: Column(children: [
-                              ListView.separated(
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.zero,
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: 16,
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        SizedBox(height: 24),
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      (index == 2 ||
-                                              index == 5 ||
-                                              index == 7 ||
-                                              index == 8 ||
-                                              index == 10 ||
-                                              index == 12 ||
-                                              index == 14 ||
-                                              index == 15)
-                                          ? Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    atOutcomeTransactionDetailScreen(),
-                                              ),
-                                            )
-                                          // .then((value) {});
-                                          : Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    atIncomeTransactionDetailScreen(),
-                                              ),
-                                            );
-                                      // .then((value) {});
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 300),
-                                      child: Row(
-                                        children: [
-                                          Image.asset(
-                                            (index == 2 ||
-                                                    index == 5 ||
-                                                    index == 7 ||
-                                                    index == 8 ||
-                                                    index == 10 ||
-                                                    index == 12 ||
-                                                    index == 14 ||
-                                                    index == 15)
-                                                ? 'assets/images/accountant/oderavatar.png'
-                                                : 'assets/images/accountant/drinkavatar.png',
-                                          ),
-                                          SizedBox(width: 16),
-                                          Container(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
+                    FutureBuilder(
+                      future: searchController.text.isEmpty || searchController.text.toLowerCase().contains("order") ? (haveFilter == true ? getAllTransSorted() : getAllTrans()) : (haveFilter == true ? getAllTransSorted() : getAllTransSearched()),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(
+                            child: 
+                              SizedBox(
+                                child: CircularProgressIndicator(
+                                  color: blackLight,
+                                  strokeWidth: 3,
+                                ),
+                                height: 25.0,
+                                width: 25.0,
+                              ),
+                          );                            
+                        }
+                        return Column(
+                          children: [
+                            atIncomeAndOutcomeWidget(income, outcome),
+                            SizedBox(height: 32),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'All Transactions',
+                                  style: TextStyle(
+                                    fontSize: content16,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'SFProText',
+                                    color: blackLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 18),
+                            Column(
+                              children: [
+                                Container(
+                                    height: 463,
+                                    width: 319,
+                                    child: RefreshIndicator(
+                                      onRefresh: () => controlRefresh(),
+                                      child: SingleChildScrollView(
+                                        physics: AlwaysScrollableScrollPhysics(),
+                                          child: Column(children: [
+                                        ListView.separated(
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          padding: EdgeInsets.zero,
+                                          scrollDirection: Axis.vertical,
+                                          shrinkWrap: true,
+                                          itemCount: trans.length,
+                                          separatorBuilder:
+                                              (BuildContext context, int index) =>
+                                                  SizedBox(height: 24),
+                                          itemBuilder: (context, index) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                    trans[index].type == "order"
+                                                    ? Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              atIncomeTransactionDetailScreen(trans[index].itemId, trans[index].code, trans[index].timestamp, trans[index].money),
+                                                        ),
+                                                      )
+                                                    // .then((value) {});
+                                                    : Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              atOutcomeTransactionDetailScreen(),
+                                                        ),
+                                                      );
+                                                // .then((value) {});
+                                              },
+                                              child: AnimatedContainer(
+                                                duration: Duration(milliseconds: 300),
+                                                child: Row(
                                                   children: [
+                                                    Image.asset(
+                                                          trans[index].type == "order"
+                                                          ? 'assets/images/accountant/drinkavatar.png'
+                                                          : 'assets/images/accountant/orderavatar.png',
+                                                    ),
+                                                    SizedBox(width: 16),
                                                     Container(
-                                                      child: Text(
-                                                        (index == 2 ||
-                                                                index == 5 ||
-                                                                index == 7 ||
-                                                                index == 8 ||
-                                                                index == 10 ||
-                                                                index == 12 ||
-                                                                index == 14 ||
-                                                                index == 15)
-                                                            ? 'Order'
-                                                            : 'Drink',
-                                                        maxLines: 1,
-                                                        softWrap: false,
-                                                        overflow:
-                                                            TextOverflow.fade,
-                                                        style: TextStyle(
-                                                            fontSize: content16,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontFamily:
-                                                                'SFProText',
-                                                            color: blackLight,
-                                                            height: 1.0),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment.center,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment.start,
+                                                            children: [
+                                                              Container(
+                                                                child: Text(
+                                                                      trans[index].type == "order"
+                                                                      ? 'Order '
+                                                                      : 'Import ',
+                                                                  maxLines: 1,
+                                                                  softWrap: false,
+                                                                  overflow:
+                                                                      TextOverflow.fade,
+                                                                  style: TextStyle(
+                                                                      fontSize: content16,
+                                                                      fontWeight:
+                                                                          FontWeight.w600,
+                                                                      fontFamily:
+                                                                          'SFProText',
+                                                                      color: blackLight,
+                                                                      height: 1.0),
+                                                                ),
+                                                              ),
+                                                              Column(
+                                                                children: [
+                                                                  SizedBox(height: 1),
+                                                                  Container(
+                                                                    width: 64,
+                                                                    child: Text(
+                                                                      trans[index].code,
+                                                                      maxLines: 1,
+                                                                      softWrap: false,
+                                                                      overflow:
+                                                                          TextOverflow
+                                                                              .fade,
+                                                                      style: TextStyle(
+                                                                        fontSize:
+                                                                            content14,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w500,
+                                                                        fontFamily:
+                                                                            'SFProText',
+                                                                        foreground: Paint()
+                                                                          ..shader = trans[index].type == "order"
+                                                                              ? greenGradient
+                                                                              : redGradient,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              )
+                                                            ],
+                                                          ),
+                                                          SizedBox(height: 4),
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment.start,
+                                                            children: [
+                                                              Container(
+                                                                width: 145,
+                                                                child: Text(
+                                                                  DateFormat("hh:mm a, MMM dd yyyy").format(trans[index].timestamp),
+                                                                  maxLines: 1,
+                                                                  overflow:
+                                                                      TextOverflow.fade,
+                                                                  softWrap: false,
+                                                                  style: TextStyle(
+                                                                      fontSize: content12,
+                                                                      fontWeight:
+                                                                          FontWeight.w400,
+                                                                      fontFamily:
+                                                                          'SFProText',
+                                                                      color: grey8,
+                                                                      height: 1.4),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                    Column(
-                                                      children: [
-                                                        SizedBox(height: 1),
-                                                        Container(
-                                                          width: 64,
-                                                          child: Text(
-                                                            ' #' + '2092',
-                                                            maxLines: 1,
-                                                            softWrap: false,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .fade,
-                                                            style: TextStyle(
-                                                              fontSize:
-                                                                  content14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontFamily:
-                                                                  'SFProText',
-                                                              foreground: Paint()
-                                                                ..shader = (index == 2 ||
-                                                                        index ==
-                                                                            5 ||
-                                                                        index ==
-                                                                            7 ||
-                                                                        index ==
-                                                                            8 ||
-                                                                        index ==
-                                                                            10 ||
-                                                                        index ==
-                                                                            12 ||
-                                                                        index ==
-                                                                            14 ||
-                                                                        index ==
-                                                                            15)
-                                                                    ? redGradient
-                                                                    : greenGradient,
-                                                            ),
-                                                          ),
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                SizedBox(height: 4),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
+                                                    Spacer(),
                                                     Container(
-                                                      width: 145,
+                                                      width: 102,
                                                       child: Text(
-                                                        '02.00 pm, 08 Oct 2021',
+                                                            trans[index].type == "order"
+                                                            ? "+ \$ " + trans[index].money + ".00"
+                                                            : "- \$ " + trans[index].money + ".00",
                                                         maxLines: 1,
-                                                        overflow:
-                                                            TextOverflow.fade,
+                                                        overflow: TextOverflow.fade,
                                                         softWrap: false,
+                                                        textAlign: TextAlign.right,
                                                         style: TextStyle(
-                                                            fontSize: content12,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontFamily:
-                                                                'SFProText',
-                                                            color: grey8,
-                                                            height: 1.4),
+                                                          fontSize: content16,
+                                                          fontWeight: FontWeight.w600,
+                                                          fontFamily: 'SFProText',
+                                                          foreground: Paint()
+                                                            ..shader = trans[index].type == "order"
+                                                                ? greenGradient
+                                                                : redGradient,
+                                                        ),
                                                       ),
                                                     )
                                                   ],
                                                 ),
-                                              ],
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          Container(
-                                            width: 102,
-                                            child: Text(
-                                              (index == 2 ||
-                                                      index == 5 ||
-                                                      index == 7 ||
-                                                      index == 8 ||
-                                                      index == 10 ||
-                                                      index == 12 ||
-                                                      index == 14 ||
-                                                      index == 15)
-                                                  ? '- ' + '\$68.00'
-                                                  : '+ ' + '\$137.00',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                              softWrap: false,
-                                              textAlign: TextAlign.right,
-                                              style: TextStyle(
-                                                fontSize: content16,
-                                                fontWeight: FontWeight.w600,
-                                                fontFamily: 'SFProText',
-                                                foreground: Paint()
-                                                  ..shader = (index == 2 ||
-                                                          index == 5 ||
-                                                          index == 7 ||
-                                                          index == 8 ||
-                                                          index == 10 ||
-                                                          index == 12 ||
-                                                          index == 14 ||
-                                                          index == 15)
-                                                      ? redGradient
-                                                      : greenGradient,
                                               ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                            );
+                                          },
+                                        ),
+                                        SizedBox(height: 112)
+                                      ])),
                                     ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 112)
-                            ]))),
-                      ],
-                    )
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }
+                    ),            
                   ],
                 ),
               ),
@@ -540,12 +527,6 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
   int selected = 0;
   double _lowerValue = 0;
   double _upperValue = 1000;
-
-  void initState() {
-    super.initState();
-    _minpricecontroller.text = _lowerValue.toString();
-    _maxpricecontroller.text = _upperValue.toString();
-  }
 
   FlutterSliderHandler customHandler(IconData icon) {
     return FlutterSliderHandler(
@@ -1033,23 +1014,34 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                       padding: const EdgeInsets.only(left: 28),
                       child: ElevatedButton(
                           onPressed: () {
-                            if (selectDate1.isBefore(selectDate2)) {
-                              if (_lowerValue <= _upperValue) {
-                                setState(() {
-                                  haveFilter = true;
-                                });
-                                Navigator.pop(context);
+                            if (selected != 0) {
+                              if (selectDate1.compareTo(selectDate2) <= 0) {
+                                if (double.parse(_minpricecontroller.text) <= double.parse(_maxpricecontroller.text)) {
+                                  setState(() {
+                                    haveFilter = true;                                  
+                                  });
+                                  Navigator.pop(context);
+                                } else {
+                                  Navigator.pop(context);
+                                  showSnackBar(
+                                      context,
+                                      'The max value must be greater than the min value',
+                                      "error");
+                                }
                               } else {
+                                Navigator.pop(context);
                                 showSnackBar(
                                     context,
-                                    'The max value must be greater than the min',
+                                    'The end date must be equal or after the start date',
                                     "error");
                               }
-                            } else {
-                              showSnackBar(
-                                  context,
-                                  'The max date must be greater than the min',
-                                  "error");
+                            }
+                            else {
+                                Navigator.pop(context);
+                                showSnackBar(
+                                    context,
+                                    'Category must be chosen!',
+                                    "error");                              
                             }
                           },
                           style: ElevatedButton.styleFrom(
@@ -1117,4 +1109,77 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
   }
   // /Bottom Sheet - end
 
+  Future<void> controlRefresh() async {
+    setState(() {
+    });
+  }
+
+  getAllTrans() async {
+    QuerySnapshot querySnapshot = await transReference.get();
+    trans.clear();
+    for (int i = 0; i < querySnapshot.docs.length; i++) {
+      var doc = querySnapshot.docs[i];
+      Trans _trans = Trans();
+      _trans = Trans.fromDocument(doc);
+      trans.add(_trans);
+    }
+    trans.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    income = "0";
+    outcome = "0";
+    for (int i = 0; i < trans.length; i++) {
+      if (trans[i].type == "order") {
+        income = (int.parse(income) + int.parse(trans[i].money)).toString();
+      }
+      else {
+        outcome = (int.parse(outcome) + int.parse(trans[i].money)).toString();        
+      }
+    }     
+  }
+
+   controlSearchTrans() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });  
+  } 
+
+  getAllTransSearched() async {
+    await getAllTrans();
+    List<Trans> searchList = [];
+    for (int i = 0; i < trans.length; i++) {
+      if (trans[i].code.contains(searchController.text)) {
+        searchList.add(trans[i]);
+      }
+    }
+    trans.clear();
+    trans = List.from(searchList);    
+  }
+
+  getAllTransSorted() async {
+    await getAllTrans();
+    List<Trans> sortedList = [];
+    for (int i = 0; i < trans.length; i++) {
+      if (trans[i].type == "order" && selected == 1) {
+        if (double.parse(trans[i].money) >= double.parse(_minpricecontroller.text)
+        && double.parse(trans[i].money) <= double.parse(_maxpricecontroller.text)
+        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate1)) >= 0
+        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate2)) <= 0) {
+          sortedList.add(trans[i]);
+        }
+      }
+      else if (trans[i].type != "order" && selected == 2) {
+        if (double.parse(trans[i].money) >= double.parse(_minpricecontroller.text)
+        && double.parse(trans[i].money) <= double.parse(_maxpricecontroller.text)
+        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate1)) >= 0
+        && dayMonthYearOnly(trans[i].timestamp).compareTo(dayMonthYearOnly(selectDate2)) <= 0) {
+          sortedList.add(trans[i]);
+        }        
+      }
+    }
+    trans.clear();
+    trans = List.from(sortedList);
+  }
+
+  DateTime dayMonthYearOnly(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day);
+  }  
 }
