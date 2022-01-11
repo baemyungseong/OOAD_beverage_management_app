@@ -1,3 +1,4 @@
+import 'package:countup/countup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -11,7 +12,10 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:iconsax/iconsax.dart';
 
 class skIncomeAndOutcomeWidgetDB extends StatelessWidget {
-  const skIncomeAndOutcomeWidgetDB({Key? key}) : super(key: key);
+  String _totalIncome;
+  String _totalOutcome;
+
+  skIncomeAndOutcomeWidgetDB(this._totalIncome, this._totalOutcome, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +70,12 @@ class skIncomeAndOutcomeWidgetDB extends StatelessWidget {
                   ),
                   Container(
                     width: 72,
-                    child: Text(
-                      '+ \$3090.00',
+                    child: Countup(
+                      prefix: "+\$ ",
+                      suffix: ".00",
+                      begin: 0,
+                      end: double.parse(_totalIncome),
+                      duration: Duration(milliseconds: 1000),
                       style: TextStyle(
                         color: white,
                         fontSize: content12,
@@ -75,7 +83,7 @@ class skIncomeAndOutcomeWidgetDB extends StatelessWidget {
                         fontFamily: 'SFProText'
                       ),
                     ),
-                  ),
+                  ),  
                 ],
               ),
             ],
@@ -111,7 +119,7 @@ class skIncomeAndOutcomeWidgetDB extends StatelessWidget {
                   color: white,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Iconsax.arrow_down, size: 24, color: black)
+                child: Icon(Iconsax.arrow_up_3, size: 24, color: black)
               ),
               SizedBox(width: 8),
               Column(
@@ -131,8 +139,12 @@ class skIncomeAndOutcomeWidgetDB extends StatelessWidget {
                   ),
                   Container(
                     width: 72,
-                    child: Text(
-                      '- \$1021.00',
+                    child: Countup(
+                      prefix: "-\$ ",
+                      suffix: ".00",
+                      begin: 0,
+                      end: double.parse(_totalOutcome),
+                      duration: Duration(milliseconds: 1000),
                       style: TextStyle(
                         color: white,
                         fontSize: content12,
@@ -140,7 +152,7 @@ class skIncomeAndOutcomeWidgetDB extends StatelessWidget {
                         fontFamily: 'SFProText'
                       ),
                     ),
-                  ),
+                  ),  
                 ],
               ),
             ],
