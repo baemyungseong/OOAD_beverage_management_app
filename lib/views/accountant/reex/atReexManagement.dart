@@ -1,3 +1,4 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -147,7 +148,7 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                   SizedBox(height: 1),
                                   Container(
                                       // alignment: Alignment.topLeft,
-                                      child: Text(currentUser.role,
+                                      child: Text(StringUtils.capitalize(currentUser.role),
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontFamily: 'SFProText',
