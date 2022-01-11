@@ -2046,6 +2046,181 @@ checkoutDialog(BuildContext context, String _id, List<appUser> _staffs) {
   );
 }
 
+confirmPurchasedDialog(BuildContext context, String _id, String _code, String _money) {
+  return showGeneralDialog(
+    barrierLabel: "Label",
+    barrierDismissible: true,
+    barrierColor: Colors.black.withOpacity(0.5),
+    transitionDuration: Duration(milliseconds: 400),
+    context: context,
+    pageBuilder: (context, anim1, anim2) {
+      return Align(
+        alignment: Alignment.center,
+        child: Container(
+          height: 194,
+          width: 299,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFF159957),
+                            Color(0xFF159199),
+                          ],
+                          stops: [
+                            0.0,
+                            1.0,
+                          ]),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Iconsax.message_question,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    child: Text(
+                      'Do you want to confirm \npurchased this Invoice?',
+                      style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20,
+                        color: blackLight,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () => controlConfirmPurchased(context, _id, _code, _money),
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFF159957),
+                              Color(0xFF159199),
+                            ],
+                            stops: [
+                              0.0,
+                              1.0,
+                            ]),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: black.withOpacity(0.25),
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: white,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, anim1, anim2, child) {
+      return SlideTransition(
+        position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim1),
+        child: child,
+      );
+    },
+  );
+}
+
 List<appUser> userListChoice = [];
 TextEditingController searchController = TextEditingController();
 Future addPerformerDialog(BuildContext mContext, String id) {
@@ -3169,6 +3344,34 @@ controlCheckOutOrder(context, String _orderID, List<appUser> _staffsList) async 
   }
 }
 
+controlConfirmPurchased(context, String _orderID, String _code, String _money) async {
+  ordersReference.doc(_orderID).update({
+    "isConfirmedPurchased": "true",
+"timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),    
+  });
+  transReference.add({
+    "id": "",
+    "itemId": _orderID,
+    "code": _code,
+    "type": "order",
+    "money": _money,
+    "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+  }).then(
+      (DocumentReference docRef) => docRef.update({"id": docRef.id})
+  );
+  reexReference.add({
+    "id": "",
+    "type": "income",
+    "money": _money,
+    "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),    
+  }).then(
+      (DocumentReference docRef) => docRef.update({"id": docRef.id})
+  );
+  Navigator.pop(context);
+  Navigator.pop(context);
+  showSnackBar(context, "The invoice has been confirmed purchased successfully!", "success");
+}
+
 dialogRemoveOrder(context, String _orderID) {
   return showGeneralDialog(
     barrierLabel: "Label",
@@ -3266,6 +3469,186 @@ dialogRemoveOrder(context, String _orderID) {
                         Navigator.pop(context);
                         showSnackBar(context, "Failed to remove the order because it no longer exists.", 'error');
                       }
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xFFCB356B),
+                              Color(0xFFBD3F32),
+                            ],
+                            stops: [
+                              0.0,
+                              1.0,
+                            ]),
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: black.withOpacity(0.25),
+                            spreadRadius: 0,
+                            blurRadius: 4,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Remove',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: white,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 122,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(8.0),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontFamily: "SFProText",
+                            fontSize: 16,
+                            color: blackLight,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          decoration: BoxDecoration(
+            color: white,
+            borderRadius: BorderRadius.circular(24),
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, anim1, anim2, child) {
+      return SlideTransition(
+        position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim1),
+        child: child,
+      );
+    },
+  );
+}
+
+dialogRemoveInvoice(context, String _orderID) {
+  return showGeneralDialog(
+    barrierLabel: "Label",
+    barrierDismissible: true,
+    barrierColor: Colors.black.withOpacity(0.5),
+    transitionDuration: Duration(milliseconds: 400),
+    context: context,
+    pageBuilder: (context, anim1, anim2) {
+      return Align(
+        alignment: Alignment.center,
+        child: Container(
+          height: 194,
+          width: 299,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFFCB356B),
+                            Color(0xFFBD3F32),
+                          ],
+                          stops: [
+                            0.0,
+                            1.0,
+                          ]),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8.0),
+                      ),
+                    ),
+                    padding: EdgeInsets.zero,
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Iconsax.close_circle,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  Container(
+                    child: Text(
+                      'Do you want to remove \nthis Invoice?',
+                      style: TextStyle(
+                        fontFamily: "SFProText",
+                        fontSize: 20,
+                        color: blackLight,
+                        fontWeight: FontWeight.w700,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                        ordersReference.doc(_orderID).delete();
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                        showSnackBar(context, "The invoice has been removed!", 'success');
                     },
                     child: Container(
                       width: 122,

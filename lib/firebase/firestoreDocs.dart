@@ -9,6 +9,8 @@ final userReference = FirebaseFirestore.instance.collection("users");
 final drinksReference = FirebaseFirestore.instance.collection("drinks");
 final cartsReference = FirebaseFirestore.instance.collection("carts");
 final ordersReference = FirebaseFirestore.instance.collection("orders");
+final transReference = FirebaseFirestore.instance.collection("transactions");
+final reexReference = FirebaseFirestore.instance.collection("reex");
 
 final firebase_storage.Reference avatarsReference = firebase_storage.FirebaseStorage.instance.ref().child("random_avatars");
 final firebase_storage.Reference _drinksReference = firebase_storage.FirebaseStorage.instance.ref().child("drink_categories");
