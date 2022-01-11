@@ -6,7 +6,6 @@ import 'package:ui_fresh_app/constants/colors.dart';
 import 'package:ui_fresh_app/constants/fonts.dart';
 import 'package:ui_fresh_app/constants/images.dart';
 import 'package:ui_fresh_app/constants/others.dart';
-import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
 
 //import widgets
 import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
@@ -15,7 +14,9 @@ import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 //import views
 import 'package:ui_fresh_app/views/account/profileManagement.dart';
 import 'package:ui_fresh_app/views/bartender/mainTask/btDrinkDetail.dart';
-import 'package:ui_fresh_app/views/bartender/mainTask/btSearchMainTask.dart';
+
+//import models
+import 'package:ui_fresh_app/models/orderModel.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
@@ -25,57 +26,143 @@ import 'package:another_xlider/another_xlider.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:intl/intl.dart';
 
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
+
 class btMainTaskManagementScreen extends StatefulWidget {
   const btMainTaskManagementScreen({Key? key}) : super(key: key);
 
   @override
-  State<btMainTaskManagementScreen> createState() =>
-      _btMainTaskManagementScreenState();
+  State<btMainTaskManagementScreen> createState() => _btMainTaskManagementScreenState();
 }
 
-class _btMainTaskManagementScreenState
-    extends State<btMainTaskManagementScreen> {
+class _btMainTaskManagementScreenState extends State<btMainTaskManagementScreen> {
+
   bool haveSearch = false;
   TextEditingController searchController = TextEditingController();
+
+  List<Order> orders = [];
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
-        value: SystemUiOverlayStyle(
-            statusBarBrightness: Brightness.light,
-            statusBarIconBrightness: Brightness.light,
-            statusBarColor: Colors.transparent),
-        child: Scaffold(
-          body: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(background), fit: BoxFit.cover),
-                ),
+      value: SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.light,
+        statusBarColor: Colors.transparent
+      ),
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(background), fit: BoxFit.cover),
               ),
-              Container(
-                padding: EdgeInsets.only(
-                    left: appPadding, top: appPadding, right: appPadding),
-                child: Column(
-                  children: [
-                    SizedBox(height: 34),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
+            ),
+            Container(
+              padding: EdgeInsets.only(left: appPadding, top: appPadding, right: appPadding),
+              child: Column(
+                children: [
+                  SizedBox(height: 34),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => profileManagementScreen(),
+                              ),
+                            );
+                            // .then((value) {});
+                          },
+                          child: AnimatedContainer(
+                            alignment: Alignment.center,
+                            duration: Duration(milliseconds: 300),
+                            height: 32,
+                            width: 32,
+                            child: displayAvatar(currentUser.avatar),
+                            decoration: BoxDecoration(
+                              color: blueWater,
+                              borderRadius: BorderRadius.circular(8),
+                              shape: BoxShape.rectangle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: black.withOpacity(0.25),
+                                  spreadRadius: 0,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4),
+                                ),
+                                BoxShadow(
+                                  color: black.withOpacity(0.1),
+                                  spreadRadius: 0,
+                                  blurRadius: 60,
+                                  offset: Offset(10, 10),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Spacer(),
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.fastOutSlowIn,
+                        child: (haveSearch == true)
+                        ? Container(
+                          width: 231,
+                          height: 32,
+                          child: TextFormField(
+                            controller: searchController,
+                            autofocus: true,
+                            onEditingComplete: () => controlSearchOrders(),
+                            style: TextStyle(
+                              fontFamily: 'SFProText',
+                              fontSize: content14,
+                              fontWeight: FontWeight.w400,
+                              color: blackLight,
+                              height: 1.4
+                            ),
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(Iconsax.search_normal_1, size: 18),
+                              contentPadding: EdgeInsets.only(left: 20, right: 0),
+                              hintText: "What're you looking for?",
+                              hintStyle: TextStyle(
+                                fontFamily: 'SFProText',
+                                fontSize: content14,
+                                fontWeight: FontWeight.w400,
+                                color: grey8,
+                                height: 1.4
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                          )
+                        )
+                        : Container(
+                          // padding: EdgeInsets.only(right: 28),
                           alignment: Alignment.center,
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      profileManagementScreen(),
-                                ),
-                              );
-                              // .then((value) {});
+                              setState(() {
+                                haveSearch = true;
+                              });
                             },
                             child: AnimatedContainer(
                               alignment: Alignment.center,
@@ -83,358 +170,248 @@ class _btMainTaskManagementScreenState
                               height: 32,
                               width: 32,
                               decoration: BoxDecoration(
-                                color: blueWater,
+                                color: blackLight,
                                 borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                    image: NetworkImage(currentUser.avatar),
-                                    fit: BoxFit.cover),
-                                shape: BoxShape.rectangle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: black.withOpacity(0.25),
+                                      color: black.withOpacity(0.25),
+                                      spreadRadius: 0,
+                                      blurRadius: 64,
+                                      offset: Offset(8, 8)),
+                                  BoxShadow(
+                                    color: black.withOpacity(0.2),
                                     spreadRadius: 0,
                                     blurRadius: 4,
                                     offset: Offset(0, 4),
                                   ),
-                                  BoxShadow(
-                                    color: black.withOpacity(0.1),
-                                    spreadRadius: 0,
-                                    blurRadius: 60,
-                                    offset: Offset(10, 10),
-                                  ),
                                 ],
                               ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 16),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Container(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  currentUser.name,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'SFProText',
-                                      color: black,
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.2),
-                                )),
-                            SizedBox(height: 1),
-                            Container(
-                                // alignment: Alignment.topLeft,
-                                child: Text(currentUser.role,
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontFamily: 'SFProText',
-                                      color: grey8,
-                                      fontWeight: FontWeight.w400,
-                                      // height: 1.4
-                                    ))),
-                          ],
-                        ),
-                        Spacer(),
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.fastOutSlowIn,
-                          child: (haveSearch == true)
-                              ? Container(
-                                  width: 231,
-                                  height: 32,
-                                  child: TextFormField(
-                                    controller: searchController,
-                                    autofocus: true,
-                                    onEditingComplete: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            btMainTaskSearchingScreen(
-                                          searchResult: searchController.text,
-                                          haveFilter: haveFilter,
-                                        ),
-                                      ),
-                                    ),
-                                    style: TextStyle(
-                                        fontFamily: 'SFProText',
-                                        fontSize: content14,
-                                        fontWeight: FontWeight.w400,
-                                        color: blackLight,
-                                        height: 1.4),
-                                    decoration: InputDecoration(
-                                      prefixIcon: Icon(Iconsax.search_normal_1,
-                                          size: 18),
-                                      contentPadding:
-                                          EdgeInsets.only(left: 20, right: 0),
-                                      hintText: "What're you looking for?",
-                                      hintStyle: TextStyle(
-                                          fontFamily: 'SFProText',
-                                          fontSize: content14,
-                                          fontWeight: FontWeight.w400,
-                                          color: grey8,
-                                          height: 1.4),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius:
-                                            BorderRadius.circular(8.0),
-                                      ),
-                                    ),
-                                  ))
-                              : Container(
-                                  // padding: EdgeInsets.only(right: 28),
-                                  alignment: Alignment.center,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        haveSearch = true;
-                                      });
-                                    },
-                                    child: AnimatedContainer(
-                                      alignment: Alignment.center,
-                                      duration: Duration(milliseconds: 300),
-                                      height: 32,
-                                      width: 32,
-                                      decoration: BoxDecoration(
-                                        color: blackLight,
-                                        borderRadius: BorderRadius.circular(8),
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: black.withOpacity(0.25),
-                                              spreadRadius: 0,
-                                              blurRadius: 64,
-                                              offset: Offset(8, 8)),
-                                          BoxShadow(
-                                            color: black.withOpacity(0.2),
-                                            spreadRadius: 0,
-                                            blurRadius: 4,
-                                            offset: Offset(0, 4),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Container(
-                                          padding: EdgeInsets.zero,
-                                          alignment: Alignment.center,
-                                          child: Icon(Iconsax.search_normal_1,
-                                              size: 18, color: white)),
-                                    ),
-                                  )),
-                        ),
-                        SizedBox(width: 8),
-                        Container(
-                            // padding: EdgeInsets.only(right: 28),
-                            alignment: Alignment.center,
-                            child: GestureDetector(
-                              onTap: () {
-                                showFilter(context);
-                              },
-                              child: AnimatedContainer(
+                              child: Container(
+                                padding: EdgeInsets.zero,
                                 alignment: Alignment.center,
-                                duration: Duration(milliseconds: 300),
-                                height: 32,
-                                width: 32,
-                                decoration: BoxDecoration(
-                                  color:
-                                      (haveFilter == true) ? blackLight : white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: black.withOpacity(0.25),
-                                        spreadRadius: 0,
-                                        blurRadius: 64,
-                                        offset: Offset(8, 8)),
-                                    BoxShadow(
-                                      color: black.withOpacity(0.2),
-                                      spreadRadius: 0,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Container(
-                                    padding: EdgeInsets.zero,
-                                    alignment: Alignment.center,
-                                    child: Icon(Iconsax.setting_4,
-                                        size: 18,
-                                        color: (haveFilter == true)
-                                            ? white
-                                            : blackLight)),
+                                child: Icon(
+                                  Iconsax.search_normal_1,
+                                  size: 18, 
+                                  color: white
+                                )
                               ),
-                            )),
-                      ],
-                    ),
-                    SizedBox(height: 32),
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.zero,
-                      child: Text(
-                        'Orders List',
-                        style: TextStyle(
-                          color: blackLight,
-                          fontSize: title24,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'SFProText',
+                            ),
+                          )
                         ),
                       ),
+                      SizedBox(width: 8),
+                      Container(
+                        // padding: EdgeInsets.only(right: 28),
+                        alignment: Alignment.center,
+                        child: GestureDetector(
+                          onTap: () {
+                            showFilter(context);
+                          },
+                          child: AnimatedContainer(
+                            alignment: Alignment.center,
+                            duration: Duration(milliseconds: 300),
+                            height: 32,
+                            width: 32,
+                            decoration: BoxDecoration(
+                              color: (haveFilter == true) ? blackLight : white,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: black.withOpacity(0.25),
+                                    spreadRadius: 0,
+                                    blurRadius: 64,
+                                    offset: Offset(8, 8)),
+                                BoxShadow(
+                                  color: black.withOpacity(0.2),
+                                  spreadRadius: 0,
+                                  blurRadius: 4,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.zero,
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Iconsax.setting_4,
+                                size: 18, 
+                                color: (haveFilter == true) ? white : blackLight
+                              )
+                            ),
+                          ),
+                        )
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 32),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.zero,
+                    child: Text(
+                      'Orders List',
+                      style: TextStyle(
+                        color: blackLight,
+                        fontSize: title24,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'SFProText',
+                      ),
                     ),
-                    SizedBox(height: 32),
-                    Column(
-                      children: [
-                        Container(
-                            height: 670 - 45,
-                            width: 319,
-                            child: SingleChildScrollView(
-                                child: Column(children: [
-                              ListView.separated(
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.zero,
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true,
-                                itemCount: 16,
-                                separatorBuilder:
-                                    (BuildContext context, int index) =>
-                                        SizedBox(height: 24),
-                                itemBuilder: (context, index) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              btDrinkDetailScreen(),
+                  ),
+                  SizedBox(height: 32),
+                  Column(
+                    children: [
+                      Container(
+                        height: 670-45,
+                        width: 319,
+                        child: RefreshIndicator(
+                          onRefresh: () => controlRefresh(),
+                          child: SingleChildScrollView(
+                            physics: AlwaysScrollableScrollPhysics(),
+                            child: FutureBuilder(
+                              future: searchController.text.isEmpty || searchController.text.toLowerCase().contains("order") ? (haveFilter == true ? getAllOrdersSorted() : getAllOrders()) : (haveFilter == true ? getAllOrdersSorted() : getAllOrdersSearched()),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(
+                                    child: 
+                                      SizedBox(
+                                        child: CircularProgressIndicator(
+                                          color: blackLight,
+                                          strokeWidth: 3,
                                         ),
-                                      );
-                                      // .then((value) {});
-                                    },
-                                    child: AnimatedContainer(
-                                      duration: Duration(milliseconds: 300),
-                                      child: Row(
-                                        children: [
-                                          Image.asset(
-                                              'assets/images/accountant/drinkavatar.png'),
-                                          SizedBox(width: 16),
-                                          Container(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                        height: 25.0,
+                                        width: 25.0,
+                                      ),
+                                  );
+                                }
+                                return Column(
+                              children: [
+                                    ListView.separated(
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: EdgeInsets.zero,
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: orders.length,
+                                      separatorBuilder: (BuildContext context, int index) =>
+                                          SizedBox(height: 24),
+                                      itemBuilder: (context, index) {
+                                        return GestureDetector(
+                                          onTap: () => controlViewOrder(orders[index].id, orders[index].code, orders[index].timestamp, orders[index].totalMoney),
+                                          child: AnimatedContainer(
+                                            duration: Duration(milliseconds: 300),
+                                            child: Row(
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      child: Text(
-                                                        'Drink',
-                                                        maxLines: 1,
-                                                        softWrap: false,
-                                                        overflow:
-                                                            TextOverflow.fade,
-                                                        style: TextStyle(
-                                                            fontSize: content16,
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontFamily:
-                                                                'SFProText',
-                                                            color: blackLight,
-                                                            height: 1.0),
-                                                      ),
-                                                    ),
-                                                    Column(
-                                                      children: [
-                                                        SizedBox(height: 1),
-                                                        Container(
-                                                          width: 64,
-                                                          child: Text(
-                                                            ' #' + '2022',
-                                                            maxLines: 1,
-                                                            softWrap: false,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .fade,
-                                                            style: TextStyle(
-                                                              fontSize:
-                                                                  content14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              fontFamily:
-                                                                  'SFProText',
-                                                              foreground: Paint()
-                                                                ..shader =
-                                                                    greenGradient,
+                                                Image.asset('assets/images/accountant/drinkavatar.png'),
+                                                SizedBox(width: 16),
+                                                Container(
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            child: Text(
+                                                              "Order ",                          
+                                                              maxLines: 1,
+                                                              softWrap: false,
+                                                              overflow: TextOverflow.fade,
+                                                              style: TextStyle(
+                                                                  fontSize: content16,
+                                                                  fontWeight: FontWeight.w600,
+                                                                  fontFamily: 'SFProText',
+                                                                  color: blackLight,
+                                                                  height: 1.0),
                                                             ),
                                                           ),
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                SizedBox(height: 4),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 145,
-                                                      child: Text(
-                                                        '02.00 pm, 08 Oct 2021',
-                                                        maxLines: 1,
-                                                        overflow:
-                                                            TextOverflow.fade,
-                                                        softWrap: false,
-                                                        style: TextStyle(
-                                                            fontSize: content12,
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontFamily:
-                                                                'SFProText',
-                                                            color: grey8,
-                                                            height: 1.4),
+                                                          Column(
+                                                            children: [
+                                                              SizedBox(height: 1),
+                                                              Container(
+                                                                width: 64,
+                                                                child: Text(
+                                                                  orders[index].code,
+                                                                  maxLines: 1,
+                                                                  softWrap: false,
+                                                                  overflow: TextOverflow.fade,
+                                                                  style: TextStyle(
+                                                                    fontSize: content14,
+                                                                    fontWeight: FontWeight.w500,
+                                                                    fontFamily: 'SFProText',
+                                                                    foreground: Paint()
+                                                                      ..shader = greenGradient,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            ],
+                                                          )
+                                                        ],
                                                       ),
-                                                    )
-                                                  ],
+                                                      SizedBox(height: 4),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            width: 145,
+                                                            child: Text(
+                                                              DateFormat("hh:mm a, MMM dd yyyy").format(orders[index].timestamp),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.fade,
+                                                              softWrap: false,
+                                                              style: TextStyle(
+                                                                  fontSize: content12,
+                                                                  fontWeight: FontWeight.w400,
+                                                                  fontFamily: 'SFProText',
+                                                                  color: grey8,
+                                                                  height: 1.4),
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
+                                                Spacer(),
+                                                Container(
+                                                  width: 102,
+                                                  child: Text(
+                                                    "+ \$ " + orders[index].totalMoney + ".00",
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.fade,
+                                                    softWrap: false,
+                                                    textAlign: TextAlign.right,
+                                                    style: TextStyle(
+                                                      fontSize: content16,
+                                                      fontWeight: FontWeight.w600,
+                                                      fontFamily: 'SFProText',
+                                                      foreground: Paint()
+                                                        ..shader = greenGradient,
+                                                    ),
+                                                  ),
+                                                )
                                               ],
                                             ),
                                           ),
-                                          Spacer(),
-                                          Container(
-                                            width: 102,
-                                            child: Text(
-                                              '+ ' + '\$36.00',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.fade,
-                                              softWrap: false,
-                                              textAlign: TextAlign.right,
-                                              style: TextStyle(
-                                                fontSize: content16,
-                                                fontWeight: FontWeight.w600,
-                                                fontFamily: 'SFProText',
-                                                foreground: Paint()
-                                                  ..shader = greenGradient,
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                              ),
-                              SizedBox(height: 112)
-                            ]))),
-                      ],
-                    )
-                  ],
-                ),
+                                    SizedBox(height: 112)
+                                  ]
+                                );
+                              }
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
               ),
-            ],
-          ),
-        ));
+            ),
+          ],
+        ),
+      )
+    );
   }
 
   //Bottom Sheet - start
@@ -461,21 +438,22 @@ class _btMainTaskManagementScreenState
     return FlutterSliderHandler(
       decoration: BoxDecoration(),
       child: Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.rectangle,
-            borderRadius: new BorderRadius.all(Radius.circular(8)),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.blue.withOpacity(0.3),
-                  spreadRadius: 0.05,
-                  blurRadius: 5,
-                  offset: Offset(0, 1))
-            ],
-          ),
-          child: Icon(Iconsax.coin, size: 20, color: blackLight)),
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.rectangle,
+          borderRadius: new BorderRadius.all(Radius.circular(8)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.blue.withOpacity(0.3),
+                spreadRadius: 0.05,
+                blurRadius: 5,
+                offset: Offset(0, 1))
+          ],
+        ),
+        child: Icon(Iconsax.coin, size: 20, color: blackLight)
+      ),
     );
   }
 
@@ -612,7 +590,7 @@ class _btMainTaskManagementScreenState
                               selectDate2 = dt;
                               SetState1(() {
                                 selectDate2 != selectDate2;
-                              });
+                              });                            
                             }
                             print(selectDate2);
                           },
@@ -853,22 +831,24 @@ class _btMainTaskManagementScreenState
                       padding: const EdgeInsets.only(left: 28),
                       child: ElevatedButton(
                           onPressed: () {
-                            if (selectDate1.isBefore(selectDate2)) {
-                              if (_lowerValue <= _upperValue) {
+                            if (selectDate1.compareTo(selectDate2) <= 0) {
+                              if (double.parse(_minpricecontroller.text) <= double.parse(_maxpricecontroller.text)) {
                                 setState(() {
-                                  haveFilter = true;
+                                  haveFilter = true;                                  
                                 });
                                 Navigator.pop(context);
                               } else {
+                                Navigator.pop(context);
                                 showSnackBar(
                                     context,
-                                    'The max value must be greater than the min',
+                                    'The max value must be greater than the min value',
                                     "error");
                               }
                             } else {
+                              Navigator.pop(context);
                               showSnackBar(
                                   context,
-                                  'The max date must be greater than the min',
+                                  'The end date must be equal or after the start date',
                                   "error");
                             }
                           },
@@ -905,9 +885,6 @@ class _btMainTaskManagementScreenState
                             setState(() {
                               haveFilter = false;
                             });
-                            SetState1(() {
-                              haveFilter = false;
-                            });
                           },
                           style: ElevatedButton.styleFrom(
                             minimumSize: Size(112, 52),
@@ -936,5 +913,77 @@ class _btMainTaskManagementScreenState
     );
   }
   // /Bottom Sheet - end
+  
+  Future<void> controlRefresh() async {
+    setState(() {
+    });
+  }
 
+  getAllOrders() async {
+    QuerySnapshot querySnapshot = await ordersReference.get();
+    orders.clear();
+    for (int i = 0; i < querySnapshot.docs.length; i++) {
+      var doc = querySnapshot.docs[i];
+      Order order = Order();
+      order = Order.fromDocument(doc);
+      if (order.isCheckedOutByServe == "true" && order.isCheckedOutByBartender == "false") {
+        orders.add(order);
+      }
+    }
+    orders.sort((a, b) => a.timestamp.compareTo(b.timestamp));    
+  }
+
+  controlSearchOrders() {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() {
+    });  
+  }
+
+  getAllOrdersSearched() async {
+    await getAllOrders();
+    List<Order> searchList = [];
+    for (int i = 0; i < orders.length; i++) {
+      if (orders[i].code.contains(searchController.text)) {
+        searchList.add(orders[i]);
+      }
+    }
+    orders.clear();
+    orders = List.from(searchList);    
+  }
+
+  getAllOrdersSorted() async {
+    await getAllOrders();
+    List<Order> sortedList = [];
+    for (int i = 0; i < orders.length; i++) {
+      if (double.parse(orders[i].totalMoney) >= double.parse(_minpricecontroller.text)
+      && double.parse(orders[i].totalMoney) <= double.parse(_maxpricecontroller.text)
+      && dayMonthYearOnly(orders[i].timestamp).compareTo(dayMonthYearOnly(selectDate1)) >= 0
+      && dayMonthYearOnly(orders[i].timestamp).compareTo(dayMonthYearOnly(selectDate2)) <= 0) {
+        sortedList.add(orders[i]);
+      }
+    }
+    orders.clear();
+    orders = List.from(sortedList);
+  }
+
+  DateTime dayMonthYearOnly(DateTime dt) {
+    return DateTime(dt.year, dt.month, dt.day);
+  }
+
+  controlViewOrder(String _id, String _code, DateTime _timestamp, String _totalMoney) async {
+    var doc = await ordersReference.doc(_id).get();
+    if (doc.exists) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => btDrinkDetailScreen(_id, _code, _timestamp, _totalMoney),
+        ),
+      );      
+    }
+    else {
+      setState(() {
+        showSnackBar(context, "This order no longer exists!", "error");
+      });
+    }
+  }  
 }

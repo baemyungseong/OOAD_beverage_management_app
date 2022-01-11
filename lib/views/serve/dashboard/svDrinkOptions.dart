@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 //import constants
 import 'package:ui_fresh_app/constants/colors.dart';
@@ -16,8 +18,24 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:dotted_line/dotted_line.dart';
 
+//import Firebase stuffs
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_fresh_app/firebase/firestoreDocs.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:ui_fresh_app/firebase/firebaseAuth.dart';
+
 class svDrinkChosingScreen extends StatefulWidget {
-  const svDrinkChosingScreen({ Key? key }) : super(key: key);
+  String drinkID;
+  String drinkImageURL;
+  String drinkName;
+  String drinkDescription;
+  String drinkUnitPrice;
+
+  svDrinkChosingScreen(this.drinkID, this.drinkImageURL, this.drinkName, this.drinkDescription, this.drinkUnitPrice,
+  { Key? key }) : super(key: key);
 
   @override
   _svDrinkChosingScreenState createState() => _svDrinkChosingScreenState();
@@ -34,6 +52,12 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
   bool haveSugar = false;
 
   int quantity = 1;
+  int totalPrice = 0;
+
+  void initState() {
+    super.initState();
+    totalPrice = int.parse(widget.drinkUnitPrice);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +100,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                                 Container(
                                   alignment: Alignment.topCenter,
                                   child: Container(
-                                    child: Image.network('https://i.imgur.com/6GfgeBS.png', scale: 4.926)
+                                    child: displayDrinkImage(widget.drinkImageURL, 300, 300),
                                   ),
                                 )
                               ],
@@ -225,7 +249,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                             // width: 319,
                             padding: EdgeInsets.zero,
                             child: Text(
-                              'Honey Tea',
+                              widget.drinkName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -306,7 +330,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                         width: 319,
                         padding: EdgeInsets.zero,
                         child: Text(
-                          'Drinks from honey, bold taste create a good feeling of sweetness',
+                          widget.drinkDescription,
                           style: TextStyle(
                             color: grey8,
                             fontSize: content14,
@@ -810,7 +834,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                             // width: 319,
                             padding: EdgeInsets.zero,
                             child: Text(
-                              '\$' + '${5.00 * quantity}',
+                              '\$' + '${totalPrice * quantity}' + '.0',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -826,11 +850,11 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                           GestureDetector(
                             //action navigate to signin screen
                             onTap: () {
-                              if (haveCondition && haveSugar && haveVolume) {
-                                Navigator.pop(context);
-                                showSnackBar(context, 'The drink have been added to cart!', 'success');
-                              } else {
-                                showSnackBar(context, 'Please select options for the drink!', 'danger');
+                              if (volume != "" && condition != "" && sugar != "") {
+                                controlAddDrinkToCart();
+                              }
+                              else {
+                                showSnackBar(context, "Please choose all options for this drink!", "warning");
                               }
                             },
                             child: AnimatedContainer(
@@ -859,7 +883,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                                 ],
                               ),
                               child: Text(
-                                "Add to cart",
+                                "Add to Cart",
                                 style: TextStyle(
                                     color: white,
                                     fontFamily: 'SFProText',
@@ -867,7 +891,7 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
                                     fontSize: textButton16),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       )
                     ]
@@ -879,5 +903,47 @@ class _svDrinkChosingScreenState extends State<svDrinkChosingScreen> {
         ],
       ),
     );
+  }
+
+  displayDrinkImage(String _url, double _height, double _width) => ClipRRect(
+    child: CachedNetworkImage(
+      imageUrl: _url,
+      height: _height,
+      width: _width,
+      placeholder: (context, url) => 
+        Center(child: SizedBox(
+            child: CircularProgressIndicator(
+              color: blackLight,
+              strokeWidth: 3,
+            ),
+            height: 25.0,
+            width: 25.0,
+          ),
+        ),
+    ),
+  );
+
+  controlAddDrinkToCart() async {
+    var doc = await drinksReference.doc(widget.drinkID).get();
+    if (doc.exists) {
+      cartsReference.doc(currentUser.id).collection("myCart").add({
+        "id": "",
+        "image": widget.drinkImageURL,
+        "name": widget.drinkName,
+        "description": widget.drinkDescription,
+        "options": "$volume - $condition - $sugar sugar",
+        "unit price": widget.drinkUnitPrice,
+        "quantity": quantity.toString(),
+        "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),
+      }).then(
+        (DocumentReference docRef) => docRef.update({"id": docRef.id})
+      );
+      Navigator.pop(context);
+      showSnackBar(context, "The drink has been added to your cart!", 'success');
+    }
+    else {
+      Navigator.pop(context);
+      showSnackBar(context, "Failed to add this drink to cart because it no longer exists.", 'error');
+    }    
   }
 }

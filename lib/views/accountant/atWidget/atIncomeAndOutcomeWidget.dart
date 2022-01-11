@@ -11,7 +11,10 @@ import 'package:ui_fresh_app/constants/others.dart';
 import 'package:iconsax/iconsax.dart';
 
 class atIncomeAndOutcomeWidget extends StatelessWidget {
-  const atIncomeAndOutcomeWidget({Key? key}) : super(key: key);
+  String _income;
+  String _outcome;
+
+  atIncomeAndOutcomeWidget(this._income, this._outcome, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class atIncomeAndOutcomeWidget extends StatelessWidget {
                   Container(
                     width: 72,
                     child: Text(
-                      '+ \$3090.00',
+                      "+ \$ " + _income + ".00",
                       style: TextStyle(
                         fontSize: content12,
                         fontWeight: FontWeight.w600,
@@ -134,7 +137,7 @@ class atIncomeAndOutcomeWidget extends StatelessWidget {
                   Container(
                     width: 72,
                     child: Text(
-                      '- \$2143.00',
+                      "- \$ " + _outcome + ".00",
                       style: TextStyle(
                         fontSize: content12,
                         fontWeight: FontWeight.w600,

@@ -14,7 +14,7 @@ import 'package:ui_fresh_app/views/widget/dialogWidget.dart';
 import 'package:ui_fresh_app/views/widget/snackBarWidget.dart';
 
 //import views
-import 'package:ui_fresh_app/views/serve/dashboard/svDrinkChosing.dart';
+import 'package:ui_fresh_app/views/serve/dashboard/svDrinkOptions.dart';
 
 //import others
 import 'package:iconsax/iconsax.dart';
