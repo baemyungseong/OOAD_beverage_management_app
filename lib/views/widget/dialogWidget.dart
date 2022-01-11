@@ -3361,6 +3361,7 @@ controlConfirmPurchased(context, String _orderID, String _code, String _money) a
   );
   reexReference.add({
     "id": "",
+    "itemId": _orderID,
     "type": "income",
     "money": _money,
     "timestamp": DateFormat("dd/MM/yyyy HH:mm:ss").format(DateTime.now()),    
