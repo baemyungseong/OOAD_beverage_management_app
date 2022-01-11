@@ -1,3 +1,4 @@
+import 'package:basic_utils/basic_utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -90,12 +91,10 @@ class _IncidentReportManagementScreenState
                             duration: Duration(milliseconds: 300),
                             height: 32,
                             width: 32,
+                            child: displayAvatar(currentUser.avatar),
                             decoration: BoxDecoration(
                               color: blueWater,
                               borderRadius: BorderRadius.circular(8),
-                              image: DecorationImage(
-                                  image: NetworkImage(currentUser.avatar),
-                                  fit: BoxFit.cover),
                               shape: BoxShape.rectangle,
                               boxShadow: [
                                 BoxShadow(
@@ -136,7 +135,7 @@ class _IncidentReportManagementScreenState
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                currentUser.role,
+                                StringUtils.capitalize(currentUser.role),
                                 style: TextStyle(
                                   fontSize: content10,
                                   fontWeight: FontWeight.w400,
@@ -290,7 +289,7 @@ class _IncidentReportManagementScreenState
                     height: 32,
                   ),
                   Text(
-                    'Incident Report',
+                    'Incident Reports',
                     style: TextStyle(
                       fontSize: title24,
                       fontWeight: FontWeight.w700,

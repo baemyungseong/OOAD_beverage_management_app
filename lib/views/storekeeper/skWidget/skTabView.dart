@@ -142,7 +142,7 @@ class _skTabViewWidgetState extends State<skTabViewWidget>
                     Container(
                       alignment: Alignment.topCenter,
                       child: new Tab(
-                          text: 'All Report',
+                          text: 'All Reports',
                           height: (_selectedIndex == 0) ? 40 : 40),
                     ),
                     (_selectedIndex == 0)
