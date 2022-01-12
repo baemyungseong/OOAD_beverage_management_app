@@ -55,6 +55,7 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
   Import import = Import(
       id: '',
       sender: '',
+      code: '',
       description: '',
       receiver: '',
       note: '',
@@ -955,93 +956,91 @@ class _btImportEditingScreenState extends State<btImportEditingScreen>
                                                   ));
                                             },
                                           ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              // setState(() {
-                                              valueReturn.clear();
-                                              addGoodDialog(
-                                                      context, valueReturn)
-                                                  .then((value) {
-                                                print("value[0]");
-                                                print(value[0]);
-                                                print("value[1]");
-                                                print(value[1]);
-                                                print("value[2]");
-                                                print(value[2]);
-                                                print("value[3]");
-                                                print(value[3]);
-                                                // getGoodList(
-                                                //     value[0].toString());
-                                                setState(() {
-                                                  name.add(value[0]);
-                                                  quantity.add(value[1]);
-                                                  unit.add(value[2]);
-                                                  total = total +
-                                                      double.parse(
-                                                              value[1] + ".0") *
-                                                          double.parse(
-                                                              value[2] + ".0");
-                                                  importSubIdList.add(value[3]);
-                                                });
-                                              });
-                                              // });
-                                            },
-                                            child: AnimatedContainer(
-                                                duration:
-                                                    Duration(milliseconds: 300),
-                                                width: 319,
-                                                height: 48,
-                                                decoration: BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                      begin:
-                                                          Alignment.centerLeft,
-                                                      end:
-                                                          Alignment.centerRight,
-                                                      colors: [
-                                                        Color(0xFF5FAAEF),
-                                                        Color(0xFF979DFA),
-                                                      ],
-                                                      stops: [
-                                                        0.0,
-                                                        1.0,
-                                                      ]),
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(8),
-                                                    bottomRight:
-                                                        Radius.circular(8),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    SizedBox(width: 21),
-                                                    Container(
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Icon(Iconsax.add,
-                                                            size: 20,
-                                                            color: white)),
-                                                    SizedBox(width: 21),
-                                                    Text(
-                                                      "New Goods",
-                                                      style: TextStyle(
-                                                        color: white,
-                                                        fontFamily: 'SFProText',
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: content14,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                )),
-                                          )
+                                          // GestureDetector(
+                                          //   onTap: () {
+                                          //     // setState(() {
+                                          //     valueReturn.clear();
+                                          //     addGoodDialog(
+                                          //             context, valueReturn)
+                                          //         .then((value) {
+                                          //       print("value[0]");
+                                          //       print(value[0]);
+                                          //       print("value[1]");
+                                          //       print(value[1]);
+                                          //       print("value[2]");
+                                          //       print(value[2]);
+                                          //       print("value[3]");
+                                          //       print(value[3]);
+                                          //       // getGoodList(
+                                          //       //     value[0].toString());
+                                          //       setState(() {
+                                          //         name.add(value[0]);
+                                          //         quantity.add(value[1]);
+                                          //         unit.add(value[2]);
+                                          //         total = total +
+                                          //             double.parse(
+                                          //                     value[1] + ".0") *
+                                          //                 double.parse(
+                                          //                     value[2] + ".0");
+                                          //         importSubIdList.add(value[3]);
+                                          //       });
+                                          //     });
+                                          //     // });
+                                          //   },
+                                          // child: AnimatedContainer(
+                                          //   duration:
+                                          //       Duration(milliseconds: 300),
+                                          //   width: 319,
+                                          //   height: 48,
+                                          //   decoration: BoxDecoration(
+                                          //     gradient: LinearGradient(
+                                          //         begin: Alignment.centerLeft,
+                                          //         end: Alignment.centerRight,
+                                          //         colors: [
+                                          //           Color(0xFF5FAAEF),
+                                          //           Color(0xFF979DFA),
+                                          //         ],
+                                          //         stops: [
+                                          //           0.0,
+                                          //           1.0,
+                                          //         ]),
+                                          //     borderRadius: BorderRadius.only(
+                                          //       bottomLeft:
+                                          //           Radius.circular(8),
+                                          //       bottomRight:
+                                          //           Radius.circular(8),
+                                          //     ),
+                                          //   ),
+                                          // child: Row(
+                                          //   mainAxisAlignment:
+                                          //       MainAxisAlignment.start,
+                                          //   crossAxisAlignment:
+                                          //       CrossAxisAlignment.center,
+                                          //   children: [
+                                          //     SizedBox(width: 21),
+                                          //     Container(
+                                          //         padding:
+                                          //             EdgeInsets.zero,
+                                          //         alignment:
+                                          //             Alignment.center,
+                                          //         child: Icon(Iconsax.add,
+                                          //             size: 20,
+                                          //             color: white)),
+                                          //     SizedBox(width: 21),
+                                          //     Text(
+                                          //       "New Goods",
+                                          //       style: TextStyle(
+                                          //         color: white,
+                                          //         fontFamily: 'SFProText',
+                                          //         fontWeight:
+                                          //             FontWeight.w600,
+                                          //         fontSize: content14,
+                                          //       ),
+                                          //     ),
+                                          //   ],
+                                          // )
+                                          //   // ),
+                                          // )
                                         ],
                                       )),
                                       SizedBox(height: 24),

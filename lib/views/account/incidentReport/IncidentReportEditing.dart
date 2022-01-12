@@ -112,13 +112,26 @@ class _IncidentReportEditingScreenState
     });
   }
 
+  Future getidRex() async {
+    FirebaseFirestore.instance
+        .collection('reex')
+        .where('itemId', isEqualTo: idIncidentReport)
+        .get()
+        .then((value) {
+      FirebaseFirestore.instance
+          .collection('reex')
+          .doc(value.docs.first.id)
+          .update({});
+    });
+  }
+
   String statusIncident = '';
   Future updateIncidentReportDetail() async {
     FirebaseFirestore.instance
         .collection("incidentReports")
         .where("id", isEqualTo: idIncidentReport)
-        .snapshots()
-        .listen((value) {
+        .get()
+        .then((value) {
       setState(() {
         incidentReport = IncidentReport.fromDocument(value.docs.first.data());
         FirebaseFirestore.instance
@@ -135,20 +148,55 @@ class _IncidentReportEditingScreenState
           "detailOfTrouble": troubleIdList,
           "partyInTrouble": relatedController.text,
           'total': total.toStringAsFixed(0).toString(),
-        }).whenComplete(() => FirebaseFirestore.instance
-                .collection("troubles")
-                .get()
-                .then((value) => value.docs.forEach((element) {
-                      if (troubleIdList
-                          .contains(element.data()['id'] as String)) {
-                        FirebaseFirestore.instance
-                            .collection("troubles")
-                            .doc(element.id)
-                            .update({
-                          'idIncidentReport': idIncidentReport,
-                        });
-                      }
-                    })));
+        }).whenComplete(() {
+          FirebaseFirestore.instance
+              .collection("troubles")
+              .get()
+              .then((value) => value.docs.forEach((element) {
+                    if (troubleIdList
+                        .contains(element.data()['id'] as String)) {
+                      FirebaseFirestore.instance
+                          .collection("troubles")
+                          .doc(element.id)
+                          .update({
+                        'idIncidentReport': idIncidentReport,
+                      });
+                    }
+                  }));
+          (statusIncident == "Done")
+              ? (total < 0)
+                  ? (FirebaseFirestore.instance
+                      .collection('reex')
+                      .where('itemId', isEqualTo: idIncidentReport)
+                      .get()
+                      .then((value1) {
+                      FirebaseFirestore.instance
+                          .collection('reex')
+                          .doc(value1.docs.first.id)
+                          .update({
+                        'type': "outcome",
+                        'money': (total * (-1.0)).toStringAsFixed(0).toString(),
+                        'timestamp':
+                            "${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}"
+                      });
+                    }))
+                  : (FirebaseFirestore.instance
+                      .collection('reex')
+                      .where('itemId', isEqualTo: idIncidentReport)
+                      .get()
+                      .then((value2) {
+                      FirebaseFirestore.instance
+                          .collection('reex')
+                          .doc(value2.docs.first.id)
+                          .update({
+                        'type': "income",
+                        'money': (total).toStringAsFixed(0).toString(),
+                        'timestamp':
+                            "${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}"
+                      });
+                    }))
+              : print("Processing");
+        });
       });
     });
   }
