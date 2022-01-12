@@ -9,7 +9,6 @@ import 'package:ui_fresh_app/views/account/accountNotifications.dart';
 import 'package:ui_fresh_app/views/account/accountMessages.dart';
 import 'package:ui_fresh_app/views/accountant/atWidget/atRevenueAndExpenditureCardWidget.dart';
 import 'package:ui_fresh_app/views/accountant/atWidget/atIncomeAndOutcomeDashboardWidget.dart';
-import 'package:ui_fresh_app/views/accountant/atWidget/atCircleProgressDashboard.dart';
 
 //import constants
 import 'package:ui_fresh_app/constants/colors.dart';
@@ -27,6 +26,7 @@ import 'package:ui_fresh_app/models/transactionModel.dart';
 import 'package:meta/meta.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:countup/countup.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 
 //import Firebase stuffs
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -57,7 +57,7 @@ class _atDashboardScreenState extends State<atDashboardScreen>
   String totalIncome = "0";
   String totalOutcome = "0";
   String totalTrans = "0";
-  double percentRev = 0;
+  double percentIncomeTrans = 0;
   double totalRevTrans = 0; 
 
   List<Reex> reex = [];
@@ -68,9 +68,11 @@ class _atDashboardScreenState extends State<atDashboardScreen>
   double _currentPosition = 0;
 
   late AnimationController _animatedController = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 2000));
-  late Animation<double> _animationRev = Tween<double>(begin: 0, end: percentRev).animate(_animatedController);
-  late Animation<double> _animationExp = Tween<double>(begin: percentRev, end: 100).animate(_animatedController);
+        vsync: this, duration: Duration(milliseconds: 2000))..addListener(() {
+          _animatedController.forward();
+         });
+  late Animation<double> _animationRev = Tween<double>(begin: 0, end: percentIncomeTrans).animate(_animatedController);
+  late Animation<double> _animationExp = Tween<double>(begin: percentIncomeTrans, end: 100).animate(_animatedController);
 
   void initState() {
     super.initState();
@@ -351,185 +353,130 @@ class _atDashboardScreenState extends State<atDashboardScreen>
                               child: atIncomeAndOutcomeWidgetDB(totalIncome, totalOutcome),
                             ),
                             SizedBox(height: 64),
-                            FutureBuilder(
-                              future: getTransInfo(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return Center(
-                                    child: SizedBox(
-                                      child: CircularProgressIndicator(
-                                        color: blackLight,
-                                        strokeWidth: 3,
-                                      ),
-                                      height: 25.0,
-                                      width: 25.0,
-                                    ),
-                                  );
-                                }
-                                return Row(
-                                  children: [
-                                    Container(
-                                      padding:
-                                          EdgeInsets.only(left: appPadding, right: appPadding),
-                                      child: CustomPaint(
-                                        foregroundPainter: atCircleProgressDashboard(
-                                            _animationRev.value, _animationExp.value),
-                                        child: Container(
-                                            width: 160,
-                                            height: 160,
-                                            child: GestureDetector(
-                                              child: Center(
-                                                child: Container(
-                                                  child: Column(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Countup(
-                                                        begin: 0,
-                                                        end: double.parse(totalTrans),
-                                                        duration: Duration(milliseconds: 400),
-                                                        style: TextStyle(
-                                                          fontSize: 32,
-                                                          fontFamily: 'SFProText',
-                                                          color: blackLight,
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding:
+                                      EdgeInsets.only(left: appPadding, right: appPadding),
+                                  child: percentIndicator()
+                                ),
+                                Spacer(),
+                                Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.only(right: 28),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              width: 64,
+                                              alignment: Alignment.centerRight,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                      margin: EdgeInsets.only(right: 8),
+                                                      height: 10,
+                                                      width: 10,
+                                                      decoration: BoxDecoration(
+                                                        color: Color(0xFF75CA92),
+                                                        borderRadius:
+                                                            BorderRadius.circular(8),
+                                                      )),
+                                                  Spacer(),
+                                                  Container(
+                                                    child:
+                                                    Countup(
+                                                      begin: 0,
+                                                      end: percentIncomeTrans,
+                                                      suffix: "%",
+                                                      duration: Duration(milliseconds: 400),
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontFamily: 'SFProText',
+                                                        color: blackLight,
+                                                        fontWeight: FontWeight.w600,
                                                       ),
-                                                      Text(
-                                                        'Total ' + '\nTransactions',
-                                                        textAlign: TextAlign.center,
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontFamily: 'SFProText',
-                                                          color: grey8,
-                                                          fontWeight: FontWeight.w500,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
+                                                    ),                                                                                                               
+                                                  ),                                                       
+                                                ],
                                               ),
-                                            )),
-                                      ),
-                                    ),
-                                    Spacer(),
-                                    Container(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: <Widget>[
-                                          Container(
-                                            padding: EdgeInsets.only(right: 28),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                Container(
-                                                  width: 64,
-                                                  alignment: Alignment.centerRight,
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Container(
-                                                          margin: EdgeInsets.only(right: 8),
-                                                          height: 10,
-                                                          width: 10,
-                                                          decoration: BoxDecoration(
-                                                            color: Color(0xFF75CA92),
-                                                            borderRadius:
-                                                                BorderRadius.circular(8),
-                                                          )),
-                                                      Spacer(),
-                                                      Container(
-                                                        child:
-                                                        Countup(
-                                                          begin: 0,
-                                                          end: percentRev,
-                                                          suffix: "%",
-                                                          duration: Duration(milliseconds: 400),
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontFamily: 'SFProText',
-                                                            color: blackLight,
-                                                            fontWeight: FontWeight.w600,
-                                                          ),
-                                                        ),                                                                                                               
-                                                      ),                                                       
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 2),
-                                                Text(
-                                                  'Revenue',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontFamily: 'SFProText',
-                                                    color: grey8,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                              ],
                                             ),
-                                          ),
-                                          SizedBox(height: 16),
-                                          Container(
-                                            padding: EdgeInsets.only(right: 28),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: [
-                                                Container(
-                                                  width: 64,
-                                                  alignment: Alignment.centerRight,
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      Container(
-                                                          margin: EdgeInsets.only(right: 8),
-                                                          height: 10,
-                                                          width: 10,
-                                                          decoration: BoxDecoration(
-                                                            color: Color(0xFFC13C43),
-                                                            borderRadius:
-                                                                BorderRadius.circular(8),
-                                                          )),
-                                                      Spacer(),
-                                                      Container(
-                                                        child:
-                                                        Countup(
-                                                          begin: 0,
-                                                          end: 100 -percentRev,
-                                                          suffix: "%",
-                                                          duration: Duration(milliseconds: 400),
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            fontFamily: 'SFProText',
-                                                            color: blackLight,
-                                                            fontWeight: FontWeight.w600,
-                                                          ),
-                                                        ),                                                                                                               
-                                                      ),  
-                                                    ],
-                                                  ),
-                                                ),
-                                                SizedBox(height: 2),
-                                                Text(
-                                                  'Expenditure',
-                                                  textAlign: TextAlign.end,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontFamily: 'SFProText',
-                                                    color: grey8,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                              ],
+                                            SizedBox(height: 2),
+                                            Text(
+                                              'Income',
+                                              textAlign: TextAlign.end,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'SFProText',
+                                                color: grey8,
+                                                fontWeight: FontWeight.w400,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );                                              
-                              }
-                            ),
+                                      SizedBox(height: 16),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 28),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              width: 64,
+                                              alignment: Alignment.centerRight,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                      margin: EdgeInsets.only(right: 8),
+                                                      height: 10,
+                                                      width: 10,
+                                                      decoration: BoxDecoration(
+                                                        color: Color(0xFFC13C43),
+                                                        borderRadius:
+                                                            BorderRadius.circular(8),
+                                                      )),
+                                                  Spacer(),
+                                                  Container(
+                                                    child:
+                                                    Countup(
+                                                      begin: 0,
+                                                      end: 100 - percentIncomeTrans,
+                                                      suffix: "%",
+                                                      duration: Duration(milliseconds: 400),
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontFamily: 'SFProText',
+                                                        color: blackLight,
+                                                        fontWeight: FontWeight.w600,
+                                                      ),
+                                                    ),                                                                                                               
+                                                  ),  
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(height: 2),
+                                            Text(
+                                              'Outcome',
+                                              textAlign: TextAlign.end,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'SFProText',
+                                                color: grey8,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),                                              
                           ],
                         );
                       }
@@ -543,11 +490,6 @@ class _atDashboardScreenState extends State<atDashboardScreen>
         ],
       ),
     );
-  }
-
-  getTransInfo() async {
-    await getReexInfo();
-    await _animatedController.forward();
   }
 
   getReexInfo() async {
@@ -583,44 +525,72 @@ class _atDashboardScreenState extends State<atDashboardScreen>
     reMonth = 0;
     reWeek = 0;
     reYear = 0;
+    double inDay = 0;
+    double inMonth = 0;
+    double inWeek = 0;
+    double inYear = 0;
+    double outDay = 0;
+    double outMonth = 0;
+    double outWeek = 0;
+    double outYear = 0;
     for (int i = 0; i < reex.length; i++) {
       if (reex[i].type == "income" && dayMonthYearOnly(reex[i].timestamp).compareTo(dayMonthYearOnly(DateTime.now())) == 0) {
-        reDay = reDay + double.parse(reex[i].money);
+        inDay = inDay + double.parse(reex[i].money);
+      }
+      if (reex[i].type == "outcome" && dayMonthYearOnly(reex[i].timestamp).compareTo(dayMonthYearOnly(DateTime.now())) == 0) {
+        outDay = outDay + double.parse(reex[i].money);
       }
       if (reex[i].type == "income" 
       && reex[i].timestamp.month.compareTo(DateTime.now().month) == 0
       && reex[i].timestamp.year.compareTo(DateTime.now().year) == 0
       && reex[i].timestamp.weekOfMonth == DateTime.now().weekOfMonth) {
-        reWeek = reWeek + double.parse(reex[i].money);
+        inWeek = inWeek + double.parse(reex[i].money);
       }
+      if (reex[i].type == "outcome" 
+      && reex[i].timestamp.month.compareTo(DateTime.now().month) == 0
+      && reex[i].timestamp.year.compareTo(DateTime.now().year) == 0
+      && reex[i].timestamp.weekOfMonth == DateTime.now().weekOfMonth) {
+        outWeek = outWeek + double.parse(reex[i].money);
+      }      
       if (reex[i].type == "income" 
       && reex[i].timestamp.month.compareTo(DateTime.now().month) == 0
       && reex[i].timestamp.year.compareTo(DateTime.now().year) == 0) {
-        reMonth = reMonth + double.parse(reex[i].money);
+        inMonth = inMonth + double.parse(reex[i].money);
       }
+      if (reex[i].type == "outcome" 
+      && reex[i].timestamp.month.compareTo(DateTime.now().month) == 0
+      && reex[i].timestamp.year.compareTo(DateTime.now().year) == 0) {
+        outMonth = outMonth + double.parse(reex[i].money);
+      }      
       if (reex[i].type == "income" 
       && reex[i].timestamp.year.compareTo(DateTime.now().year) == 0) {
-        reYear = reYear + double.parse(reex[i].money);
-      }            
+        inYear = inYear + double.parse(reex[i].money);
+      }
+      if (reex[i].type == "outcome" 
+      && reex[i].timestamp.year.compareTo(DateTime.now().year) == 0) {
+        outYear = outYear + double.parse(reex[i].money);
+      }                     
     }
+    reDay = inDay - outDay;
+    reWeek = inWeek - outWeek;
+    reMonth = inMonth - outMonth;
+    reYear = inYear - outYear;
     //Get transactions stuffs
     totalRevTrans = 0;
-    percentRev = 0;
+    percentIncomeTrans = 0;
     totalTrans = trans.length.toString();
     for (int i = 0; i < trans.length; i++) {
       if (trans[i].type == "order") {
         totalRevTrans = totalRevTrans + 1;
       }
     }
-    percentRev = double.parse(((totalRevTrans * 100) / double.parse(totalTrans)).toString());
+    percentIncomeTrans = double.parse(((totalRevTrans * 100) / double.parse(totalTrans)).toString());
 
     revenueCards.clear();
     revenueCards.add(atRevenueAndExpenditureCardWidget("Day", reDay, currentReexTime));
     revenueCards.add(atRevenueAndExpenditureCardWidget("Week", reWeek, currentReexTime));
     revenueCards.add(atRevenueAndExpenditureCardWidget("Month", reMonth, currentReexTime));
-    revenueCards.add(atRevenueAndExpenditureCardWidget("Year", reYear, currentReexTime));
-    _animationRev = Tween<double>(begin: 0, end: percentRev).animate(_animatedController);
-    _animationExp = Tween<double>(begin: percentRev, end: 100).animate(_animatedController);           
+    revenueCards.add(atRevenueAndExpenditureCardWidget("Year", reYear, currentReexTime));          
   }
 
   DateTime dayMonthYearOnly(DateTime dt) {
@@ -630,6 +600,46 @@ class _atDashboardScreenState extends State<atDashboardScreen>
   Future<void> controlRefresh() async {
     setState(() {
     });
+  }
+
+  percentIndicator() {
+    return CircularPercentIndicator(
+      radius: 160.0,
+      lineWidth: 15.0,
+      animation: true,
+      animationDuration: 1000,
+      percent: percentIncomeTrans / 100,
+      center: Column(
+        children: [
+          SizedBox(height: 40),
+          Countup(
+            begin: 0,
+            end: double.parse(totalTrans),
+            duration: Duration(milliseconds: 400),
+            style: TextStyle(
+              fontSize: 32,
+              fontFamily: 'SFProText',
+              color: blackLight,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            'Total ' + '\nTransactions',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontFamily: 'SFProText',
+              color: grey8,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],          
+      ),
+      circularStrokeCap: CircularStrokeCap.round,
+      progressColor: Color(0xFF75CA92),
+      backgroundColor: Color(0xFFC13C43),
+      backgroundWidth: 15.0,
+    );
   }
 }
 

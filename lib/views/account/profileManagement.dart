@@ -649,7 +649,7 @@ class _profileManagementScreenState extends State<profileManagementScreen>
                               ],
                             ),
                             child: Text(
-                              "Log out",
+                              "Log Out",
                               style: TextStyle(
                                   color: whiteLight,
                                   fontFamily: 'SFProText',
