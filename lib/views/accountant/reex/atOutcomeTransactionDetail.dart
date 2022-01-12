@@ -138,7 +138,7 @@ class _atOutcomeTransactionDetailScreenState
                                       SizedBox(height: 8),
                                       Container(
                                         child: Text(
-                                          "Order " + code,
+                                          "Import " + code,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: 24.0,

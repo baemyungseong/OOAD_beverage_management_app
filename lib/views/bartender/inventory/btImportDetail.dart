@@ -148,7 +148,7 @@ class _btImportDetailScreenState extends State<btImportDetailScreen> {
                                       SizedBox(height: 8),
                                       Container(
                                         child: Text(
-                                          "Order #" + import.code,
+                                          "Import #" + import.code,
                                           style: TextStyle(
                                             fontFamily: "SFProText",
                                             fontSize: 24.0,

@@ -16,24 +16,38 @@
             "flutterMode": "profile"
         },
         {
-			"name": "LDPlayer1",
+			"name": "Storekeeper",
             "request": "launch",
 			"flutterMode": "debug",
 			"type": "dart",
 			"deviceId": "emulator-5554"
 		},
         {
-			"name": "LDPlayer2",
+			"name": "Bartender",
             "request": "launch",
 			"flutterMode": "debug",
 			"type": "dart",
 			"deviceId": "emulator-5556"
 		},
+        {
+			"name": "Serve",
+            "request": "launch",
+			"flutterMode": "debug",
+			"type": "dart",
+			"deviceId": "emulator-5558"
+		},
+        {
+			"name": "Accountant",
+            "request": "launch",
+			"flutterMode": "debug",
+			"type": "dart",
+			"deviceId": "emulator-5560"
+		},                   
     ],
     "compounds": [
 		{
 			"name": "All Devices",
-			"configurations": ["LDPlayer1", "LDPlayer2"],
+			"configurations": ["Storekeeper", "Bartender", "Serve", "Accountant"],
 		}
 	]
 }
