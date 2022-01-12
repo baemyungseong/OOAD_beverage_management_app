@@ -298,75 +298,65 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                       ),
                     ),
                     SizedBox(height: 32),
-                    FutureBuilder(
-                        future: searchController.text.isEmpty ||
-                                searchController.text
-                                    .toLowerCase()
-                                    .contains("order")
-                            ? (haveFilter == true
-                                ? getAllTransSorted()
-                                : getAllTrans())
-                            : (haveFilter == true
-                                ? getAllTransSorted()
-                                : getAllTransSearched()),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(
-                              child: SizedBox(
-                                child: CircularProgressIndicator(
-                                  color: blackLight,
-                                  strokeWidth: 3,
-                                ),
-                                height: 25.0,
-                                width: 25.0,
-                              ),
-                            );
-                          }
-                          return Column(
-                            children: [
-                              atIncomeAndOutcomeWidget(income, outcome),
-                              SizedBox(height: 32),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'All Transactions',
-                                    style: TextStyle(
-                                      fontSize: content16,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: 'SFProText',
+                    RefreshIndicator(
+                      onRefresh: () => controlRefresh(),
+                      child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: FutureBuilder(
+                          future: searchController.text.isEmpty || searchController.text.toLowerCase().contains("order") ? (haveFilter == true ? getAllTransSorted() : getAllTrans()) : (haveFilter == true ? getAllTransSorted() : getAllTransSearched()),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return Center(
+                                child: 
+                                  SizedBox(
+                                    child: CircularProgressIndicator(
                                       color: blackLight,
+                                      strokeWidth: 3,
                                     ),
+                                    height: 25.0,
+                                    width: 25.0,
                                   ),
-                                ],
-                              ),
-                              SizedBox(height: 18),
-                              Column(
-                                children: [
-                                  Container(
-                                    height: 463,
-                                    width: 319,
-                                    child: RefreshIndicator(
-                                      onRefresh: () => controlRefresh(),
-                                      child: SingleChildScrollView(
-                                          physics:
-                                              AlwaysScrollableScrollPhysics(),
-                                          child: Column(children: [
-                                            ListView.separated(
-                                              physics:
-                                                  const NeverScrollableScrollPhysics(),
-                                              padding: EdgeInsets.zero,
-                                              scrollDirection: Axis.vertical,
-                                              shrinkWrap: true,
-                                              itemCount: trans.length,
-                                              separatorBuilder:
-                                                  (BuildContext context,
-                                                          int index) =>
-                                                      SizedBox(height: 24),
-                                              itemBuilder: (context, index) {
-                                                return GestureDetector(
-                                                  onTap: () {
+                              );                            
+                            }
+                            return Column(
+                              children: [
+                                atIncomeAndOutcomeWidget(income, outcome),
+                                SizedBox(height: 32),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'All Transactions',
+                                      style: TextStyle(
+                                        fontSize: content16,
+                                        fontWeight: FontWeight.w500,
+                                        fontFamily: 'SFProText',
+                                        color: blackLight,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 18),
+                                Column(
+                                  children: [
+                                    Container(
+                                        height: 463,
+                                        width: 319,
+                                        child: SingleChildScrollView(
+                                        physics: AlwaysScrollableScrollPhysics(),
+                                        child: Column(children: [
+                                        ListView.separated(
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          padding: EdgeInsets.zero,
+                                          scrollDirection: Axis.vertical,
+                                          shrinkWrap: true,
+                                          itemCount: trans.length,
+                                          separatorBuilder:
+                                              (BuildContext context, int index) =>
+                                                  SizedBox(height: 24),
+                                          itemBuilder: (context, index) {
+                                            return GestureDetector(
+                                              onTap: () {
                                                     trans[index].type == "order"
                                                         ? Navigator.push(
                                                             context,
@@ -572,12 +562,14 @@ class _atReexManagementScreenState extends State<atReexManagementScreen> {
                                             SizedBox(height: 112)
                                           ])),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        }),
+                                  ],
+                                ),
+                              ],
+                            );
+                          }
+                        ),  
+                      ),
+                    ),          
                   ],
                 ),
               ),
